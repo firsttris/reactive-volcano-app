@@ -1,0 +1,10 @@
+@font-face {
+  font-family: "CustomFont";
+  src: url("./../font/technology/Technology-Bold.ttf") format("truetype");
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  user-select: none;
+  margin: 0;
+}
