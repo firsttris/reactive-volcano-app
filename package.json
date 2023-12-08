@@ -21,6 +21,7 @@
     "eslint": "^8.55.0",
     "eslint-plugin-solid": "^0.13.0",
     "typescript": "^5.3.2",
+    "vite-plugin-pwa": "^0.17.4",
     "vite-plugin-solid": "^2.7.2"
   }
 }
