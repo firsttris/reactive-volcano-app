@@ -1,28 +1,57 @@
-## Usage
 
-```bash
-$ npm install # or pnpm install or yarn install
-```
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
+# Introduction
 
-## Available Scripts
+The Volcano, a product of Storz & Bickel based in Tuttlingen, Germany, is a renowned vaporizer known for its superior quality. This project showcases how to leverage modern web technologies to create a cutting-edge WebApp. The WebApp is designed to control the Volcano via the Web Bluetooth API.
 
-In the project directory, you can run:
+# Motivation
 
-### `npm run dev`
+- Use cutting edge technology to build a Volcano App
 
-Runs the app in the development mode.<br>
-Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
+- Interestd in reverse engineering Web Bluetooth API with the Volcano. 
 
-### `npm run build`
+- Showcase how a reactive application is the better choice for Bluetooth communication.
 
-Builds the app for production to the `dist` folder.<br>
-It correctly bundles Solid in production mode and optimizes the build for the best performance.
+- Showcase a clean intuitive API written in TypeScript.
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+# Connect your Volcano
 
-## Deployment
+https://firsttris.github.io/reactive-volcano-app/
 
-Learn more about deploying your application with the [documentations](https://vitejs.dev/guide/static-deploy.html)
+# Technology Stack
+
+This project utilizes a number of cutting-edge technologies to deliver a high-performance, user-friendly application:
+
+- **[SolidJS](https://www.solidjs.com/)**: A declarative JavaScript library for building user interfaces.
+- **[TypeScript](https://www.typescriptlang.org/)**: A strongly typed superset of JavaScript that adds static types.
+- **[Styled-Components](https://styled-components.com/)**: Visual primitives for the component age.
+- **[Web Bluetooth API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API)**: An interface that provides the ability to connect and interact with Bluetooth Low Energy peripherals.
+
+# Prerequisites
+
+To enable the Web Bluetooth API in Chrome on Linux, follow these steps:
+
+1. Open Chrome and navigate to `chrome://flags/#enable-web-bluetooth`.
+2. Enable the flag as shown in the image below.
+
+![Enabling Web Bluetooth API in Chrome](/docs/web-bluetooth-api.png)
+
+# Development and Build
+
+To develop and build this project, follow these steps:
+
+1. Clone the repository: `git clone https://github.com/reactive-volcano-app.git`
+2. Navigate into the project directory: `cd reactive-volcano-app`
+3. Install the dependencies: `npm install`
+5. Start the development server: `npm run dev`
+6. To build the project, use: `npm run build`
+
+# Issues
+
+Want to start contributing to this project? 
+
+Please visit our [issues page](https://github.com/firsttris/reactive-volcano-app/issues) for the latest issues and feature requests.
+
+# User Interface Overview
+
+todo
