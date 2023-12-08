@@ -1,19 +1,46 @@
 
 
+Everything is Open Source if you can reverse engineer it!
+
 # Introduction
 
-The Volcano, a product of Storz & Bickel based in Tuttlingen, Germany, is a renowned vaporizer known for its superior quality. The Volcano can be controlled using the Bluetooth Web API. This project showcases how to create a cutting-edge WebApp to control the Volcano via the Web Bluetooth API.
+The Volcano, made by Storz & Bickel in Tuttlingen, Germany, is a well-known high-quality vaporizer. The Volcano can be controlled using the Bluetooth Web API. 
+
+This project showcases how to use cutting-edge WebApp Technology to control the Volcano via the Web Bluetooth API.
 
 # Motivation
 
 - Use cutting edge technology to build a Volcano App.
-- Interestd in reverse engineering Web Bluetooth API with the Volcano. 
+- Interested in reverse engineering Web Bluetooth API with the Volcano. 
 - Show how a reactive application is the better choice for Bluetooth communication.
-- Showcase a clean intuitive API written in TypeScript.
+- Showcase a clean intuitive Frontend API written in TypeScript.
+
+# Device Support
+Currently, we only support the Volcano device as this is the only device I own. But the same is possible to Venty and Crafty as the use the same API.
+
+# Features
+The application offers a variety of features including:
+
+- Temperature control
+- Heat regulation
+- Pump control
+- Brightness adjustment
+- Auto-shutdown time
+- Dark mode
+- Vibration control
+- Standby light
+- Device runtime
+- Reading serial number
+
+## Non-implemented Features
+Some features were not implemented:
+
+- Workflows: Its an App feature, rather than a device feature. The WebApp controls the device using `setTimeout()`.
+- Analytics: Didnt see any benefit in reverse engineering this part yet.
 
 # Get Started
 
-You can open the WebApp using this Link and connect your Volcano
+You can test & use the WebApp directly using this Link and connect your Volcano
 
 https://firsttris.github.io/reactive-volcano-app/
 
