@@ -2,19 +2,18 @@
 
 # Introduction
 
-The Volcano, a product of Storz & Bickel based in Tuttlingen, Germany, is a renowned vaporizer known for its superior quality. This project showcases how to leverage modern web technologies to create a cutting-edge WebApp. The WebApp is designed to control the Volcano via the Web Bluetooth API.
+The Volcano, a product of Storz & Bickel based in Tuttlingen, Germany, is a renowned vaporizer known for its superior quality. The Volcano can be controlled using the Bluetooth Web API. This project showcases how to create a cutting-edge WebApp to control the Volcano via the Web Bluetooth API.
 
 # Motivation
 
-- Use cutting edge technology to build a Volcano App
-
+- Use cutting edge technology to build a Volcano App.
 - Interestd in reverse engineering Web Bluetooth API with the Volcano. 
-
-- Showcase how a reactive application is the better choice for Bluetooth communication.
-
+- Show how a reactive application is the better choice for Bluetooth communication.
 - Showcase a clean intuitive API written in TypeScript.
 
-# Connect your Volcano
+# Get Started
+
+You can open the WebApp using this Link and connect your Volcano
 
 https://firsttris.github.io/reactive-volcano-app/
 
