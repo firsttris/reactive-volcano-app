@@ -54,7 +54,7 @@ export const App = () => {
       <ResponsiveContainer>
         <div style={{ "margin-left": "20px", "margin-right": "20px" }}>
           <div>
-            <div style={{ "margin-top": "50px", "margin-bottom": "70px" }}>
+            <div style={{ "margin-top": "40px", "margin-bottom": "40px" }}>
               <ShutdownTime />
             </div>
             <div style={{ "margin-bottom": "30px" }}>
@@ -63,7 +63,7 @@ export const App = () => {
             <HeatAndPump />
           </div>
 
-          <div style={{ "margin-top": "100px" }}>
+          <div style={{ "margin-top": "50px" }}>
             <div style={{ "font-size": "30px" }}>{t("settings")}</div>
 
             <div style={{ "margin-bottom": "10px" }}>
