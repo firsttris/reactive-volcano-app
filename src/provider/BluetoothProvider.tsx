@@ -75,8 +75,9 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
       );
       setService4(vulcanoSerivce4);
     } catch (error) {
-      console.error("Failed to connect to device", error);
+      console.error((error as Error).message);
       setConnectionState(ConnectionState.CONNECTION_FAILED);
+      alert((error as Error).message)
       return;
     }
     setConnectionState(ConnectionState.CONNECTED);
