@@ -50,7 +50,13 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
     setConnectionState(ConnectionState.CONNECTING);
     try {
       const device = await navigator.bluetooth.requestDevice({
-        acceptAllDevices: true,
+        filters: [
+          { namePrefix: "STORZ&BICKEL" },
+          { namePrefix: "Storz&Bickel" },
+          { namePrefix: "S&B" },
+          { services: [ServiceUUIDs.Service3, ServiceUUIDs.Service4] },
+        ],
+        acceptAllDevices: false,
       });
 
       if (!device.gatt) {
