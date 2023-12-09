@@ -139,3 +139,7 @@ Follow these steps to develop and test the application on an Android device:
 Want to start contributing to this project? 
 
 Please visit our [issues page](https://github.com/firsttris/reactive-volcano-app/issues) for the latest issues and feature requests.
+
+# License
+
+This work is currently licensed under a [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/).
