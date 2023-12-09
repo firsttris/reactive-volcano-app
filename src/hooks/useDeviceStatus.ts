@@ -2,8 +2,8 @@ import { createEffect, createSignal, onCleanup } from "solid-js";
 import { convertBLEToUint16 } from "../utils/bluetoothUtils";
 import { CharateristicUUIDs, States } from "../utils/uuids";
 import {
-  createCharateristicWithEventListener,
-  detachEventListener,
+  createCharateristicWithEventListenerWithQueue,
+  detachEventListenerWithQueue,
 } from "../utils/characteristic";
 import { useBluetooth } from "../provider/BluetoothProvider";
 
@@ -12,17 +12,20 @@ export const useDeviceStatus = () => {
   const [isPumpActive, setIsPumpActive] = createSignal<boolean>(false);
   const [isAutoShutdownActive, setIsAutoShutdownActive] =
     createSignal<boolean>(false);
-  const { getService3, getCharacteristics, setCharacteristics } =
+  const { getDeviceStateService, getCharacteristics, setCharacteristics } =
     useBluetooth();
 
   const handleCharacteristics = async () => {
-    const service = getService3();
-    if (!service) return;
-    const activity = await createCharateristicWithEventListener(
-      service,
+    const stateService = getDeviceStateService();
+    if (!stateService) return;
+    const activity = await createCharateristicWithEventListenerWithQueue(
+      stateService,
       CharateristicUUIDs.activity,
       handleActivity
     );
+    if(!activity) {
+      return Promise.reject("activityCharacteristic not found");
+    }
     setCharacteristics((prev) => ({
       ...prev,
       activity,
@@ -36,7 +39,7 @@ export const useDeviceStatus = () => {
   onCleanup(() => {
     const { activity } = getCharacteristics();
     if (activity) {
-      detachEventListener(activity, handleActivity);
+      detachEventListenerWithQueue(activity, handleActivity);
     }
   });
 

@@ -1,6 +1,6 @@
 import { createEffect, createSignal } from "solid-js";
 import { CharateristicUUIDs } from "../utils/uuids";
-import { createCharateristic } from "../utils/characteristic";
+import { createCharateristicWithQueue } from "../utils/characteristic";
 import { useBluetooth } from "../provider/BluetoothProvider";
 
 export function useDeviceInformation(
@@ -9,23 +9,23 @@ export function useDeviceInformation(
   const [getFirmwareVersion, setFirmwareVersion] = createSignal<string>("");
   const [getBleFirmwareVersion, setBleFirmwareVersion] =
     createSignal<string>("");
-    const { getService3 } = useBluetooth();
+    const { getDeviceStateService } = useBluetooth();
 
   createEffect(() => {
-    const service = getService3();
-    if (!service) return;
-    createCharateristic(
-      service,
+    const stateService = getDeviceStateService();
+    if (!stateService) return;
+    createCharateristicWithQueue(
+      stateService,
       CharateristicUUIDs.serialNumber,
       handleSerialNumber
     );
-    createCharateristic(
-      service,
+    createCharateristicWithQueue(
+      stateService,
       CharateristicUUIDs.firmwareVersion,
       handleFirmwareVersion
     );
-    createCharateristic(
-      service,
+    createCharateristicWithQueue(
+      stateService,
       CharateristicUUIDs.firmwareBLEVersion,
       handleBLEFirmwareVersion
     );

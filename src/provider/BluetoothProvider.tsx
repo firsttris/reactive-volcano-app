@@ -11,8 +11,8 @@ export type Methods = {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   connectionState: () => ConnectionState;
-  getService3: Accessor<BluetoothRemoteGATTService | undefined>;
-  getService4: Accessor<BluetoothRemoteGATTService | undefined>;
+  getDeviceStateService: Accessor<BluetoothRemoteGATTService | undefined>;
+  getDeviceControlService: Accessor<BluetoothRemoteGATTService | undefined>;
   getCharacteristics: Accessor<VolcanoCharacteristics>;
   setCharacteristics: Setter<VolcanoCharacteristics>;
 };
@@ -25,8 +25,8 @@ type BluetoothProviderProps = {
 
 export const BluetoothProvider = (props: BluetoothProviderProps) => {
   const [ server, setServer ] = createSignal<BluetoothRemoteGATTServer>();
-  const [getService3, setService3] = createSignal<BluetoothRemoteGATTService>();
-  const [getService4, setService4] = createSignal<BluetoothRemoteGATTService>();
+  const [getDeviceStateService, setDeviceStateService] = createSignal<BluetoothRemoteGATTService>();
+  const [getDeviceControlService, setDeviceControlService] = createSignal<BluetoothRemoteGATTService>();
   const [getCharacteristics, setCharacteristics] =
     createSignal<VolcanoCharacteristics>(initialCharacteristics);
 
@@ -42,8 +42,8 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
     }
     await currentServer.disconnect();
     setConnectionState(ConnectionState.NOT_CONNECTED);
-    setService3(undefined);
-    setService4(undefined);
+    setDeviceStateService(undefined);
+    setDeviceControlService(undefined);
   }
 
   const connect = async () => {
@@ -54,7 +54,7 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
           { namePrefix: "STORZ&BICKEL" },
           { namePrefix: "Storz&Bickel" },
           { namePrefix: "S&B" },
-          { services: [ServiceUUIDs.Service3, ServiceUUIDs.Service4] },
+          { services: [ServiceUUIDs.DeviceState, ServiceUUIDs.DeviceControl] },
         ],
         acceptAllDevices: false,
       });
@@ -66,14 +66,14 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
      
       const server = await device.gatt.connect();
       setServer(server)
-      const vulcanoSerivce3 = await server.getPrimaryService(
-        ServiceUUIDs.Service3
+      const stateService = await server.getPrimaryService(
+        ServiceUUIDs.DeviceState
       );
-      setService3(vulcanoSerivce3);
-      const vulcanoSerivce4 = await server.getPrimaryService(
-        ServiceUUIDs.Service4
+      setDeviceStateService(stateService);
+      const controlService = await server.getPrimaryService(
+        ServiceUUIDs.DeviceControl
       );
-      setService4(vulcanoSerivce4);
+      setDeviceControlService(controlService);
     } catch (error) {
       console.error((error as Error).message);
       setConnectionState(ConnectionState.CONNECTION_FAILED);
@@ -88,8 +88,8 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
         connect,
         disconnect,
         connectionState,
-        getService3,
-        getService4,
+        getDeviceStateService,
+        getDeviceControlService,
         getCharacteristics,
         setCharacteristics,
       }}

@@ -2,35 +2,44 @@ import { createEffect, createSignal, onCleanup } from "solid-js";
 import { convertBLEToUint16 } from "../utils/bluetoothUtils";
 import { CharateristicUUIDs } from "../utils/uuids";
 import {
-  createCharateristicWithEventListener,
-  detachEventListener,
-  createCharateristic,
+  createCharateristicWithEventListenerWithQueue,
+  detachEventListenerWithQueue,
+  createCharateristicWithQueue,
 } from "../utils/characteristic";
 import { useBluetooth } from "../provider/BluetoothProvider";
 
 export const useShutdowntime = () => {
   const [getAutoOffTimeInSec, setAutoOffTime] = createSignal<number>(0);
   const [getShutoffTimeInSec, setShutoffTime] = createSignal<number>(0);
-  const { getService4, getCharacteristics, setCharacteristics } =
+  const { getDeviceControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
 
   const handleCharacteristics = async () => {
-    const serivce4 = getService4();
-    if (!serivce4) return;
-    const shutoffTime = await createCharateristic(
-      serivce4,
+    const controlService = getDeviceControlService();
+    if (!controlService) return;
+    const shutoffTime = await createCharateristicWithQueue(
+      controlService,
       CharateristicUUIDs.shutoffTime,
       handleShutoffTime
     );
-    const currentAutoOffValue = await createCharateristicWithEventListener(
-      serivce4,
+    if(!shutoffTime) {
+      return Promise.reject("shutoffTimeCharacteristic not found");
+    }
+    setCharacteristics((prev) => ({
+      ...prev,
+      shutoffTime,
+    }));
+    const currentAutoOffValue = await createCharateristicWithEventListenerWithQueue(
+      controlService,
       CharateristicUUIDs.currentAutoOffValue,
       handleAutoOffTimeInSec
     );
+    if(!currentAutoOffValue) {
+      return Promise.reject("currentAutoOffValueCharacteristic not found");
+    }
     setCharacteristics((prev) => ({
       ...prev,
       currentAutoOffValue,
-      shutoffTime,
     }));
   };
 
@@ -41,7 +50,7 @@ export const useShutdowntime = () => {
   onCleanup(() => {
     const { currentAutoOffValue } = getCharacteristics();
     if (currentAutoOffValue) {
-      detachEventListener(currentAutoOffValue, handleAutoOffTimeInSec);
+      detachEventListenerWithQueue(currentAutoOffValue, handleAutoOffTimeInSec);
     }
   });
 

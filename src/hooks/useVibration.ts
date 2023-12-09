@@ -1,21 +1,24 @@
 import { createEffect, createSignal } from "solid-js";
 import { convertBLEToUint16 } from "../utils/bluetoothUtils";
 import { CharateristicUUIDs, States } from "../utils/uuids";
-import { createCharateristic } from "../utils/characteristic";
+import { createCharateristicWithQueue } from "../utils/characteristic";
 import { useBluetooth } from "../provider/BluetoothProvider";
 
 export const useVibration = () => {
   const [isVibrationOn, setIsVibrationOn] = createSignal<boolean>(false);
-  const { getService3, setCharacteristics } = useBluetooth();
+  const { getDeviceStateService, setCharacteristics } = useBluetooth();
 
   const handleCharacteristics = async () => {
-    const service = getService3();
+    const service = getDeviceStateService();
     if (!service) return;
-    const vibration = await createCharateristic(
+    const vibration = await createCharateristicWithQueue(
       service,
       CharateristicUUIDs.vibration,
       handleVibration
     );
+    if(!vibration) {
+      return Promise.reject("vibrationCharacteristic not found");
+    }
     setCharacteristics((prev) => ({
       ...prev,
       vibration,

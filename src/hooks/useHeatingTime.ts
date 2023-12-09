@@ -2,32 +2,41 @@ import { createEffect, createSignal, onCleanup } from "solid-js";
 import { convertBLEToUint16 } from "../utils/bluetoothUtils";
 import { CharateristicUUIDs } from "../utils/uuids";
 import {
-  createCharateristicWithEventListener,
-  detachEventListener,
+  createCharateristicWithEventListenerWithQueue,
+  detachEventListenerWithQueue,
 } from "../utils/characteristic";
 import { useBluetooth } from "../provider/BluetoothProvider";
 
 export const useHeatingTime = () => {
   const [getHoursOfHeating, setHoursOfHeating] = createSignal<number>(0);
   const [getMinutesOfHeating, setMinutesOfHeating] = createSignal<number>(0);
-  const { getService4, getCharacteristics, setCharacteristics } = useBluetooth();
+  const { getDeviceControlService, getCharacteristics, setCharacteristics } = useBluetooth();
 
   const handleCharacteristics = async () => {
-    const service = getService4();
-    if (!service) return;
-    const hoursOfHeating = await createCharateristicWithEventListener(
-      service,
+    const controlService = getDeviceControlService();
+    if (!controlService) return;
+    const hoursOfHeating = await createCharateristicWithEventListenerWithQueue(
+      controlService,
       CharateristicUUIDs.hoursOfHeating,
       handleHoursOfHeating
     );
-    const minutesOfHeating = await createCharateristicWithEventListener(
-      service,
-      CharateristicUUIDs.minutesOfHeating,
-      handleMinutesOfHeating
-    );
+    if(!hoursOfHeating) {
+      return Promise.reject("hoursOfHeatingCharacteristic not found");
+    }
     setCharacteristics((prev) => ({
       ...prev,
       hoursOfHeating,
+    }));
+    const minutesOfHeating = await createCharateristicWithEventListenerWithQueue(
+      controlService,
+      CharateristicUUIDs.minutesOfHeating,
+      handleMinutesOfHeating
+    );
+    if(!minutesOfHeating) {
+      return Promise.reject("minutesOfHeatingCharacteristic not found");
+    }
+    setCharacteristics((prev) => ({
+      ...prev,
       minutesOfHeating,
     }));
   };
@@ -39,10 +48,10 @@ export const useHeatingTime = () => {
   onCleanup(() => {
     const { hoursOfHeating, minutesOfHeating } = getCharacteristics();
     if (hoursOfHeating) {
-      detachEventListener(hoursOfHeating, handleHoursOfHeating);
+      detachEventListenerWithQueue(hoursOfHeating, handleHoursOfHeating);
     }
     if (minutesOfHeating) {
-      detachEventListener(minutesOfHeating, handleMinutesOfHeating);
+      detachEventListenerWithQueue(minutesOfHeating, handleMinutesOfHeating);
     }
   });
 

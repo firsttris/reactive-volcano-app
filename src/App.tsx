@@ -54,7 +54,7 @@ export const App = () => {
       <ResponsiveContainer>
         <div style={{ "margin-left": "20px", "margin-right": "20px" }}>
           <div>
-            <div style={{ "margin-top": "40px", "margin-bottom": "40px" }}>
+            <div style={{ "margin-top": "20px", "margin-bottom": "20px" }}>
               <ShutdownTime />
             </div>
             <div style={{ "margin-bottom": "30px" }}>

@@ -2,33 +2,42 @@ import { createEffect, createSignal, onCleanup } from "solid-js";
 import { convertBLEToUint16 } from "../utils/bluetoothUtils";
 import { CharateristicUUIDs } from "../utils/uuids";
 import {
-  createCharateristicWithEventListener,
-  detachEventListener,
+  createCharateristicWithEventListenerWithQueue,
+  detachEventListenerWithQueue,
 } from "../utils/characteristic";
 import { useBluetooth } from "../provider/BluetoothProvider";
 
 export const useTemperature = () => {
   const [getTargetTemperature, setTargetTemperature] = createSignal(0);
   const [getCurrentTemperature, setCurrentTemperature] = createSignal(0);
-  const { getService4, getCharacteristics, setCharacteristics } =
+  const { getDeviceControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
 
   const handleCharacteristics = async () => {
-    const service = getService4();
+    const service = getDeviceControlService();
     if (!service) return;
-    const targetTemperature = await createCharateristicWithEventListener(
+    const targetTemperature = await createCharateristicWithEventListenerWithQueue(
       service,
       CharateristicUUIDs.targetTemperature,
       handleTargetTemperature
     );
-    const currentTemperature = await createCharateristicWithEventListener(
+    if(!targetTemperature) {
+      return Promise.reject("targetTemperatureCharacteristic not found");
+    }
+    setCharacteristics((prev) => ({
+      ...prev,
+      targetTemperature,
+    }));
+    const currentTemperature = await createCharateristicWithEventListenerWithQueue(
       service,
       CharateristicUUIDs.currentTemperature,
       handleCurrentTemperature
     );
+    if(!currentTemperature) {
+      return Promise.reject("currentTemperatureCharacteristic not found");
+    }
     setCharacteristics((prev) => ({
       ...prev,
-      targetTemperature,
       currentTemperature,
     }));
   };
@@ -40,10 +49,10 @@ export const useTemperature = () => {
   onCleanup(() => {
     const { targetTemperature, currentTemperature } = getCharacteristics();
     if (targetTemperature) {
-      detachEventListener(targetTemperature, handleTargetTemperature);
+      detachEventListenerWithQueue(targetTemperature, handleTargetTemperature);
     }
     if (currentTemperature) {
-      detachEventListener(currentTemperature, handleCurrentTemperature);
+      detachEventListenerWithQueue(currentTemperature, handleCurrentTemperature);
     }
   });
 

@@ -4,13 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc && vite build --base=/reactive-volcano-app/",
     "preview": "vite preview"
   },
   "dependencies": {
     "@fontsource/roboto": "^5.0.8",
     "@types/web-bluetooth": "^0.0.20",
+    "p-queue": "^8.0.0",
     "solid-icons": "^1.1.0",
     "solid-js": "^1.8.7",
     "solid-styled-components": "^0.28.5"

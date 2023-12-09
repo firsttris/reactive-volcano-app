@@ -2,8 +2,8 @@ import { createEffect, createSignal, onCleanup } from "solid-js";
 import { convertBLEToUint16 } from "../utils/bluetoothUtils";
 import { CharateristicUUIDs, States } from "../utils/uuids";
 import {
-  createCharateristicWithEventListener,
-  detachEventListener,
+  createCharateristicWithEventListenerWithQueue,
+  detachEventListenerWithQueue,
 } from "../utils/characteristic";
 import { useBluetooth } from "../provider/BluetoothProvider";
 
@@ -12,16 +12,19 @@ export const useDeviceSetting = (
   const [isCelsius, setIsCelsius] = createSignal<boolean>(true);
   const [isDisplayOnCooling, setIsDisplayOnCooling] =
     createSignal<boolean>(true);
-  const { getService3, getCharacteristics, setCharacteristics } = useBluetooth();
+  const { getDeviceStateService, getCharacteristics, setCharacteristics } = useBluetooth();
 
   const handleCharacteristics = async () => {
-    const service = getService3();
-    if (!service) return;
-    const display = await createCharateristicWithEventListener(
-      service,
+    const stateService = getDeviceStateService();
+    if (!stateService) return;
+    const display = await createCharateristicWithEventListenerWithQueue(
+      stateService,
       CharateristicUUIDs.display,
       handleDisplayValue
     );
+    if(!display) {
+      return Promise.reject("displayCharacteristic not found");
+    }
     setCharacteristics((prev) => ({
       ...prev,
       display,
@@ -35,7 +38,7 @@ export const useDeviceSetting = (
   onCleanup(() => {
     const { display } = getCharacteristics();
     if (display) {
-      detachEventListener(display, handleDisplayValue);
+      detachEventListenerWithQueue(display, handleDisplayValue);
     }
   });
 

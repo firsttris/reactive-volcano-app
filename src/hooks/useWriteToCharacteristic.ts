@@ -13,10 +13,10 @@ import { createEffect, createSignal } from "solid-js";
 
 export const useWriteToCharacteristic = () => {
   const [isWriting, setIsWriting] = createSignal(false);
-  const { getService4, getCharacteristics, setCharacteristics } = useBluetooth();
+  const { getDeviceControlService, getCharacteristics, setCharacteristics } = useBluetooth();
 
   const handleCharacteristics = async () => {
-    const service = getService4();
+    const service = getDeviceControlService();
     if (!service) return;
 
     const heaterOnCharacteristic = await service.getCharacteristic(
@@ -59,7 +59,7 @@ export const useWriteToCharacteristic = () => {
     const characteristic = characteristics[characteristicsUUID];
     if (!characteristic) {
       setIsWriting(false);
-      return Promise.resolve();
+      return Promise.resolve("Characteristic not found");
     }
 
     const buffer = bufferConversionFunction(bufferValue);

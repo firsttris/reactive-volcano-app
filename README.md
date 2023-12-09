@@ -53,6 +53,14 @@ To develop and build this project, follow these steps:
 5. Start the development server: `npm run dev`
 6. To build the project, use: `npm run build`
 
+## Step to develop & Test on Android
+
+1. Enable USB-Debugging in Developer Settings in Adnroid.
+2. When connecting the USB-Cabel select "Data Transfer / Android Auto".
+3. Go to chrome://flags/#unsafely-treat-insecure-origin-as-secure to enable Bluetooth Web API for HTTP.
+4. Open the URL of your local development server e.g. http://192.168.178.134:5174/ (replace with your ip)
+3. Go to chrome://inspect/#devices on your Desktop to Remote Debug Chrome on your Android Device.
+
 # Issues
 
 Want to start contributing to this project? 
