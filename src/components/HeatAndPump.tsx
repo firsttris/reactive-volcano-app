@@ -15,7 +15,7 @@ const Container = styled("div")`
   justify-content: center;
   gap: 45px;
 
-  @media (max-width: 320px) {
+  @media (max-width: 375px) {
     gap: 10px;
   }
 `;
