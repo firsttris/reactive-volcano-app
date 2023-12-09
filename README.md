@@ -1,61 +1,42 @@
 
 
-Everything is Open Source if you can reverse engineer it!
+Please note, this project has been developed with utmost care to respect and not infringe upon any rights of Storz & Bickel.   
 
 # Introduction
 
 The Volcano, made by Storz & Bickel in Tuttlingen, Germany, is a well-known high-quality vaporizer. The Volcano can be controlled using the Bluetooth Web API. 
 
-This project showcases how to use cutting-edge WebApp Technology to control the Volcano via the Web Bluetooth API.
+This project showcases how to use cutting-edge technology to control the Volcano via the Web Bluetooth API.
 
 # Motivation
 
+- The current WebApp of Storz & Bickel does not match the quality of their vaporizers.
 - Use cutting edge technology to build a Volcano App.
-- Interested in reverse engineering Web Bluetooth API with the Volcano. 
+- Interested in reverse engineering the Volcano with Web Bluetooth API.
 - Show how a reactive application is the better choice for Bluetooth communication.
-- Showcase a clean intuitive Frontend API written in TypeScript.
+- Showcase how to write clean intuitive Frontend API in TypeScript.
 
 # Device Support
-Currently, we only support the Volcano device as this is the only device I own. But the same is possible to Venty and Crafty as the use the same API.
+Currently, this only supports the Volcano as this is the only device I own.   
+Venty and Crafty use the same Web Bluetooth API.
 
-# Features
-The application offers a variety of features including:
+# Test my App
 
-- Temperature control
-- Heat regulation
-- Pump control
-- Brightness adjustment
-- Auto-shutdown time
-- Dark mode
-- Vibration control
-- Standby light
-- Device runtime
-- Reading serial number
-
-## Non-implemented Features
-Some features were not implemented:
-
-- Workflows: Its an App feature, rather than a device feature. The WebApp controls the device using `setTimeout()`.
-- Analytics: Didnt see any benefit in reverse engineering this part yet.
-
-# Get Started
-
-You can test & use the WebApp directly using this Link and connect your Volcano
-
-https://firsttris.github.io/reactive-volcano-app/
+You can directly access and use the WebApp from this [link](https://firsttris.github.io/reactive-volcano-app/), allowing you to connect your Volcano with ease.
 
 # Technology Stack
 
-This project utilizes a number of cutting-edge technologies to deliver a high-performance, user-friendly application:
+This project is built upon a solid foundation of cutting-edge technologies to deliver a high-performance:
 
 - **[SolidJS](https://www.solidjs.com/)**: A declarative JavaScript library for building user interfaces.
 - **[TypeScript](https://www.typescriptlang.org/)**: A strongly typed superset of JavaScript that adds static types.
 - **[Styled-Components](https://styled-components.com/)**: Visual primitives for the component age.
 - **[Web Bluetooth API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API)**: An interface that provides the ability to connect and interact with Bluetooth Low Energy peripherals.
 
-# Prerequisites
+# Prerequisites for Linux
 
-To enable the Web Bluetooth API in Chrome on Linux, follow these steps:
+In Linux there is no official support for Web Bluetooth API in Chrome.  
+However you can still enable Web Bluetooth API in Chrome on Linux, follow these steps:
 
 1. Open Chrome and navigate to `chrome://flags/#enable-web-bluetooth`.
 2. Enable the flag as shown in the image below.
@@ -80,4 +61,52 @@ Please visit our [issues page](https://github.com/firsttris/reactive-volcano-app
 
 # User Interface Overview
 
-todo
+The user interface is responsive and designed to work well on both desktop and mobile devices.
+
+## Click on the Bluetooth icon to initiate Bluetooth discovery.    
+![Bluetooth Discovery](/docs/ui-connect.png)
+
+
+## Select your device to establish a connection.    
+![Device Selection](/docs/ui-connect-2.png)
+
+
+## Effortlessly control your Volcano.    
+![User Interface](/docs/ui.png)
+
+# Features
+The application offers a variety of features including:
+
+## Device Features
+
+- Temperature control
+- Heat regulation
+- Pump control
+- Brightness adjustment
+- Auto-shutdown time
+- Vibration control
+- Standby light
+- Device runtime
+- Reading serial number
+
+## App Features
+
+- Dark mode
+- Responsive UI
+- Localization for German and English
+
+## Non-implemented Features
+Some features were not implemented:
+
+### Workflows: 
+
+Workflows are a feature of the application, not inherent to the device. The WebApp manages the device using JavaScript's `setTimeout()` function to schedule tasks.
+
+Reasons for not implementing Workflows:
+- Assumption that Workflows are not commonly used.
+- An Application should do one thing and be good at it.
+- JavaScript's single-threaded nature and event loop do not guarantee precise timing.
+
+### Analytics
+
+- Didnt want to mess with the Bootloader.
