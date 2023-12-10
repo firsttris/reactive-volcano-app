@@ -8,7 +8,7 @@ This project showcases how to use cutting-edge technology to control the Volcano
 
 Please note, this project has been developed with utmost care to respect and not infringe upon any rights of Storz & Bickel.
 
-All code in this Repository was written from scratch by me. I used a different programming language and different technologies. 
+All code in this Repository was written from scratch by me. I used a different language and different technologies. 
 Any asset used in this project is open source and free to use under their respective licenses. This project does not contain any proprietary or copyrighted material.
 
 If there are any concerns or issues, please contact me before taking any legal action.
