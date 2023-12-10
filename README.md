@@ -8,25 +8,26 @@ This project showcases how to use cutting-edge technology to control the Volcano
 
 Please note, this project has been developed with utmost care to respect and not infringe upon any rights of Storz & Bickel.
 
-All code in this Repository was written from scratch by me. Any asset used in this project is open source and free to use under their respective licenses. This project does not contain any proprietary or copyrighted material.
+All code in this Repository was written from scratch by me. I used a different programming language and different technologies. 
+Any asset used in this project is open source and free to use under their respective licenses. This project does not contain any proprietary or copyrighted material.
+
+If there are any concerns or issues, please contact me before taking any legal action.
 
 # Motivation
 
-The Motivation Behind Implementing a Volcano Application:
+The Motivation behind implementing a Volcano WebApp:
 
-- The current WebApp of Storz & Bickel does not match the quality of their vaporizers.
 - Use cutting edge technology to build a Volcano App.
-- Interested in reverse engineering the Volcano with Web Bluetooth API.
-- Show how a reactive application is the better choice for Bluetooth communication.
-- Showcase how to write clean intuitive Frontend API in TypeScript.
+- Interested in reverse engineering my Volcano with Web Bluetooth API.
+- Showcase how a reactive application is the better choice for bidirectional Bluetooth communication.
 
 # Device Support
 Currently, this only supports the Volcano as this is the only device I own.   
-Venty and Crafty use the same Web Bluetooth API.
+Venty and Crafty also uses Web Bluetooth API.
 
 # Test my App
 
-You can directly access and use the WebApp from this [link](https://firsttris.github.io/reactive-volcano-app/)
+Access & Test my WebApp from this [Link](https://firsttris.github.io/reactive-volcano-app/)
 
 # Technology Stack
 
