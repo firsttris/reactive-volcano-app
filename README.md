@@ -95,18 +95,8 @@ After these steps, the PWA will appear as an icon on your home screen, and you c
 ## Non-implemented Features
 Some features were not implemented:
 
-### Workflows: 
-
-Workflows is not a device feature, its a feature of the WebApp. The WebApp manages the device using JavaScript's `setTimeout()` function to schedule tasks.
-
-My reasons for not implementing Workflows:
-- Assumption that Workflows are not commonly used.
-- An Application should only do one thing and be good at it.
-- JavaScript's single-threaded nature and event loop do not guarantee precise timing.
-
-### Analytics
-
-- Didnt want to mess with the Bootloader.
+- Workflows
+- Analytics
 
 # Prerequisites for Linux
 
