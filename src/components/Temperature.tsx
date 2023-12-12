@@ -1,4 +1,3 @@
-import { createEffect, createSignal } from "solid-js";
 import { useCharacteristics } from "../provider/CharacteristicsProvider";
 import { styled } from "solid-styled-components";
 import { FaSolidMinus } from "solid-icons/fa";

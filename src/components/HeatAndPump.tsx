@@ -1,4 +1,3 @@
-import { createEffect, createSignal } from "solid-js";
 import { Button } from "./Button/Button";
 import { FaSolidWind } from "solid-icons/fa";
 import { SiFireship } from "solid-icons/si";
