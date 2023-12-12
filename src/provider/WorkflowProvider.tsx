@@ -1,17 +1,25 @@
 import { Component, createContext, createSignal, useContext } from "solid-js";
 import type { JSX } from "solid-js";
 import { useCharacteristics } from "./CharacteristicsProvider";
-import { workflow1 } from "./../utils/workflowData";
+import { WorkflowStep } from "./../utils/workflowData";
 
 const delayFor = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 interface WorkflowContextType {
   toggleWorkflow: () => void;
+  workflow: () => WorkflowStep[];
+  editWorkflow: (workflowIndex: number, workFlowStep: WorkflowStep) => void;
+  deleteWorkflow: (workflowIndex: number) => void;
+  addWorkflow: () => void;
 }
 
 const WorkflowContext = createContext<WorkflowContextType>({
   toggleWorkflow: () => {},
+  workflow: () => [],
+  editWorkflow: () => {},
+  deleteWorkflow: () => {},
+  addWorkflow: () => {},
 });
 
 interface WorkflowProviderProps {
@@ -19,6 +27,30 @@ interface WorkflowProviderProps {
 }
 
 export const WorkflowProvider: Component<WorkflowProviderProps> = (props) => {
+  const [workflow, setWorkflow] = createSignal<WorkflowStep[]>([]);
+
+  const editWorkflow = (workflowIndex: number, workFlowStep: WorkflowStep) => {
+    setWorkflow(prevWorkflow => [
+      ...prevWorkflow.slice(0, workflowIndex),
+      workFlowStep,
+      ...prevWorkflow.slice(workflowIndex + 1)
+    ]);
+  };
+
+  const deleteWorkflow = (workflowIndex: number) => {
+    setWorkflow(prevWorkflow => [
+      ...prevWorkflow.slice(0, workflowIndex),
+      ...prevWorkflow.slice(workflowIndex + 1)
+    ]);
+  }
+
+  const addWorkflow = () => {
+    setWorkflow(prevWorkflow => [
+      ...prevWorkflow,
+      { temperature: 180, holdTimeInSeconds: 0, pumpTimeInSeconds: 5 }
+    ]);
+  }
+
   const [currentStep, setCurrentStep] = createSignal(0);
   const {
     getters: { getCurrentTemperature, getTargetTemperature },
@@ -50,17 +82,18 @@ export const WorkflowProvider: Component<WorkflowProviderProps> = (props) => {
     await setPumpOn();
   };
 
-  const disablePumpAndHeatAfterDeplay = async (pumpTimeInSec: number) => {
+  const disablePumpAfterDeplay = async (pumpTimeInSec: number) => {
     await delayFor(pumpTimeInSec * 1000);
     await setPumpOff();
-    await setHeatOff();
+    
   };
 
-  const executeNextWorkflowStep = (workflowLenth: number) => {
+  const executeNextWorkflowStep = async (workflowLenth: number) => {
     setCurrentStep((prevStep) => prevStep + 1);
     if (currentStep() < workflowLenth) {
       startWorkflow();
     } else {
+      await setHeatOff();
       // what todo if the workflow is finished?
     }
   };
@@ -71,18 +104,20 @@ export const WorkflowProvider: Component<WorkflowProviderProps> = (props) => {
   };
 
   const startWorkflow = async () => {
+    const currentWorkflow = workflow();
+    if(!currentWorkflow) return;
     const { temperature, holdTimeInSeconds, pumpTimeInSeconds } =
-      workflow1[currentStep()];
+    currentWorkflow[currentStep()];
 
     await activeHeatAndSetTargetTemperature(temperature);
     await monitorTemperaturUntilTarget();
     await activatePumpAfterDelay(holdTimeInSeconds);
-    await disablePumpAndHeatAfterDeplay(pumpTimeInSeconds);
-    executeNextWorkflowStep(workflow1.length);
+    await disablePumpAfterDeplay(pumpTimeInSeconds);
+    await executeNextWorkflowStep(currentWorkflow.length);
   };
 
   return (
-    <WorkflowContext.Provider value={{ toggleWorkflow }}>
+    <WorkflowContext.Provider value={{ toggleWorkflow, workflow, addWorkflow, editWorkflow, deleteWorkflow }}>
       {props.children}
     </WorkflowContext.Provider>
   );

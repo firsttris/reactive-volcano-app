@@ -1,10 +1,10 @@
-interface Workflow {
+export interface WorkflowStep {
   temperature: number;
   holdTimeInSeconds: number;
   pumpTimeInSeconds: number;
 }
 
-export const workflow1: Workflow[] = [
+export const workflow1: WorkflowStep[] = [
   {
     temperature: 170,
     holdTimeInSeconds: 0,
@@ -62,7 +62,7 @@ export const workflow1: Workflow[] = [
   },
 ];
 
-export const workflow2: Workflow[] = [
+export const workflow2: WorkflowStep[] = [
   {
     temperature: 182,
     holdTimeInSeconds: 10,
@@ -85,7 +85,7 @@ export const workflow2: Workflow[] = [
   },
 ];
 
-export const workflow3: Workflow[] = [
+export const workflow3: WorkflowStep[] = [
   {
     temperature: 175,
     holdTimeInSeconds: 0,
@@ -113,7 +113,7 @@ export const workflow3: Workflow[] = [
   },
 ];
 
-export const workflow4: Workflow[] = [
+export const workflow4: WorkflowStep[] = [
   {
     temperature: 174,
     holdTimeInSeconds: 20,
@@ -135,3 +135,23 @@ export const workflow4: Workflow[] = [
     pumpTimeInSeconds: 10,
   },
 ];
+
+
+export const listOfWorkflows = [
+  {
+    name: "Ballon",
+    workflow: workflow1,
+  },
+  {
+    name: "workflow2",
+    workflow: workflow2,
+  },
+  {
+    name: "workflow3",
+    workflow: workflow3,
+  },
+  {
+    name: "workflow4",
+    workflow: workflow4,
+  },
+]

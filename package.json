@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@fontsource/roboto": "^5.0.8",
+    "@solidjs/router": "^0.10.1",
     "@types/web-bluetooth": "^0.0.20",
     "p-queue": "^8.0.0",
     "solid-icons": "^1.1.0",

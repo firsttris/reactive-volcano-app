@@ -17,6 +17,9 @@ export const ui = {
         "deviceRuntime": "Device Runtime",
         "hours": "hours",
         "bleFirmwareVersion": "BLE Firmware Version",
+        "temperature": "Temperature",
+        "holdTime": "Hold Time",
+        "pumpTime": "Pump Time",
     },
     de: {
         "settings": "Einstellungen",
@@ -29,6 +32,9 @@ export const ui = {
         "deviceRuntime": "Geräte-Laufzeit",
         "hours": "Stunden",
         "bleFirmwareVersion": "BLE-Firmware-Version",
+        "temperature": "Temperatur",
+        "holdTime": "Haltezeit",
+        "pumpTime": "Pumpenzeit",
     },
 } as const;
 
