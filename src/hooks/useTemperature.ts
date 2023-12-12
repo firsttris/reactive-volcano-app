@@ -1,22 +1,24 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
-import { convertBLEToUint16 } from "../utils/bluetoothUtils";
+import { convertBLEToUint16, convertToUInt32BLE } from "../utils/bluetoothUtils";
 import { CharateristicUUIDs } from "../utils/uuids";
 import {
-  createCharateristicWithEventListenerWithQueue,
-  detachEventListenerWithQueue,
+  createCharateristicWithEventListener,
+  detachEventListener,
 } from "../utils/characteristic";
 import { useBluetooth } from "../provider/BluetoothProvider";
+import { useWriteToCharacteristic } from "./useWriteToCharacteristic";
 
 export const useTemperature = () => {
   const [getTargetTemperature, setTargetTemperature] = createSignal(0);
   const [getCurrentTemperature, setCurrentTemperature] = createSignal(0);
   const { getDeviceControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
+    const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
   const handleCharacteristics = async () => {
     const service = getDeviceControlService();
     if (!service) return;
-    const targetTemperature = await createCharateristicWithEventListenerWithQueue(
+    const targetTemperature = await createCharateristicWithEventListener(
       service,
       CharateristicUUIDs.targetTemperature,
       handleTargetTemperature
@@ -28,7 +30,7 @@ export const useTemperature = () => {
       ...prev,
       targetTemperature,
     }));
-    const currentTemperature = await createCharateristicWithEventListenerWithQueue(
+    const currentTemperature = await createCharateristicWithEventListener(
       service,
       CharateristicUUIDs.currentTemperature,
       handleCurrentTemperature
@@ -42,6 +44,15 @@ export const useTemperature = () => {
     }));
   };
 
+  const setTemperature = async (value: number) => {
+    await writeValueToCharacteristic(
+      "targetTemperature",
+      value * 10,
+      convertToUInt32BLE
+    );
+    setTargetTemperature(value);
+  }
+
   createEffect(() => {
     handleCharacteristics();
   });
@@ -49,10 +60,10 @@ export const useTemperature = () => {
   onCleanup(() => {
     const { targetTemperature, currentTemperature } = getCharacteristics();
     if (targetTemperature) {
-      detachEventListenerWithQueue(targetTemperature, handleTargetTemperature);
+      detachEventListener(targetTemperature, handleTargetTemperature);
     }
     if (currentTemperature) {
-      detachEventListenerWithQueue(currentTemperature, handleCurrentTemperature);
+      detachEventListener(currentTemperature, handleCurrentTemperature);
     }
   });
 
@@ -71,5 +82,6 @@ export const useTemperature = () => {
   return {
     getTargetTemperature,
     getCurrentTemperature,
+    setTargetTemperature: setTemperature
   };
 };

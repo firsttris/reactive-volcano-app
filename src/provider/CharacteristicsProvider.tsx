@@ -1,7 +1,6 @@
 import { createContext, useContext } from "solid-js";
 import type { JSX } from "solid-js";
 import { useTemperature } from "../hooks/useTemperature";
-import { useWriteToCharacteristic } from "../hooks/useWriteToCharacteristic";
 import { useDeviceInformation } from "../hooks/useDeviceInformation";
 import { useHeatingTime } from "../hooks/useHeatingTime";
 import { useDeviceSetting } from "../hooks/useDeviceSettings";
@@ -30,17 +29,17 @@ type CharacteristicMethods = {
     getBrightness: () => number;
   };
   setters: {
-    setTemperature: (temperature: number) => void;
-    setPumpOn: () => void;
-    setPumpOff: () => void;
-    setHeatOn: () => void;
-    setHeatOff: () => void;
-    setVibrationOn: () => void;
-    setVibrationOff: () => void;
-    setDisplayOnCoolingOn: () => void;
-    setDisplayOnCoolingOff: () => void;
-    setShutOffTime: (timeInSec: number) => void;
-    setBrightness: (brightness: number) => void;
+    setTargetTemperature: (temperature: number) => void;
+    setPumpOn: () => Promise<void>;
+    setPumpOff: () => Promise<void>;
+    setHeatOn: () => Promise<void>;
+    setHeatOff: () => Promise<void>;
+    setVibrationOn: () => Promise<void>;
+    setVibrationOff: () => Promise<void>;
+    setDisplayOnCoolingOn: () => Promise<void>;
+    setDisplayOnCoolingOff: () => Promise<void>;
+    setShutOffTime: (timeInSec: number) => Promise<void>;
+    setTargetBrightness: (brightness: number) => Promise<void>;
   };
 };
 
@@ -53,30 +52,17 @@ type CharacteristicsProviderProps = {
 export const CharacteristicsProvider = (
   props: CharacteristicsProviderProps
 ) => {
-  const { getCurrentTemperature, getTargetTemperature } = useTemperature();
-  const {
-    setTemperature,
-    setPumpOn,
-    setPumpOff,
-    setHeatOn,
-    setHeatOff,
-    setVibrationOn,
-    setVibrationOff,
-    setDisplayOnCoolingOn,
-    setDisplayOnCoolingOff,
-    setShutOffTime,
-    setBrightness,
-  } = useWriteToCharacteristic();
+  const { getCurrentTemperature, getTargetTemperature, setTargetTemperature } = useTemperature();
 
   const { getSerialNumber, getFirmwareVersion, getBleFirmwareVersion } =
     useDeviceInformation();
   const { getHoursOfHeating, getMinutesOfHeating } = useHeatingTime();
-  const { isCelsius, isDisplayOnCooling } = useDeviceSetting();
-  const { isAutoShutdownActive, isHeatingActive, isPumpActive } =
+  const { isCelsius, isDisplayOnCooling, setDisplayOnCoolingOff, setDisplayOnCoolingOn } = useDeviceSetting();
+  const { isAutoShutdownActive, isHeatingActive, isPumpActive, setHeatOff, setHeatOn, setPumpOff, setPumpOn } =
     useDeviceStatus();
-  const { getAutoOffTimeInSec, getShutoffTimeInSec } = useShutdowntime();
-  const { getBrightness } = useBrightness();
-  const { isVibrationOn } = useVibration();
+  const { getAutoOffTimeInSec, getShutoffTimeInSec, setShutOffTime } = useShutdowntime();
+  const { getBrightness, setTargetBrightness } = useBrightness();
+  const { isVibrationOn, setVibrationOff, setVibrationOn } = useVibration();
 
   return (
     <CharacteristicsContext.Provider
@@ -100,7 +86,7 @@ export const CharacteristicsProvider = (
           getBrightness,
         },
         setters: {
-          setTemperature,
+          setTargetTemperature,
           setPumpOn,
           setPumpOff,
           setHeatOn,
@@ -110,7 +96,7 @@ export const CharacteristicsProvider = (
           setDisplayOnCoolingOn,
           setDisplayOnCoolingOff,
           setShutOffTime,
-          setBrightness,
+          setTargetBrightness,
         },
       }}
     >

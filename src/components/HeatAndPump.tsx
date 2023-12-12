@@ -36,34 +36,23 @@ const TextContainer = styled("div")`
 
 export const HeatAndPump = () => {
   const {
-    getters: { isPumpActive, isHeatingActive },
+    getters: { isPumpActive: getIsPumpActive, isHeatingActive: getIsHeatActive },
     setters: { setHeatOn, setHeatOff, setPumpOn, setPumpOff },
   } = useCharacteristics();
-  const [getIsHeatActive, setHeatActive] = createSignal<boolean>(false);
-  const [getIsPumpActive, setPumpActive] = createSignal<boolean>(false);
-
-  createEffect(() => {
-    setHeatActive(isHeatingActive());
-    setPumpActive(isPumpActive());
-  });
 
   const toggleHeat = () => {
     if (getIsHeatActive()) {
       setHeatOff();
-      setHeatActive(false);
     } else {
       setHeatOn();
-      setHeatActive(true);
     }
   };
 
   const togglePump = () => {
     if (getIsPumpActive()) {
       setPumpOff();
-      setPumpActive(false);
     } else {
       setPumpOn();
-      setPumpActive(true);
     }
   };
 

@@ -1,40 +1,45 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
-import { convertBLEToUint16 } from "../utils/bluetoothUtils";
+import {
+  convertBLEToUint16,
+  convertToUInt16BLE,
+} from "../utils/bluetoothUtils";
 import { CharateristicUUIDs } from "../utils/uuids";
 import {
-  createCharateristicWithEventListenerWithQueue,
-  detachEventListenerWithQueue,
-  createCharateristicWithQueue,
+  createCharateristicWithEventListener,
+  detachEventListener,
+  createCharateristic,
 } from "../utils/characteristic";
 import { useBluetooth } from "../provider/BluetoothProvider";
+import { useWriteToCharacteristic } from "./useWriteToCharacteristic";
 
 export const useShutdowntime = () => {
   const [getAutoOffTimeInSec, setAutoOffTime] = createSignal<number>(0);
   const [getShutoffTimeInSec, setShutoffTime] = createSignal<number>(0);
   const { getDeviceControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
+  const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
   const handleCharacteristics = async () => {
     const controlService = getDeviceControlService();
     if (!controlService) return;
-    const shutoffTime = await createCharateristicWithQueue(
+    const shutoffTime = await createCharateristic(
       controlService,
       CharateristicUUIDs.shutoffTime,
       handleShutoffTime
     );
-    if(!shutoffTime) {
+    if (!shutoffTime) {
       return Promise.reject("shutoffTimeCharacteristic not found");
     }
     setCharacteristics((prev) => ({
       ...prev,
       shutoffTime,
     }));
-    const currentAutoOffValue = await createCharateristicWithEventListenerWithQueue(
+    const currentAutoOffValue = await createCharateristicWithEventListener(
       controlService,
       CharateristicUUIDs.currentAutoOffValue,
       handleAutoOffTimeInSec
     );
-    if(!currentAutoOffValue) {
+    if (!currentAutoOffValue) {
       return Promise.reject("currentAutoOffValueCharacteristic not found");
     }
     setCharacteristics((prev) => ({
@@ -50,9 +55,18 @@ export const useShutdowntime = () => {
   onCleanup(() => {
     const { currentAutoOffValue } = getCharacteristics();
     if (currentAutoOffValue) {
-      detachEventListenerWithQueue(currentAutoOffValue, handleAutoOffTimeInSec);
+      detachEventListener(currentAutoOffValue, handleAutoOffTimeInSec);
     }
   });
+
+  const setShutOffTime = async (timeInSec: number) => {
+    await writeValueToCharacteristic(
+      "shutoffTime",
+      timeInSec,
+      convertToUInt16BLE
+    );
+    setShutOffTime(timeInSec);
+  };
 
   const handleAutoOffTimeInSec = (value: DataView): void => {
     setAutoOffTime(convertBLEToUint16(value));
@@ -65,5 +79,6 @@ export const useShutdowntime = () => {
   return {
     getAutoOffTimeInSec,
     getShutoffTimeInSec,
+    setShutOffTime,
   };
 };

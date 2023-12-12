@@ -15,11 +15,6 @@ export const attachEventListener = async (
   return characteristicNotification;
 };
 
-export const detachEventListenerWithQueue = async (
-  characteristicNotification: BluetoothRemoteGATTCharacteristic,
-  handleValue: (value: DataView) => void
-) => queue.add(async () => detachEventListener(characteristicNotification, handleValue));
-
 export const detachEventListener = async (
   characteristicNotification: BluetoothRemoteGATTCharacteristic,
   handleValue: (value: DataView) => void
@@ -39,34 +34,32 @@ export const handleInitialValue = async (
   handleValue(value);
 };
 
-export const createCharateristicWithEventListenerWithQueue = async (
-  service: BluetoothRemoteGATTService,
-  characteristicUUID: string,
-  handleValue: (value: DataView) => void
-) => queue.add(async () => createCharateristicWithEventListener(service, characteristicUUID, handleValue));
+export const getCharacteristic = async (service: BluetoothRemoteGATTService,
+  characteristicUUID: CharateristicUUIDs) => 
+  queue.add(async () => await service.getCharacteristic(characteristicUUID))
 
 export const createCharateristicWithEventListener = async (
   service: BluetoothRemoteGATTService,
-  characteristicUUID: string,
+  characteristicUUID: CharateristicUUIDs,
   handleValue: (value: DataView) => void
 ) => {
-  const characteristic = await service.getCharacteristic(characteristicUUID);
+  const characteristic = await getCharacteristic(service, characteristicUUID);
+  if(!characteristic) {
+    return;
+  }
   await handleInitialValue(characteristic, handleValue);
   return attachEventListener(characteristic, handleValue);
 };
-
-export const createCharateristicWithQueue = async (
-  service: BluetoothRemoteGATTService,
-  characteristicUUID: CharateristicUUIDs,
-  handleValue: (value: DataView) => void
-) => queue.add(async () => createCharateristic(service, characteristicUUID, handleValue));
 
 export const createCharateristic = async (
   service: BluetoothRemoteGATTService,
   characteristicUUID: CharateristicUUIDs,
   handleValue: (value: DataView) => void
 ) => {
-  const characteristic = await service.getCharacteristic(characteristicUUID);
+  const characteristic = await getCharacteristic(service, characteristicUUID);
+  if(!characteristic) {
+    return;
+  }
   await handleInitialValue(characteristic, handleValue);
   return characteristic;
 };

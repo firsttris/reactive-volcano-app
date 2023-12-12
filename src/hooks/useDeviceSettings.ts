@@ -1,28 +1,33 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
-import { convertBLEToUint16 } from "../utils/bluetoothUtils";
+import {
+  convertBLEToUint16,
+  convertToUInt32BLE,
+} from "../utils/bluetoothUtils";
 import { CharateristicUUIDs, States } from "../utils/uuids";
 import {
-  createCharateristicWithEventListenerWithQueue,
-  detachEventListenerWithQueue,
+  createCharateristicWithEventListener,
+  detachEventListener,
 } from "../utils/characteristic";
 import { useBluetooth } from "../provider/BluetoothProvider";
+import { useWriteToCharacteristic } from "./useWriteToCharacteristic";
 
-export const useDeviceSetting = (
-) => {
+export const useDeviceSetting = () => {
   const [isCelsius, setIsCelsius] = createSignal<boolean>(true);
   const [isDisplayOnCooling, setIsDisplayOnCooling] =
     createSignal<boolean>(true);
-  const { getDeviceStateService, getCharacteristics, setCharacteristics } = useBluetooth();
+  const { getDeviceStateService, getCharacteristics, setCharacteristics } =
+    useBluetooth();
+  const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
   const handleCharacteristics = async () => {
     const stateService = getDeviceStateService();
     if (!stateService) return;
-    const display = await createCharateristicWithEventListenerWithQueue(
+    const display = await createCharateristicWithEventListener(
       stateService,
       CharateristicUUIDs.display,
       handleDisplayValue
     );
-    if(!display) {
+    if (!display) {
       return Promise.reject("displayCharacteristic not found");
     }
     setCharacteristics((prev) => ({
@@ -38,9 +43,24 @@ export const useDeviceSetting = (
   onCleanup(() => {
     const { display } = getCharacteristics();
     if (display) {
-      detachEventListenerWithQueue(display, handleDisplayValue);
+      detachEventListener(display, handleDisplayValue);
     }
   });
+
+  const setDisplayOnCoolingOn = async () => {
+    await writeValueToCharacteristic(
+      "display",
+      States.DISPLAY_ON_COOLING,
+      convertToUInt32BLE
+    );
+    setIsDisplayOnCooling(true);
+  };
+  const setDisplayOnCoolingOff = async () =>
+    await writeValueToCharacteristic(
+      "display",
+      0x10000 + States.DISPLAY_ON_COOLING,
+      convertToUInt32BLE
+    );
 
   const handleDisplayValue = (value: DataView) => {
     const convertedValue = convertBLEToUint16(value);
@@ -53,5 +73,7 @@ export const useDeviceSetting = (
   return {
     isCelsius,
     isDisplayOnCooling,
+    setDisplayOnCoolingOn,
+    setDisplayOnCoolingOff,
   };
 };

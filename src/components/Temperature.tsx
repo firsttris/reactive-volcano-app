@@ -46,25 +46,17 @@ const CenteredContainer = styled("div")`
 `;
 
 export const Temperature = () => {
-  const [targetTemp, setTargetTemp] = createSignal(0);
-
   const {
     getters: { getTargetTemperature, getCurrentTemperature, isCelsius },
-    setters: { setTemperature },
+    setters: { setTargetTemperature },
   } = useCharacteristics();
 
-  createEffect(() => {
-    setTargetTemp(getTargetTemperature());
-  });
-
   const increaseTemperature = () => {
-    setTemperature(targetTemp() + 1);
-    setTargetTemp(targetTemp() + 1);
+    setTargetTemperature(getTargetTemperature() + 1);
   };
 
   const decreaseTemperature = () => {
-    setTemperature(targetTemp() - 1);
-    setTargetTemp(targetTemp() - 1);
+    setTargetTemperature(getTargetTemperature() - 1);
   };
 
   const isCelsiusOrFahrenheit = () => {
@@ -82,7 +74,7 @@ export const Temperature = () => {
         <TempButton onClick={decreaseTemperature}>
           <FaSolidMinus size="30px" />
         </TempButton>{" "}
-        <DigitalText>{`${targetTemp()} ${isCelsiusOrFahrenheit()}`}</DigitalText>
+        <DigitalText>{`${getTargetTemperature()} ${isCelsiusOrFahrenheit()}`}</DigitalText>
         <TempButton onClick={increaseTemperature}>
           <FaSolidPlus size="30px" />
         </TempButton>

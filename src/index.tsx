@@ -6,6 +6,7 @@ import { Connect } from "./components/Connect/Connect";
 import { App } from "./App";
 import "./css/main.css";
 import "@fontsource/roboto";
+import { WorkflowProvider } from "./provider/WorkflowProvider";
 
 const root = document.getElementById("root");
 
@@ -15,7 +16,9 @@ render(
     <DarkModeProvider>
       <BluetoothProvider>
         <CharacteristicsProvider>
-          {isProd ? <Connect /> : <App />}
+          <WorkflowProvider>
+            {isProd ? <Connect /> : <App />}
+          </WorkflowProvider>
         </CharacteristicsProvider>
       </BluetoothProvider>
     </DarkModeProvider>

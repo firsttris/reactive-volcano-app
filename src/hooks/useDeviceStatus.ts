@@ -1,29 +1,36 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
-import { convertBLEToUint16 } from "../utils/bluetoothUtils";
+import { convertBLEToUint16, convertToUInt8BLE } from "../utils/bluetoothUtils";
 import { CharateristicUUIDs, States } from "../utils/uuids";
 import {
-  createCharateristicWithEventListenerWithQueue,
-  detachEventListenerWithQueue,
+  createCharateristicWithEventListener,
+  detachEventListener,
+  getCharacteristic,
 } from "../utils/characteristic";
 import { useBluetooth } from "../provider/BluetoothProvider";
+import { useWriteToCharacteristic } from "./useWriteToCharacteristic";
 
 export const useDeviceStatus = () => {
   const [isHeatingActive, setIsHeatingActive] = createSignal<boolean>(false);
   const [isPumpActive, setIsPumpActive] = createSignal<boolean>(false);
   const [isAutoShutdownActive, setIsAutoShutdownActive] =
     createSignal<boolean>(false);
-  const { getDeviceStateService, getCharacteristics, setCharacteristics } =
-    useBluetooth();
+  const {
+    getDeviceStateService,
+    getDeviceControlService,
+    getCharacteristics,
+    setCharacteristics,
+  } = useBluetooth();
+  const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
-  const handleCharacteristics = async () => {
+  const handleDeviceStateCharacteristics = async () => {
     const stateService = getDeviceStateService();
     if (!stateService) return;
-    const activity = await createCharateristicWithEventListenerWithQueue(
+    const activity = await createCharateristicWithEventListener(
       stateService,
       CharateristicUUIDs.activity,
       handleActivity
     );
-    if(!activity) {
+    if (!activity) {
       return Promise.reject("activityCharacteristic not found");
     }
     setCharacteristics((prev) => ({
@@ -32,14 +39,86 @@ export const useDeviceStatus = () => {
     }));
   };
 
+  const handleDeviceControlCharacteristics = async () => {
+    const service = getDeviceControlService();
+    if (!service) return;
+
+    const heaterOnCharacteristic = await getCharacteristic(
+      service,
+      CharateristicUUIDs.heaterOn
+    );
+    if (!heaterOnCharacteristic) {
+      return Promise.reject("heaterOnCharacteristic not found");
+    }
+    setCharacteristics((prev) => ({
+      ...prev,
+      heaterOn: heaterOnCharacteristic,
+    }));
+    const heaterOffCharacteristic = await getCharacteristic(
+      service,
+      CharateristicUUIDs.heaterOff
+    );
+    if (!heaterOffCharacteristic) {
+      return Promise.reject("heaterOffCharacteristic not found");
+    }
+    setCharacteristics((prev) => ({
+      ...prev,
+      heaterOff: heaterOffCharacteristic,
+    }));
+    const pumpOffCharacteristic = await getCharacteristic(
+      service,
+      CharateristicUUIDs.pumpOff
+    );
+    if (!pumpOffCharacteristic) {
+      return Promise.reject("pumpOffCharacteristic not found");
+    }
+    setCharacteristics((prev) => ({
+      ...prev,
+      pumpOff: pumpOffCharacteristic,
+    }));
+    const pumpOnCharacteristic = await getCharacteristic(
+      service,
+      CharateristicUUIDs.pumpOn
+    );
+    if (!pumpOnCharacteristic) {
+      return Promise.reject("pumpOnCharacteristic not found");
+    }
+
+    setCharacteristics((prev) => ({
+      ...prev,
+      pumpOn: pumpOnCharacteristic,
+    }));
+  };
+
+  const setPumpOn = async () => {
+    await writeValueToCharacteristic("pumpOn", 0, convertToUInt8BLE);
+    setIsPumpActive(true);
+  };
+
+  const setPumpOff = async () => {
+    await writeValueToCharacteristic("pumpOff", 0, convertToUInt8BLE);
+    setIsPumpActive(false);
+  };
+
+  const setHeatOn = async () => {
+    await writeValueToCharacteristic("heaterOn", 0, convertToUInt8BLE);
+    setIsHeatingActive(true);
+  };
+
+  const setHeatOff = async () => {
+    await writeValueToCharacteristic("heaterOff", 0, convertToUInt8BLE);
+    setIsHeatingActive(false);
+  };
+
   createEffect(() => {
-    handleCharacteristics();
+    handleDeviceStateCharacteristics();
+    handleDeviceControlCharacteristics();
   });
 
   onCleanup(() => {
     const { activity } = getCharacteristics();
     if (activity) {
-      detachEventListenerWithQueue(activity, handleActivity);
+      detachEventListener(activity, handleActivity);
     }
   });
 
@@ -58,5 +137,9 @@ export const useDeviceStatus = () => {
     isHeatingActive,
     isPumpActive,
     isAutoShutdownActive,
+    setPumpOn,
+    setPumpOff,
+    setHeatOn,
+    setHeatOff,
   };
 };

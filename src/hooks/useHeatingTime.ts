@@ -2,8 +2,8 @@ import { createEffect, createSignal, onCleanup } from "solid-js";
 import { convertBLEToUint16 } from "../utils/bluetoothUtils";
 import { CharateristicUUIDs } from "../utils/uuids";
 import {
-  createCharateristicWithEventListenerWithQueue,
-  detachEventListenerWithQueue,
+  createCharateristicWithEventListener,
+  detachEventListener,
 } from "../utils/characteristic";
 import { useBluetooth } from "../provider/BluetoothProvider";
 
@@ -15,7 +15,7 @@ export const useHeatingTime = () => {
   const handleCharacteristics = async () => {
     const controlService = getDeviceControlService();
     if (!controlService) return;
-    const hoursOfHeating = await createCharateristicWithEventListenerWithQueue(
+    const hoursOfHeating = await createCharateristicWithEventListener(
       controlService,
       CharateristicUUIDs.hoursOfHeating,
       handleHoursOfHeating
@@ -27,7 +27,7 @@ export const useHeatingTime = () => {
       ...prev,
       hoursOfHeating,
     }));
-    const minutesOfHeating = await createCharateristicWithEventListenerWithQueue(
+    const minutesOfHeating = await createCharateristicWithEventListener(
       controlService,
       CharateristicUUIDs.minutesOfHeating,
       handleMinutesOfHeating
@@ -48,10 +48,10 @@ export const useHeatingTime = () => {
   onCleanup(() => {
     const { hoursOfHeating, minutesOfHeating } = getCharacteristics();
     if (hoursOfHeating) {
-      detachEventListenerWithQueue(hoursOfHeating, handleHoursOfHeating);
+      detachEventListener(hoursOfHeating, handleHoursOfHeating);
     }
     if (minutesOfHeating) {
-      detachEventListenerWithQueue(minutesOfHeating, handleMinutesOfHeating);
+      detachEventListener(minutesOfHeating, handleMinutesOfHeating);
     }
   });
 

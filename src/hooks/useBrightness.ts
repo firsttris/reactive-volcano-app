@@ -1,18 +1,20 @@
 import { createEffect, createSignal } from "solid-js";
-import { convertBLEToUint16 } from "../utils/bluetoothUtils";
-import { createCharateristicWithQueue } from "../utils/characteristic";
+import { convertBLEToUint16, convertToUInt16BLE } from "../utils/bluetoothUtils";
+import { createCharateristic } from "../utils/characteristic";
 import { CharateristicUUIDs } from "../utils/uuids";
 import { useBluetooth } from "../provider/BluetoothProvider";
+import { useWriteToCharacteristic } from "./useWriteToCharacteristic";
 
 export const useBrightness = (
 ) => {
   const [getBrightness, setBrightness] = createSignal(0);
   const { getDeviceControlService, setCharacteristics } = useBluetooth();
+  const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
   const handleCharacteristics = async () => {
     const controlService = getDeviceControlService();
     if (!controlService) return;
-    const brightness = await createCharateristicWithQueue(
+    const brightness = await createCharateristic(
       controlService,
       CharateristicUUIDs.brightness,
       handleBrightness
@@ -36,7 +38,14 @@ export const useBrightness = (
     setBrightness(brightness);
   };
 
+  const setTargetBrightness = async (brightness: number) =>
+  {
+    setBrightness(brightness)
+    await writeValueToCharacteristic("brightness", brightness, convertToUInt16BLE);
+  }
+
   return {
     getBrightness,
+    setTargetBrightness
   };
 };
