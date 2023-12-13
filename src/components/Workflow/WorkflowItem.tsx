@@ -2,10 +2,12 @@ import { Component } from "solid-js";
 import { OcWorkflow3 } from "solid-icons/oc";
 import { AiFillPlaySquare } from "solid-icons/ai";
 import { styled } from "solid-styled-components";
-import { A } from "@solidjs/router";
+import { A, useNavigate } from "@solidjs/router";
+import { Workflow } from "../../utils/workflowData";
+import { useWorkflow } from "../../provider/WorkflowProvider";
 
 interface WorkflowItemProps {
-  name: string;
+  workflow: Workflow
   index: number;
 }
 
@@ -23,14 +25,21 @@ const WorkflowName = styled('div')`
 `;
 
 export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
+  const { setWorkflowSteps } = useWorkflow();
+  const navigate = useNavigate();
+
+    const selectWorkflow = () => {
+      setWorkflowSteps(props.workflow.workflowSteps);
+      navigate(`/workflow-list/${props.index}`)
+    }
+
+
     return (
-      <Container>
-        <A href={`/workflow-details/${props.index}`}>
+      <Container onClick={selectWorkflow}>
         <WorkflowName>
-          <OcWorkflow3 /> <span>{props.name}</span>
+          <OcWorkflow3 /> <span>{props.workflow.name}</span>
         </WorkflowName>
         <AiFillPlaySquare />
-        </A>
       </Container>
     );
   };

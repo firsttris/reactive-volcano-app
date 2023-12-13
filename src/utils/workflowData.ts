@@ -142,7 +142,7 @@ export const workflow3: WorkflowStep[] = [
 export interface Workflow {
   name: string;
   id: string;
-  workflow: WorkflowStep[];
+  workflowSteps: WorkflowStep[];
 }
 
 
@@ -150,21 +150,21 @@ export const initialListOfWorkflows: Workflow[] = [
   {
     name: "Ballon",
     id: uuidv4(),
-    workflow: workflow0,
+    workflowSteps: workflow0,
   },
   {
     name: "workflow2",
     id: uuidv4(),
-    workflow: workflow1,
+    workflowSteps: workflow1,
   },
   {
     name: "workflow3",
     id: uuidv4(),
-    workflow: workflow2,
+    workflowSteps: workflow2,
   },
   {
     name: "workflow4",
     id: uuidv4(),
-    workflow: workflow3,
+    workflowSteps: workflow3,
   },
 ]

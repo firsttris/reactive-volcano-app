@@ -1,58 +1,35 @@
 import {
   Component,
   createContext,
-  createMemo,
   createSignal,
   useContext,
 } from "solid-js";
 import type { JSX } from "solid-js";
 import { useCharacteristics } from "./CharacteristicsProvider";
 import {
-  Workflow,
   WorkflowStep,
-  initialListOfWorkflows,
 } from "./../utils/workflowData";
-import { useParams } from "@solidjs/router";
-import { v4 as uuidv4 } from "uuid";
+
 
 const delayFor = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 interface WorkflowContextType {
   toggleWorkflow: () => void;
-  workflow: () => WorkflowStep[];
-  editWorkflow: (workflowIndex: number, workFlow: Workflow) => void;
-  deleteWorkflow: (workflowIndex: number) => void;
-  addWorkflow: () => void;
-  deleteWorkflowStep: (
-    workflowIndex: number,
-    workflowStepIndex: number
-  ) => void;
-  addWorkflowStep: (workflowIndex: number) => void;
-  editWorkflowStep: (
-    workflowIndex: number,
-    workflowStepIndex: number,
-    workFlowStep: WorkflowStep
-  ) => void;
-  workflowListIndex: () => number;
-  workflowStep: () => WorkflowStep;
-  workflowStepIndex: () => number;
-  workflowList: () => Workflow[];
+  workflowSteps: () => WorkflowStep[];
+  addWorkflowStep: () => void;
+  editWorkflowStep: (workflowStepIndex: number, workflowStep: WorkflowStep) => void;
+  deleteWorkflowStep: (workflowStepIndex: number) => void;
+  setWorkflowSteps: (workflowSteps: WorkflowStep[]) => void;
 }
 
 const WorkflowContext = createContext<WorkflowContextType>({
   toggleWorkflow: () => {},
-  workflow: () => [],
-  editWorkflow: () => {},
-  deleteWorkflow: () => {},
-  addWorkflow: () => {},
-  deleteWorkflowStep: () => {},
+  workflowSteps: () => [],
   addWorkflowStep: () => {},
   editWorkflowStep: () => {},
-  workflowListIndex: () => 0,
-  workflowStep: () => ({ temperature: 0, holdTimeInSeconds: 0, pumpTimeInSeconds: 0 }),
-  workflowStepIndex: () => 0,
-  workflowList: () => [],
+  deleteWorkflowStep: () => {},
+  setWorkflowSteps: () => {},
 });
 
 interface WorkflowProviderProps {
@@ -60,103 +37,28 @@ interface WorkflowProviderProps {
 }
 
 export const WorkflowProvider: Component<WorkflowProviderProps> = (props) => {
-  const [workflowList, setWorkflowList] = createSignal<Workflow[]>(
-    initialListOfWorkflows
-  );
+  
+  const [workflowSteps, setWorkflowSteps] = createSignal<WorkflowStep[]>([]);
 
-  const { workflowListIndex, workflowStepIndex } = useParams();
+  const addWorkflowStep = () => {
+    setWorkflowSteps((prev) => [...prev, { temperature: 0, holdTimeInSeconds: 0, pumpTimeInSeconds: 0 }]);
+  }
 
-  const workflow = createMemo(() => {
-    return (
-      workflowList()[Number(workflowListIndex)].workflow ?? []
-    );
-  });
-
-  const workflowStep = createMemo(() => {
-    return workflow()[Number(workflowStepIndex)];
-  });
-
-  const deleteWorkflow = (workflowIndex: number) => {
-    setWorkflowList((prevWorkflowList) => [
-      ...prevWorkflowList.slice(0, workflowIndex),
-      ...prevWorkflowList.slice(workflowIndex + 1),
-    ]);
-  };
-
-  const deleteWorkflowStep = (
-    workflowIndex: number,
-    workflowStepIndex: number
-  ) => {
-    setWorkflowList((prevWorkflowList) => [
-      ...prevWorkflowList.slice(0, workflowIndex),
-      {
-        ...prevWorkflowList[workflowIndex],
-        workflow: [
-          ...prevWorkflowList[workflowIndex].workflow.slice(
-            0,
-            workflowStepIndex
-          ),
-          ...prevWorkflowList[workflowIndex].workflow.slice(
-            workflowStepIndex + 1
-          ),
-        ],
-      },
-      ...prevWorkflowList.slice(workflowIndex + 1),
-    ]);
-  };
-
-  const addWorkflow = () => {
-    setWorkflowList((prevWorkflowList) => [
-      ...prevWorkflowList,
-      { name: "New", id: uuidv4(), workflow: [] },
-    ]);
-  };
-
-  const addWorkflowStep = (workflowIndex: number) => {
-    setWorkflowList((prevWorkflowList) => [
-      ...prevWorkflowList.slice(0, workflowIndex),
-      {
-        ...prevWorkflowList[workflowIndex],
-        workflow: [
-          ...prevWorkflowList[workflowIndex].workflow,
-          { temperature: 180, holdTimeInSeconds: 0, pumpTimeInSeconds: 5 },
-        ],
-      },
-      ...prevWorkflowList.slice(workflowIndex + 1),
-    ]);
-  };
-
-  const editWorkflow = (workflowIndex: number, workFlow: Workflow) => {
-    setWorkflowList((prevWorkflowList) => [
-      ...prevWorkflowList.slice(0, workflowIndex),
-      workFlow,
-      ...prevWorkflowList.slice(workflowIndex + 1),
-    ]);
-  };
-
-  const editWorkflowStep = (
-    workflowIndex: number,
-    workflowStepIndex: number,
-    workFlowStep: WorkflowStep
-  ) => {
-    setWorkflowList((prevWorkflowList) => [
-      ...prevWorkflowList.slice(0, workflowIndex),
-      {
-        ...prevWorkflowList[workflowIndex],
-        workflow: [
-          ...prevWorkflowList[workflowIndex].workflow.slice(
-            0,
-            workflowStepIndex
-          ),
-          workFlowStep,
-          ...prevWorkflowList[workflowIndex].workflow.slice(
-            workflowStepIndex + 1
-          ),
-        ],
-      },
-      ...prevWorkflowList.slice(workflowIndex + 1),
-    ]);
-  };
+  const editWorkflowStep = (workflowStepIndex: number, workflowStep: WorkflowStep) => {
+    setWorkflowSteps((prev) => {
+      const newWorkflowSteps = [...prev];
+      newWorkflowSteps[workflowStepIndex] = workflowStep;
+      return newWorkflowSteps;
+    });
+  }
+  
+  const deleteWorkflowStep = (workflowStepIndex: number) => {
+    setWorkflowSteps((prev) => {
+      const newWorkflowSteps = [...prev];
+      newWorkflowSteps.splice(workflowStepIndex, 1);
+      return newWorkflowSteps;
+    });
+  }
 
   const [currentStep, setCurrentStep] = createSignal(0);
   const {
@@ -210,7 +112,7 @@ export const WorkflowProvider: Component<WorkflowProviderProps> = (props) => {
   };
 
   const startWorkflow = async () => {
-    const currentWorkflow = workflow();
+    const currentWorkflow = workflowSteps();
     if (!currentWorkflow) return;
     const { temperature, holdTimeInSeconds, pumpTimeInSeconds } =
       currentWorkflow[currentStep()];
@@ -226,17 +128,11 @@ export const WorkflowProvider: Component<WorkflowProviderProps> = (props) => {
     <WorkflowContext.Provider
       value={{
         toggleWorkflow,
-        workflow,
-        workflowListIndex: () => Number(workflowListIndex),
-        workflowStepIndex: () => Number(workflowStepIndex),
-        workflowStep,
-        addWorkflow,
-        editWorkflow,
-        deleteWorkflow,
-        deleteWorkflowStep,
+        workflowSteps,
         addWorkflowStep,
         editWorkflowStep,
-        workflowList
+        deleteWorkflowStep,
+        setWorkflowSteps
       }}
     >
       {props.children}
