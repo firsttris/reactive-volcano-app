@@ -1,10 +1,12 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export interface WorkflowStep {
   temperature: number;
   holdTimeInSeconds: number;
   pumpTimeInSeconds: number;
 }
 
-export const workflow1: WorkflowStep[] = [
+export const workflow0: WorkflowStep[] = [
   {
     temperature: 170,
     holdTimeInSeconds: 0,
@@ -62,7 +64,7 @@ export const workflow1: WorkflowStep[] = [
   },
 ];
 
-export const workflow2: WorkflowStep[] = [
+export const workflow1: WorkflowStep[] = [
   {
     temperature: 182,
     holdTimeInSeconds: 10,
@@ -85,7 +87,7 @@ export const workflow2: WorkflowStep[] = [
   },
 ];
 
-export const workflow3: WorkflowStep[] = [
+export const workflow2: WorkflowStep[] = [
   {
     temperature: 175,
     holdTimeInSeconds: 0,
@@ -113,7 +115,7 @@ export const workflow3: WorkflowStep[] = [
   },
 ];
 
-export const workflow4: WorkflowStep[] = [
+export const workflow3: WorkflowStep[] = [
   {
     temperature: 174,
     holdTimeInSeconds: 20,
@@ -137,21 +139,32 @@ export const workflow4: WorkflowStep[] = [
 ];
 
 
-export const listOfWorkflows = [
+export interface Workflow {
+  name: string;
+  id: string;
+  workflow: WorkflowStep[];
+}
+
+
+export const initialListOfWorkflows: Workflow[] = [
   {
     name: "Ballon",
-    workflow: workflow1,
+    id: uuidv4(),
+    workflow: workflow0,
   },
   {
     name: "workflow2",
-    workflow: workflow2,
+    id: uuidv4(),
+    workflow: workflow1,
   },
   {
     name: "workflow3",
-    workflow: workflow3,
+    id: uuidv4(),
+    workflow: workflow2,
   },
   {
     name: "workflow4",
-    workflow: workflow4,
+    id: uuidv4(),
+    workflow: workflow3,
   },
 ]

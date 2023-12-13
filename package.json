@@ -15,9 +15,11 @@
     "p-queue": "^8.0.0",
     "solid-icons": "^1.1.0",
     "solid-js": "^1.8.7",
-    "solid-styled-components": "^0.28.5"
+    "solid-styled-components": "^0.28.5",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.13.2",
     "@typescript-eslint/parser": "^6.13.2",
     "eslint": "^8.55.0",

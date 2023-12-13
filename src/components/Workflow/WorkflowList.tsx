@@ -1,10 +1,12 @@
 import { For } from "solid-js";
 import { useWorkflow } from "../../provider/WorkflowProvider";
 import { Button } from "../Button/Button";
+import { useNavigate } from "@solidjs/router";
 
 
 export const WorkflowList = () => {
-    const { workflow, addWorkflow, deleteWorkflow, editWorkflow } = useWorkflow();
+    const { workflow, addWorkflow, deleteWorkflowStep, workflowStepIndex, workflowListIndex } = useWorkflow();
+    const navigate = useNavigate();
   return (
     <div>
     <ul>
@@ -14,8 +16,8 @@ export const WorkflowList = () => {
             <div>Temperature: {workflowItem.temperature}</div>
             <div>Hold Time: {workflowItem.holdTimeInSeconds}</div>
             <div>Pump Time: {workflowItem.pumpTimeInSeconds}</div>
-            <Button onClick={() => editWorkflow(index(), workflowItem)}>Edit</Button>
-            <Button onClick={() => deleteWorkflow(index())}>Delete</Button>
+            <Button onClick={() => navigate(`/workflow-step-details/${workflowListIndex()}/${workflowStepIndex()}`)}>Edit</Button>
+            <Button onClick={() => deleteWorkflowStep(workflowListIndex(), index())}>Delete</Button>
           </li>
         )}
       </For>
