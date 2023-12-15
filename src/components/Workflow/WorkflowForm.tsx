@@ -9,32 +9,32 @@ import { useNavigate, useParams } from "@solidjs/router";
 export const WorkflowForm: Component = () => {
   const {
     workflowSteps,
-    editWorkflowStep,
+    editWorkflowStepInList,
   } = useWorkflow();
 
-
-
-  const { workflowStepIndex, workflowListIndex } = useParams();
+  const { workflowStepId, workflowListId } = useParams();
 
   const navigate = useNavigate();
 
-  const workflowStep = createMemo(() => workflowSteps()[Number(workflowStepIndex)]);
+  const workflowStep = createMemo(() => workflowSteps().find((workflowStep) => workflowStep.id === workflowStepId));
   const [temperature, setTemperature] = createSignal<number>(0);
   const [holdTime, setHoldTime] = createSignal<number>(0);
   const [pumpTime, setPumpTime] = createSignal<number>(0);
 
   createEffect(() => {
-    setTemperature(workflowStep().temperature)
-    setHoldTime(workflowStep().holdTimeInSeconds)
-    setPumpTime(workflowStep().pumpTimeInSeconds)
+    const step = workflowStep();
+    if(!step) return;
+    setTemperature(step.temperature)
+    setHoldTime(step.holdTimeInSeconds)
+    setPumpTime(step.pumpTimeInSeconds)
   });
 
   const t = useTranslations();
 
   const handleSubmit = (event: Event) => {
     event.preventDefault();
-    editWorkflowStep(Number(workflowStepIndex), { temperature: temperature(), holdTimeInSeconds: holdTime(), pumpTimeInSeconds: pumpTime() });
-    navigate(`/workflow-list/${workflowListIndex}`);
+    editWorkflowStepInList(workflowListId, workflowStepId, { id: workflowStepId, temperature: temperature(), holdTimeInSeconds: holdTime(), pumpTimeInSeconds: pumpTime() });
+    navigate(`/list/${workflowListId}`);
   };
 
   return (

@@ -12,8 +12,8 @@ export const Routes = () => {
   return (
     <Router>
         <Route path="/" component={Start} /> 
-        <Route path="/workflow-list/:workflowListIndex" component={WorkflowList} />
-        <Route path="/workflow-form/:workflowListIndex/:workflowStepIndex" component={WorkflowForm} />
+        <Route path="/list/:workflowListId" component={WorkflowList} />
+        <Route path="/form/:workflowListId/:workflowStepId" component={WorkflowForm} />
     </Router>
   );
 };

@@ -1,9 +1,9 @@
 import { For } from "solid-js";
 import { WorkflowItem } from "./WorkflowItem";
 import { styled } from "solid-styled-components";
-import { useWorkflowList } from "../../hooks/useWorkflowList";
+import { useWorkflow } from "../../provider/WorkflowProvider";
 
-const Container = styled('div')`
+const Container = styled("div")`
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -14,22 +14,24 @@ const Container = styled('div')`
   }
 `;
 
-const WorkflowItemContainer = styled('div')`
-width: 43%;
-@media (max-width: 500px) {
+const WorkflowItemContainer = styled("div")`
+  width: 43%;
+  @media (max-width: 500px) {
     width: 100%;
   }
-`
+`;
 
 export const WorkFlowSection = () => {
-
-  const { workflowList } = useWorkflowList();
+  const { workflowList } = useWorkflow();
 
   return (
-    <Container
-    >
+    <Container>
       <For each={workflowList()}>
-        {(workflow, index) => <WorkflowItemContainer><WorkflowItem workflow={workflow} index={index()} /></WorkflowItemContainer>}
+        {(workflow) => (
+          <WorkflowItemContainer>
+            <WorkflowItem workflow={workflow} />
+          </WorkflowItemContainer>
+        )}
       </For>
     </Container>
   );

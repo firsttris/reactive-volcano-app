@@ -1,15 +1,20 @@
 import {
   Component,
   createContext,
+  createEffect,
+  createMemo,
   createSignal,
+  onMount,
   useContext,
 } from "solid-js";
 import type { JSX } from "solid-js";
 import { useCharacteristics } from "./CharacteristicsProvider";
 import {
+  Workflow,
   WorkflowStep,
+  initialListOfWorkflows,
 } from "./../utils/workflowData";
-
+import { v4 as uuidv4 } from "uuid";
 
 const delayFor = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
@@ -17,19 +22,48 @@ const delayFor = (ms: number) =>
 interface WorkflowContextType {
   toggleWorkflow: () => void;
   workflowSteps: () => WorkflowStep[];
-  addWorkflowStep: () => void;
-  editWorkflowStep: (workflowStepIndex: number, workflowStep: WorkflowStep) => void;
-  deleteWorkflowStep: (workflowStepIndex: number) => void;
-  setWorkflowSteps: (workflowSteps: WorkflowStep[]) => void;
+  selectedWorkflowId: () => string;
+  setSelectedWorkflowId: (workflowId: string) => void;
+  addWorkflowToList: () => void;
+  addWorkflowStepToWorkflow: (
+    workflowId: string,
+    workflowStep: WorkflowStep
+  ) => void;
+  deleteWorkflowFromList: (workflowId: string) => void;
+  deleteWorkflowStepFromList: (
+    workflowId: string,
+    workflowStepId: string
+  ) => void;
+  editWorkflowInList: (workflowId: string, workflow: Workflow) => void;
+  editWorkflowStepInList: (
+    workflowId: string,
+    workflowStepId: string,
+    workflowStep: WorkflowStep
+  ) => void;
+  workflowList: () => Workflow[];
+  setWorkflowList: (workflowList: Workflow[]) => void;
+  updateWorkflowStepsInList: (
+    workflowId: string,
+    workflowSteps: WorkflowStep[]
+  ) => void;
+  addNewWorkflowStep: () => void;
 }
 
 const WorkflowContext = createContext<WorkflowContextType>({
   toggleWorkflow: () => {},
   workflowSteps: () => [],
-  addWorkflowStep: () => {},
-  editWorkflowStep: () => {},
-  deleteWorkflowStep: () => {},
-  setWorkflowSteps: () => {},
+  selectedWorkflowId: () => "",
+  setSelectedWorkflowId: () => {},
+  addWorkflowToList: () => {},
+  addWorkflowStepToWorkflow: () => {},
+  deleteWorkflowFromList: () => {},
+  deleteWorkflowStepFromList: () => {},
+  editWorkflowInList: () => {},
+  editWorkflowStepInList: () => {},
+  workflowList: () => [],
+  setWorkflowList: () => {},
+  updateWorkflowStepsInList: () => {},
+  addNewWorkflowStep: () => {},
 });
 
 interface WorkflowProviderProps {
@@ -37,28 +71,248 @@ interface WorkflowProviderProps {
 }
 
 export const WorkflowProvider: Component<WorkflowProviderProps> = (props) => {
-  
-  const [workflowSteps, setWorkflowSteps] = createSignal<WorkflowStep[]>([]);
+  const [workflowList, setWorkflowList] = createSignal<Workflow[]>(
+    initialListOfWorkflows
+  );
+  const [selectedWorkflowId, setSelectedWorkflowId] = createSignal<string>("");
 
-  const addWorkflowStep = () => {
-    setWorkflowSteps((prev) => [...prev, { temperature: 0, holdTimeInSeconds: 0, pumpTimeInSeconds: 0 }]);
-  }
+  onMount(() => {
+    const selectedWorkflowIdFromLocalStorage =
+      localStorage.getItem("selectedWorkflowId");
+    if (!selectedWorkflowIdFromLocalStorage) return;
+    console.log("selectedWorkflowId", selectedWorkflowIdFromLocalStorage);
+    setSelectedWorkflowId(selectedWorkflowIdFromLocalStorage);
 
-  const editWorkflowStep = (workflowStepIndex: number, workflowStep: WorkflowStep) => {
-    setWorkflowSteps((prev) => {
-      const newWorkflowSteps = [...prev];
-      newWorkflowSteps[workflowStepIndex] = workflowStep;
-      return newWorkflowSteps;
-    });
-  }
-  
-  const deleteWorkflowStep = (workflowStepIndex: number) => {
-    setWorkflowSteps((prev) => {
-      const newWorkflowSteps = [...prev];
-      newWorkflowSteps.splice(workflowStepIndex, 1);
-      return newWorkflowSteps;
-    });
-  }
+    const workflowListFromLocalStorage = localStorage.getItem("workflowList");
+    if (!workflowListFromLocalStorage) return;
+    console.log("workflowList", workflowListFromLocalStorage);
+    try {
+      setWorkflowList(JSON.parse(workflowListFromLocalStorage));
+    } catch (error) {
+      console.log("error", error);
+    }
+  });
+
+  createEffect(() => {
+    if (selectedWorkflowId()) {
+      localStorage.setItem("selectedWorkflowId", selectedWorkflowId());
+    }
+
+    if (workflowList()) {
+      localStorage.setItem("workflowList", JSON.stringify(workflowList()));
+    }
+  });
+
+  const workflowSteps = createMemo(() => {
+    const workflow = workflowList().find(
+      (workflow) => workflow.id === selectedWorkflowId()
+    );
+    return workflow?.workflowSteps || [];
+  });
+
+  const addWorkflowToList = () => {
+    const newWorkflow: Workflow = {
+      id: uuidv4(),
+      name: "New Workflow",
+      workflowSteps: [],
+    };
+    setWorkflowList([...workflowList(), newWorkflow]);
+    setSelectedWorkflowId(newWorkflow.id);
+  };
+
+  const findWorkflowIndex = (workflowId: string) => {
+    return workflowList().findIndex((workflow) => workflow.id === workflowId);
+  };
+
+  const addWorkflowStepToWorkflow = (
+    workflowId: string,
+    workflowStep: WorkflowStep
+  ) => {
+    const workflows = workflowList();
+    const workflowIndex = findWorkflowIndex(workflowId);
+
+    if (workflowIndex === -1) {
+      console.log(`Workflow with id ${workflowId} not found`);
+      return;
+    }
+
+    const workflow = workflows[workflowIndex];
+    const updatedWorkflow = {
+      ...workflow,
+      workflowSteps: [...workflow.workflowSteps, workflowStep],
+    };
+
+    setWorkflowList([
+      ...workflows.slice(0, workflowIndex),
+      updatedWorkflow,
+      ...workflows.slice(workflowIndex + 1),
+    ]);
+  };
+
+  const deleteWorkflowFromList = (workflowId: string) => {
+    const workflows = workflowList();
+    const workflowIndex = findWorkflowIndex(workflowId);
+
+    if (workflowIndex === -1) {
+      console.log(`Workflow with id ${workflowId} not found`);
+      return;
+    }
+
+    setWorkflowList([
+      ...workflows.slice(0, workflowIndex),
+      ...workflows.slice(workflowIndex + 1),
+    ]);
+  };
+
+  const deleteWorkflowStepFromList = (
+    workflowId: string,
+    workflowStepId: string
+  ) => {
+    const workflows = workflowList();
+    const workflowIndex = findWorkflowIndex(workflowId);
+
+    if (workflowIndex === -1) {
+      console.log(`Workflow with id ${workflowId} not found`);
+      return;
+    }
+
+    const workflow = workflows[workflowIndex];
+    const workflowStepIndex = workflow.workflowSteps.findIndex(
+      (workflowStep) => workflowStep.id === workflowStepId
+    );
+
+    if (workflowStepIndex === -1) {
+      console.log(`WorkflowStep with id ${workflowStepId} not found`);
+      return;
+    }
+
+    const updatedWorkflow = {
+      ...workflow,
+      workflowSteps: [
+        ...workflow.workflowSteps.slice(0, workflowStepIndex),
+        ...workflow.workflowSteps.slice(workflowStepIndex + 1),
+      ],
+    };
+
+    setWorkflowList([
+      ...workflows.slice(0, workflowIndex),
+      updatedWorkflow,
+      ...workflows.slice(workflowIndex + 1),
+    ]);
+  };
+
+  const editWorkflowInList = (workflowId: string, workflow: Workflow) => {
+    const workflows = workflowList();
+    const workflowIndex = findWorkflowIndex(workflowId);
+
+    if (workflowIndex === -1) {
+      console.log(`Workflow with id ${workflowId} not found`);
+      return;
+    }
+
+    const updatedWorkflow = {
+      ...workflow,
+    };
+
+    setWorkflowList([
+      ...workflows.slice(0, workflowIndex),
+      updatedWorkflow,
+      ...workflows.slice(workflowIndex + 1),
+    ]);
+  };
+
+  const editWorkflowStepInList = (
+    workflowId: string,
+    workflowStepId: string,
+    workflowStep: WorkflowStep
+  ) => {
+    const workflows = workflowList();
+    const workflowIndex = findWorkflowIndex(workflowId);
+
+    if (workflowIndex === -1) {
+      console.log(`Workflow with id ${workflowId} not found`);
+      return;
+    }
+
+    const workflow = workflows[workflowIndex];
+    const workflowStepIndex = workflow.workflowSteps.findIndex(
+      (workflowStep) => workflowStep.id === workflowStepId
+    );
+
+    if (workflowStepIndex === -1) {
+      console.log(`WorkflowStep with id ${workflowStepId} not found`);
+      return;
+    }
+
+    const updatedWorkflow = {
+      ...workflow,
+      workflowSteps: [
+        ...workflow.workflowSteps.slice(0, workflowStepIndex),
+        workflowStep,
+        ...workflow.workflowSteps.slice(workflowStepIndex + 1),
+      ],
+    };
+
+    setWorkflowList([
+      ...workflows.slice(0, workflowIndex),
+      updatedWorkflow,
+      ...workflows.slice(workflowIndex + 1),
+    ]);
+  };
+
+  const updateWorkflowStepsInList = (
+    workflowId: string,
+    workflowSteps: WorkflowStep[]
+  ) => {
+    const workflows = workflowList();
+    const workflowIndex = findWorkflowIndex(workflowId);
+
+    if (workflowIndex === -1) {
+      console.log(`Workflow with id ${workflowId} not found`);
+      return;
+    }
+
+    const workflow = workflows[workflowIndex];
+
+    const updatedWorkflow = {
+      ...workflow,
+      workflowSteps,
+    };
+
+    setWorkflowList([
+      ...workflows.slice(0, workflowIndex),
+      updatedWorkflow,
+      ...workflows.slice(workflowIndex + 1),
+    ]);
+  };
+
+  const addNewWorkflowStep = () => {
+    const workflowStep: WorkflowStep = {
+      id: uuidv4(),
+      temperature: 0,
+      holdTimeInSeconds: 0,
+      pumpTimeInSeconds: 0,
+    };
+    const workflows = workflowList();
+    const workflowIndex = findWorkflowIndex(selectedWorkflowId());
+
+    if (workflowIndex === -1) {
+      console.log(`Workflow with id ${selectedWorkflowId()} not found`);
+      return;
+    }
+
+    const workflow = workflows[workflowIndex];
+    const updatedWorkflow = {
+      ...workflow,
+      workflowSteps: [...workflow.workflowSteps, workflowStep],
+    };
+
+    setWorkflowList([
+      ...workflows.slice(0, workflowIndex),
+      updatedWorkflow,
+      ...workflows.slice(workflowIndex + 1),
+    ]);
+  };
 
   const [currentStep, setCurrentStep] = createSignal(0);
   const {
@@ -129,10 +383,18 @@ export const WorkflowProvider: Component<WorkflowProviderProps> = (props) => {
       value={{
         toggleWorkflow,
         workflowSteps,
-        addWorkflowStep,
-        editWorkflowStep,
-        deleteWorkflowStep,
-        setWorkflowSteps
+        selectedWorkflowId,
+        setSelectedWorkflowId,
+        addWorkflowToList,
+        addWorkflowStepToWorkflow,
+        deleteWorkflowFromList,
+        deleteWorkflowStepFromList,
+        editWorkflowInList,
+        editWorkflowStepInList,
+        workflowList,
+        setWorkflowList,
+        updateWorkflowStepsInList,
+        addNewWorkflowStep,
       }}
     >
       {props.children}

@@ -2,43 +2,54 @@ import { For } from "solid-js";
 import { useWorkflow } from "../../provider/WorkflowProvider";
 import { Button } from "../Button/Button";
 import { useNavigate, useParams } from "@solidjs/router";
-import { useWorkflowList } from "../../hooks/useWorkflowList";
 
 export const WorkflowList = () => {
-  const { deleteWorkflowStep, workflowSteps, addWorkflowStep } = useWorkflow();
-  const { updateWorkflowSteps } = useWorkflowList();
-  const { workflowListIndex } = useParams();
+  const {
+    deleteWorkflowStepFromList,
+    workflowSteps,
+    updateWorkflowStepsInList,
+    addNewWorkflowStep,
+  } = useWorkflow();
+
+  const { workflowListId } = useParams();
   const navigate = useNavigate();
+
   return (
     <div>
       <ul>
         <For each={workflowSteps()}>
-          {(workflowItem, index) => (
+          {(workflowItem) => (
             <li>
               <div>Temperature: {workflowItem.temperature}</div>
               <div>Hold Time: {workflowItem.holdTimeInSeconds}</div>
               <div>Pump Time: {workflowItem.pumpTimeInSeconds}</div>
-              <div style={{ display: 'flex', "flex-direction": "row", gap: '5px'}}>
-              <Button
-                onClick={() =>
-                  navigate(`/workflow-form/${workflowListIndex}/${index()}`)
-                }
+              <div
+                style={{ display: "flex", "flex-direction": "row", gap: "5px" }}
               >
-                Edit
-              </Button>
-              <Button onClick={() => deleteWorkflowStep(index())}>
-                Delete
-              </Button>
+                <Button
+                  onClick={() =>
+                    navigate(`/form/${workflowListId}/${workflowItem.id}`)
+                  }
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={() =>
+                    deleteWorkflowStepFromList(workflowListId, workflowItem.id)
+                  }
+                >
+                  Delete
+                </Button>
               </div>
             </li>
           )}
         </For>
       </ul>
-      <div style={{ display: 'flex', "flex-direction": "row"}}>
-        <Button onClick={() => addWorkflowStep()}>Add</Button>
+      <div style={{ display: "flex", "flex-direction": "row" }}>
+        <Button onClick={() => addNewWorkflowStep()}>Add</Button>
         <Button
           onClick={() => {
-            updateWorkflowSteps(Number(workflowListIndex), workflowSteps());
+            updateWorkflowStepsInList(workflowListId, workflowSteps());
             navigate("/");
           }}
         >
