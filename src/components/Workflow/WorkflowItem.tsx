@@ -21,6 +21,7 @@ const Container = styled('div')`
 
 const WorkflowName = styled('div')`
   min-width: 200px;
+  cursor: pointer;
 `;
 
 export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
