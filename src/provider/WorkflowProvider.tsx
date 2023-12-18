@@ -8,7 +8,6 @@ import {
   useContext,
 } from "solid-js";
 import type { JSX } from "solid-js";
-import { useCharacteristics } from "./CharacteristicsProvider";
 import {
   Workflow,
   WorkflowStep,
@@ -16,11 +15,7 @@ import {
 } from "./../utils/workflowData";
 import { v4 as uuidv4 } from "uuid";
 
-const delayFor = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
-
 interface WorkflowContextType {
-  toggleWorkflow: () => void;
   workflowSteps: () => WorkflowStep[];
   selectedWorkflowId: () => string;
   setSelectedWorkflowId: (workflowId: string) => void;
@@ -50,7 +45,6 @@ interface WorkflowContextType {
 }
 
 const WorkflowContext = createContext<WorkflowContextType>({
-  toggleWorkflow: () => {},
   workflowSteps: () => [],
   selectedWorkflowId: () => "",
   setSelectedWorkflowId: () => {},
@@ -75,6 +69,13 @@ export const WorkflowProvider: Component<WorkflowProviderProps> = (props) => {
     initialListOfWorkflows
   );
   const [selectedWorkflowId, setSelectedWorkflowId] = createSignal<string>("");
+
+  const workflowSteps = createMemo(() => {
+    const workflow = workflowList().find(
+      (workflow) => workflow.id === selectedWorkflowId()
+    );
+    return workflow?.workflowSteps || [];
+  });
 
   onMount(() => {
     const selectedWorkflowIdFromLocalStorage =
@@ -103,12 +104,7 @@ export const WorkflowProvider: Component<WorkflowProviderProps> = (props) => {
     }
   });
 
-  const workflowSteps = createMemo(() => {
-    const workflow = workflowList().find(
-      (workflow) => workflow.id === selectedWorkflowId()
-    );
-    return workflow?.workflowSteps || [];
-  });
+
 
   const addWorkflowToList = () => {
     const newWorkflow: Workflow = {
@@ -314,74 +310,11 @@ export const WorkflowProvider: Component<WorkflowProviderProps> = (props) => {
     ]);
   };
 
-  const [currentStep, setCurrentStep] = createSignal(0);
-  const {
-    getters: { getCurrentTemperature, getTargetTemperature },
-    setters: {
-      setTargetTemperature,
-      setPumpOn,
-      setPumpOff,
-      setHeatOn,
-      setHeatOff,
-    },
-  } = useCharacteristics();
 
-  const toggleWorkflow = async () => {
-    startWorkflow();
-  };
-
-  const monitorTemperaturUntilTarget = () =>
-    new Promise((resolve) => {
-      const interval = setInterval(() => {
-        if (getCurrentTemperature() >= getTargetTemperature()) {
-          clearInterval(interval);
-          resolve(null);
-        }
-      }, 1000);
-    });
-
-  const activatePumpAfterDelay = async (holdTimeInSec: number) => {
-    await delayFor(holdTimeInSec * 1000);
-    await setPumpOn();
-  };
-
-  const disablePumpAfterDeplay = async (pumpTimeInSec: number) => {
-    await delayFor(pumpTimeInSec * 1000);
-    await setPumpOff();
-  };
-
-  const executeNextWorkflowStep = async (workflowLenth: number) => {
-    setCurrentStep((prevStep) => prevStep + 1);
-    if (currentStep() < workflowLenth) {
-      startWorkflow();
-    } else {
-      await setHeatOff();
-      // what todo if the workflow is finished?
-    }
-  };
-
-  const activeHeatAndSetTargetTemperature = async (temperature: number) => {
-    await setTargetTemperature(temperature);
-    await setHeatOn();
-  };
-
-  const startWorkflow = async () => {
-    const currentWorkflow = workflowSteps();
-    if (!currentWorkflow) return;
-    const { temperature, holdTimeInSeconds, pumpTimeInSeconds } =
-      currentWorkflow[currentStep()];
-
-    await activeHeatAndSetTargetTemperature(temperature);
-    await monitorTemperaturUntilTarget();
-    await activatePumpAfterDelay(holdTimeInSeconds);
-    await disablePumpAfterDeplay(pumpTimeInSeconds);
-    await executeNextWorkflowStep(currentWorkflow.length);
-  };
 
   return (
     <WorkflowContext.Provider
       value={{
-        toggleWorkflow,
         workflowSteps,
         selectedWorkflowId,
         setSelectedWorkflowId,

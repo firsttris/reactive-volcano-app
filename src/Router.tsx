@@ -10,7 +10,7 @@ export const Routes = () => {
     const Start = () => isProd ? <Connect /> : <App />
 
   return (
-    <Router>
+    <Router base={ isProd ? '/reactive-volcano-app/' : undefined}>
         <Route path="/" component={Start} /> 
         <Route path="/list/:workflowListId" component={WorkflowList} />
         <Route path="/form/:workflowListId/:workflowStepId" component={WorkflowForm} />
