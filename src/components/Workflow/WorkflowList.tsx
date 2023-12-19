@@ -5,7 +5,6 @@ import { useNavigate, useParams } from "@solidjs/router";
 import { AiFillEdit } from "solid-icons/ai";
 import { AiFillDelete } from "solid-icons/ai";
 import { styled } from "solid-styled-components";
-import { useWorkflowScheduler } from "../../hooks/useWorkflowScheduler";
 
 const ResponsiveContainer = styled("div")`
   display: flex;
@@ -34,7 +33,7 @@ export const WorkflowList = () => {
   const { workflowListId } = useParams();
   const navigate = useNavigate();
 
-  const { startWorkflow, currentStep } = useWorkflowScheduler(workflowSteps)
+  // const { startWorkflow, currentStep } = useWorkflowScheduler(workflowSteps)
 
   return (
     <ResponsiveContainer>
