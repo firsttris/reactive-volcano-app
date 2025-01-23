@@ -9,7 +9,7 @@ import { StandbyDisplaySwitch } from "./components/Switch/StandbyDisplaySwitch";
 import { ConnectionBar } from "./components/Connect/ConnectionBar";
 import { styled } from "solid-styled-components";
 import { useTranslations } from "./i18n/utils";
-import { WorkFlowSection } from "./components/Workflow/WorkflowSection";
+// import { WorkFlowSection } from "./components/Workflow/WorkflowSection";
 
 const ResponsiveContainer = styled("div")`
   display: flex;
