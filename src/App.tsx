@@ -63,8 +63,7 @@ export const App = () => {
             </div>
             <HeatAndPump />
           </div>
-
-          <WorkFlowSection />
+         {/* <WorkFlowSection />*/}
           <div style={{ "margin-top": "50px" }}>
             <div style={{ "font-size": "30px" }}>{t("settings")}</div>
 
