@@ -7,7 +7,32 @@ export enum States {
   VIBRATION = 0x400,
 }
 
-export enum ServiceUUIDs {
+// Veazy/Venty Write Masks (from qvap.js)
+export enum VentyVeazyWriteMasks {
+  SET_TEMPERATURE = 1 << 1,
+  SET_BOOST = 1 << 2,
+  SET_SUPERBOOST = 1 << 3,
+  HEATER = 1 << 5,
+  SETTINGS = 1 << 7,
+}
+
+// Veazy/Venty Settings Bits (from qvap.js)
+export enum VentyVeazySettingsBits {
+  UNIT = 1 << 0,
+  SETPOINT_REACHED = 1 << 1,
+  FACTORY_RESET = 1 << 2,
+  ECOMODE_CHARGE = 1 << 3,
+  BUTTON_CHANGED_FILLING_CHAMBER = 1 << 4,
+  ECOMODE_VOLTAGE = 1 << 5,
+  BOOST_VISUALIZATION = 1 << 6,
+}
+
+export enum VentyVeazySettings2Bits {
+  BLE_PERMANENT = 1 << 0,
+}
+
+// Volcano Services
+export enum VolcanoServiceUUIDs {
   Bootloader = "00000001-1989-0108-1234-123456789abc",
   Service2 = "01000002-1989-0108-1234-123456789abc",
   DeviceState = "10100000-5354-4f52-5a26-4249434b454c",
@@ -15,7 +40,14 @@ export enum ServiceUUIDs {
   Service5 = "10130000-5354-4f52-5a26-4249434b454c",
 }
 
-export enum CharateristicUUIDs {
+// Venty/Veazy Services
+export enum VentyVeazyServiceUUIDs {
+  Primary = "00000000-5354-4f52-5a26-4249434b454c",
+  GenericAccess = "00001800-0000-1000-8000-00805f9b34fb",
+}
+
+// Volcano Characteristics
+export enum VolcanoCharacteristicUUIDs {
   display = "1010000d-5354-4f52-5a26-4249434b454c",
   targetTemperature = "10110003-5354-4f52-5a26-4249434b454c",
   currentTemperature = "10110001-5354-4f52-5a26-4249434b454c",
@@ -35,20 +67,54 @@ export enum CharateristicUUIDs {
   brightness = "10110005-5354-4f52-5a26-4249434b454c",
 }
 
-export type CharateristicUUIDsKeys = keyof typeof CharateristicUUIDs;
+// Venty/Veazy Characteristics
+export enum VentyVeazyCharacteristicUUIDs {
+  control = "00000001-5354-4f52-5a26-4249434b454c",
+  deviceName = "00002a00-0000-1000-8000-00805f9b34fb",
+}
 
+// Backward compatibility - explicit mapping to avoid conflicts
+export const ServiceUUIDs = {
+  // Volcano services
+  Bootloader: VolcanoServiceUUIDs.Bootloader,
+  Service2: VolcanoServiceUUIDs.Service2,
+  DeviceState: VolcanoServiceUUIDs.DeviceState,
+  DeviceControl: VolcanoServiceUUIDs.DeviceControl,
+  Service5: VolcanoServiceUUIDs.Service5,
+
+  // Veazy/Venty services
+  Primary: VentyVeazyServiceUUIDs.Primary,
+  GenericAccess: VentyVeazyServiceUUIDs.GenericAccess,
+};
+
+export const CharateristicUUIDs = {
+  ...VolcanoCharacteristicUUIDs,
+  ...VentyVeazyCharacteristicUUIDs,
+};
+
+// Device-specific characteristic types
 export type VolcanoCharacteristics = Record<
-  keyof typeof CharateristicUUIDs,
+  keyof typeof VolcanoCharacteristicUUIDs,
   BluetoothRemoteGATTCharacteristic | undefined
 >;
 
-export const initialCharacteristics = Object.fromEntries(
-  Object.keys(CharateristicUUIDs).map((key) => [key, undefined])
-) as VolcanoCharacteristics;
+export type VentyVeazyCharacteristics = Record<
+  keyof typeof VentyVeazyCharacteristicUUIDs,
+  BluetoothRemoteGATTCharacteristic | undefined
+>;
+
+export type CharateristicUUIDsKeys = keyof typeof CharateristicUUIDs;
 
 export enum ConnectionState {
   NOT_CONNECTED = "NOT_CONNECTED",
   CONNECTING = "CONNECTING",
   CONNECTED = "CONNECTED",
   CONNECTION_FAILED = "CONNECTION_FAILED",
+}
+
+export enum DeviceType {
+  VOLCANO = "VOLCANO",
+  VEAZY = "VEAZY",
+  VENTY = "VENTY",
+  UNKNOWN = "UNKNOWN",
 }

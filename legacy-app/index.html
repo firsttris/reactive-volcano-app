@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<!--
+*STORZ & BICKEL Web App v3.4.0 (https://app.storz-bickel.com)
+*STORZ & BICKEL © 2020-2025
+*Unauthorized copying of this file via any medium is prohibited.
+*Written by STORZ & BICKEL GmbH
+-->
+<html class="bg-orange" lang="en">
+  <head>
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-TM9XMFV");
+    </script>
+    <title>STORZ &amp; BICKEL</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="author" content="STORZ & BICKEL" />
+    <meta
+      name="description"
+      content="STORZ & BICKEL Web App for Bluetooth Devices."
+    />
+    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="theme-color" content="#FFFFFF" />
+    <link rel="icon" href="img/icon-sb-md.png" />
+    <link rel="apple-touch-icon" href="img/icon-sb-xs.png" />
+    <link rel="manifest" href="manifest.json" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:700,400"
+    />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/boot.css" />
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-156279675-1"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "UA-156279675-1");
+    </script>
+  </head>
+  <body class="bg-white color-grey">
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-TM9XMFV"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+    <aside class="h-100 bg-white fixed-top" style="z-index: 1100" id="aside">
+      <div class="container h-100">
+        <div class="row">
+          <div class="col text-right pt-2">
+            <small class="color-grey disabled" id="webAppVersionID"
+              >V3.4.0</small
+            >
+          </div>
+        </div>
+        <div class="row h-100">
+          <div class="col align-self-center text-center">
+            <img src="img/logo.svg" height="60" alt="Storz & Bickel" /><br />
+            <button
+              class="btn-sb bg-transparent my-4"
+              aria-label="Connect to Device"
+              id="connectBtn"
+            >
+              Connect</button
+            ><br />
+            <br />
+            <img
+              class="absolute"
+              src="img/load.gif"
+              height="24"
+              width="24"
+              alt="Loading... "
+              id="loadGif"
+            /><br />
+            <a
+              href="https://www.storz-bickel.com/en/support/web/troubleshooting"
+            >
+              <small class="color-grey text-underline disabled"
+                ><u>Can't connect?</u></small
+              >
+            </a>
+          </div>
+        </div>
+        <div class="footer bg-blue fixed-bottom">
+          <div class="container h-100">
+            <div class="row h-100 align-items-center">
+              <div class="col-6">
+                <small id="webAppCopyrightYear"
+                  >STORZ &amp; BICKEL © 2025</small
+                >
+              </div>
+              <div class="col-6 text-right">
+                <div>
+                  <a
+                    class="color-white"
+                    href="https://www.storz-bickel.com/en/privacy"
+                  >
+                    <small>Privacy Policy</small>
+                  </a>
+                  <small>•</small>
+                  <a
+                    class="color-white"
+                    href="https://www.storz-bickel.com/en/imprint"
+                  >
+                    <small>Imprint</small>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <header class="w-100">
+      <div class="container h-100">
+        <div class="row h-100 align-items-center">
+          <div class="col">
+            <img
+              class="crafty icon-sm d-none"
+              src="img/logo-cy.svg"
+              alt="Crafty"
+              id="img-cy1"
+            />
+            <img
+              class="crafty icon-sm d-none"
+              src="img/logo-cp.svg"
+              alt="Crafty Plus"
+              id="img-cp1"
+            />
+            <img
+              class="venty icon-sm d-none"
+              src="img/logo-vy.svg"
+              alt="Venty"
+              id="img-vy"
+            />
+            <img
+              class="veazy icon-sm d-none"
+              src="img/logo-vz.svg"
+              alt="Veazy"
+              id="img-vz"
+            />
+            <img
+              class="volcano icon-sm d-none"
+              src="img/logo-v.svg"
+              alt="Volcano"
+              id="img-v"
+            />
+          </div>
+          <div class="col text-right">
+            <button
+              class="btn-sb bg-transparent"
+              aria-label="Disconnect from Device"
+              id="disconnectBtn"
+            >
+              Disconnect
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <nav class="bg-grey">
+      <div class="container">
+        <div class="row">
+          <div class="col text-center">
+            <img class="icon-md" src="img/logo-sb.svg" alt="Storz & Bickel" />
+          </div>
+        </div>
+      </div>
+    </nav>
+    <section class="bg-grey">
+      <div class="container">
+        <div class="row py-4">
+          <div class="col text-center">
+            <h2>TEMPERATURE</h2>
+          </div>
+        </div>
+        <div class="row justify-content-center pb-4" id="timerObject">
+          <div class="col-8 col-sm-6 col-md-4 text-center">
+            <div class="progress bg-grey rounded-0" style="height: 4px">
+              <div
+                class="progress-bar bg-orange mx-auto"
+                role="progressbar"
+                aria-valuenow="100"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                id="timer"
+                style="width: 100%"
+              ></div>
+            </div>
+            <small id="timerInSec">60 sec</small>
+          </div>
+        </div>
+      </div>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col text-center">
+            <img class="crafty d-none" src="img/img-cy.jpg" alt="Crafty" />
+            <img
+              class="veazy-black veazyDevColor d-none"
+              src="img/img-vz-black.jpg"
+              alt="Veazy Black"
+            />
+            <img
+              class="veazy-blue veazyDevColor d-none"
+              src="img/img-vz-blue.jpg"
+              alt="Veazy Blue"
+            />
+            <img
+              class="veazy-orange veazyDevColor d-none"
+              src="img/img-vz-orange.jpg"
+              alt="Veazy Orange"
+            />
+            <img
+              class="veazy-pink veazyDevColor d-none"
+              src="img/img-vz-pink.jpg"
+              alt="Veazy Pink"
+            />
+            <img class="venty d-none" src="img/img-vy.jpg" alt="Venty" />
+            <img class="volcano d-none" src="img/img-v.jpg" alt="Volcano" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col text-center">
+            <div class="icon-md">
+              <button
+                class="border-0 bg-transparent"
+                aria-label="Turn Device On or Off"
+                id="logoOnBtn"
+              >
+                <img
+                  class="crafty icon-md absolute layer-top d-none"
+                  src="img/cy-logo-power-0.svg"
+                  alt="Crafty"
+                  id="craftySchriftzug"
+                />
+                <img
+                  class="crafty icon-md absolute layer-top d-none"
+                  src="img/cp-logo-power-0.svg"
+                  alt="Crafty Plus"
+                  id="craftyPlusSchriftzug"
+                />
+                <img
+                  class="venty icon-md absolute layer-top d-none"
+                  src="img/vy-logo-power-0.svg"
+                  alt="Venty"
+                  id="ventySchriftzug"
+                />
+                <img
+                  class="veazy icon-md absolute layer-top d-none"
+                  src="img/vz-logo-power-0.svg"
+                  alt="Veazy"
+                  id="veazySchriftzug"
+                />
+                <img
+                  class="volcano icon-md absolute layer-top d-none"
+                  src="img/v-logo-power-0.svg"
+                  alt="Volcano"
+                  id="volcanoSchriftzug"
+                />
+              </button>
+            </div>
+            <div class="power-border h-50 bg-white absolute" id="border"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section>
+      <div class="container findMyDeviceDis">
+        <div class="row py-4">
+          <div class="col-3 col-sm-4 col-lg-4 align-self-end text-right">
+            <button
+              class="btn-minus btn-temp bg-transparent border-0"
+              aria-label="Decrease Temperature"
+              id="tempMinus"
+            ></button>
+          </div>
+          <div class="col-6 col-sm-4 col-lg-4 text-center">
+            <button class="color-grey bg-transparent border-0 w-100">
+              <span class="display display-4 w-100" id="tempUnitChangeBtn">
+                <span
+                  class="float-right color-orange text-nowrap w-100"
+                  id="istTemp"
+                  >888°C</span
+                >
+                <span id="istTempBreak"><br /></span>
+                <span class="float-right text-nowrap w-100" id="sollTemp"
+                  >888°C</span
+                >
+              </span>
+            </button>
+          </div>
+          <div class="col-3 col-sm-4 col-lg-4 align-self-end text-left">
+            <button
+              class="btn-plus btn-temp bg-transparent border-0"
+              aria-label="Increase Temperature"
+              id="tempPlus"
+            ></button>
+          </div>
+        </div>
+        <div class="crafty venty veazy row justify-content-center d-none">
+          <div class="col">
+            <div class="power-battery mx-auto">
+              <div class="progress bg-white rounded-0" style="height: 20px">
+                <div
+                  class="progress-bar progress-bar-striped progress-bar-animated bg-dark"
+                  role="progressbar"
+                  aria-valuenow="75"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  id="battery"
+                  style="width: 0%"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="volcano row justify-content-center pb-4 d-none">
+          <div class="col-3 col-sm-4 col-lg-4 align-self-end text-right">
+            <button
+              class="bg-transparent border-0 p-0"
+              aria-label="Heat"
+              id="heat"
+            >
+              <img
+                class="btn-func"
+                src="img/heat-0.svg"
+                alt="Heat"
+                id="heatImg"
+              />
+            </button>
+          </div>
+          <div class="col-6 col-sm-4 col-lg-4 text-center">
+            <img class="icon-xs" src="img/logo-vh.svg" alt="Hybrid" />
+          </div>
+          <div class="col-3 col-sm-4 col-lg-4 align-self-end text-left">
+            <button
+              class="bg-transparent border-0 p-0"
+              aria-label="Air"
+              id="air"
+            >
+              <img class="btn-func" src="img/air-0.svg" alt="Air" id="airImg" />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="container d-none findMyDeviceEna">
+        <div class="row py-5">
+          <h5 class="text-center w-100">
+            <span class="text-center w-100">
+              Find my Device Function enabled
+              <br /><br />
+              <button
+                class="venty btn-sb bg-transparent d-none"
+                id="findVenty2"
+                aria-label="Find My"
+                type="button"
+              >
+                Find My VENTY
+              </button>
+              <button
+                class="veazy btn-sb bg-transparent d-none"
+                id="findVeazy2"
+                aria-label="Find My"
+                type="button"
+              >
+                Find My VEAZY
+              </button>
+              <br /><br />
+              To switch on device, press power button or insert USB-C cable.
+            </span>
+          </h5>
+        </div>
+      </div>
+    </section>
+    <section class="crafty venty veazy bg-orange d-none">
+      <div class="container findMyDeviceDis">
+        <div class="row py-2 mt-4">
+          <div class="col-3 col-sm-4 col-lg-4 align-self-end text-right pb-1">
+            <button
+              class="btn-boost-minus btn-temp bg-transparent border-0"
+              aria-label="Decrease Boost Temperature"
+              id="boostMinus"
+            ></button>
+          </div>
+          <div class="col-6 col-sm-4 col-lg-4 text-center">
+            <h6 class="py-2">BOOST</h6>
+            <div class="display display-4 text-right">
+              <div class="float-right" id="boostTemp">88°C</div>
+            </div>
+          </div>
+          <div class="col-3 col-sm-4 col-lg-4 align-self-end text-left pb-1">
+            <button
+              class="btn-boost-plus btn-temp bg-transparent border-0"
+              aria-label="Increase Boost Temperature"
+              id="boostPlus"
+            ></button>
+          </div>
+        </div>
+        <div class="venty veazy row py-2 d-none">
+          <div class="col-3 col-sm-4 col-lg-4 align-self-end text-right pb-1">
+            <button
+              class="btn-boost-minus btn-temp bg-transparent border-0"
+              aria-label="Decrease SuperBoost Temperature"
+              id="superboostMinus"
+            ></button>
+          </div>
+          <div class="col-6 col-sm-4 col-lg-4 text-center">
+            <h6 class="py-2">SUPERBOOST</h6>
+            <div class="display display-4 text-right">
+              <div class="float-right" id="superboostTemp">88°C</div>
+            </div>
+          </div>
+          <div class="col-3 col-sm-4 col-lg-4 align-self-end text-left pb-1">
+            <button
+              class="btn-boost-plus btn-temp bg-transparent border-0"
+              aria-label="Increase SuperBoost Temperature"
+              id="superboostPlus"
+            ></button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="volcano bg-orange d-none">
+      <div class="container">
+        <div class="row justify-content-center py-2 mt-4">
+          <div class="col-6 col-sm-4 col-lg-4 text-center">
+            <h6 class="py-2">WORKFLOW</h6>
+          </div>
+        </div>
+        <div class="row justify-content-center pb-2">
+          <div class="col-9 col-sm-6 col-md-4 col-lg-3 pb-4">
+            <div
+              class="card border-0"
+              style="
+                border-radius: 1rem;
+                box-shadow: 0 6px 8px 0 rgba(0, 0, 0, 0.5);
+              "
+            >
+              <div class="card-body py-2">
+                <div class="row align-items-center">
+                  <div class="col-6">
+                    <h5 class="card-title color-orange mb-0">Balloon</h5>
+                    <a
+                      href="javascript://"
+                      data-toggle="popover"
+                      data-placement="bottom"
+                      data-content="Get the full spectrum of flavor in 5°C (9°F) steps from 170°C (338 °F) to 220 °C (428 °F)."
+                    >
+                      <small class="text-muted"><u>Details</u></small>
+                    </a>
+                  </div>
+                  <div class="col-6 text-right">
+                    <button
+                      class="bg-transparent border-0 p-0"
+                      aria-label="Control Workflow"
+                      id="wf-0"
+                    >
+                      <img
+                        class="btn-work"
+                        src="img/play-0.svg"
+                        alt="Play"
+                        id="wf-0-img"
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-9 col-sm-6 col-md-4 col-lg-3 pb-4">
+            <div
+              class="card border-0"
+              style="
+                border-radius: 1rem;
+                box-shadow: 0 6px 8px 0 rgba(0, 0, 0, 0.5);
+              "
+            >
+              <div class="card-body py-2">
+                <div class="row align-items-center">
+                  <div class="col-6">
+                    <h5 class="card-title color-orange mb-0">Flow 1</h5>
+                    <a
+                      href="javascript://"
+                      data-toggle="popover"
+                      data-placement="bottom"
+                      data-content="Heat 182°C (360°F) > Hold 10 secs. > Pump 10 secs. > Heat 192°C (379°F) > Hold 7 secs. > Pump 12 secs. > Heat 201°C (394°F) > Hold 5 secs. > Pump 10 secs. > Heat 220°C (428°F) > Hold 3 secs. > Pump 10 secs."
+                    >
+                      <small class="text-muted"><u>Details</u></small>
+                    </a>
+                  </div>
+                  <div class="col-6 text-right">
+                    <button
+                      class="bg-transparent border-0 p-0"
+                      aria-label="Control Workflow"
+                      id="wf-1"
+                    >
+                      <img
+                        class="btn-work"
+                        src="img/play-0.svg"
+                        alt="Play"
+                        id="wf-1-img"
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="w-100 d-none d-md-block"></div>
+          <div class="col-9 col-sm-6 col-md-4 col-lg-3 pb-4">
+            <div
+              class="card border-0"
+              style="
+                border-radius: 1rem;
+                box-shadow: 0 6px 8px 0 rgba(0, 0, 0, 0.5);
+              "
+            >
+              <div class="card-body py-2">
+                <div class="row align-items-center">
+                  <div class="col-6">
+                    <h5 class="card-title color-orange mb-0">Flow 2</h5>
+                    <a
+                      href="javascript://"
+                      data-toggle="popover"
+                      data-placement="bottom"
+                      data-content="Heat 175°C (347°F) > Pump 7 secs. > Heat 180°C (356°F) > Pump 7 secs. > Heat 185°C (365°F) > Pump 7 secs. > Heat 190°C (374°F) > Pump 7 secs. > Heat 195°C (383°F) > Pump 10 secs."
+                    >
+                      <small class="text-muted"><u>Details</u></small>
+                    </a>
+                  </div>
+                  <div class="col-6 text-right">
+                    <button
+                      class="bg-transparent border-0 p-0"
+                      aria-label="Control Workflow"
+                      id="wf-2"
+                    >
+                      <img
+                        class="btn-work"
+                        src="img/play-0.svg"
+                        alt="Play"
+                        id="wf-2-img"
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-9 col-sm-6 col-md-4 col-lg-3 pb-4">
+            <div
+              class="card border-0"
+              style="
+                border-radius: 1rem;
+                box-shadow: 0 6px 8px 0 rgba(0, 0, 0, 0.5);
+              "
+            >
+              <div class="card-body py-2">
+                <div class="row align-items-center">
+                  <div class="col-6">
+                    <h5 class="card-title color-orange mb-0">Flow 3</h5>
+                    <a
+                      href="javascript://"
+                      data-toggle="popover"
+                      data-placement="bottom"
+                      data-content="Heat 174°C (345°F) > Hold 20 secs. > Pump 8 sec. > Heat 199°C (390°F) > Pump 20 secs. > Heat 213°C (415°F) > Pump 10 secs. > Heat 222°C (432°F) > Pump 10 secs."
+                    >
+                      <small class="text-muted"><u>Details</u></small>
+                    </a>
+                  </div>
+                  <div class="col-6 text-right">
+                    <button
+                      class="bg-transparent border-0 p-0"
+                      aria-label="Control Workflow"
+                      id="wf-3"
+                    >
+                      <img
+                        class="btn-work"
+                        src="img/play-0.svg"
+                        alt="Play"
+                        id="wf-3-img"
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer class="footer bg-blue fixed-bottom">
+      <div class="container h-100">
+        <div class="row h-100 px-1">
+          <div class="col-3 align-self-center text-center p-0">
+            <button
+              class="bg-transparent border-0"
+              aria-label="Temperature Tab"
+            >
+              <span class="m-0">
+                <img
+                  class="icon-sm"
+                  src="img/tab-temp-1.svg"
+                  alt="Temperature"
+                /><br />
+                <small class="bg-blue">Temperature</small>
+              </span>
+            </button>
+          </div>
+          <div class="col-3 align-self-center text-center p-0">
+            <button
+              class="bg-transparent border-0"
+              data-toggle="modal"
+              data-target="#settings"
+              aria-label="Settings Tab"
+              id="settingTab"
+            >
+              <span class="m-0 disabled">
+                <img
+                  class="icon-sm"
+                  src="img/tab-sett-0.svg"
+                  alt="Settings"
+                /><br />
+                <small class="bg-blue">Settings</small>
+              </span>
+            </button>
+          </div>
+          <div class="col-3 align-self-center text-center p-0">
+            <button
+              class="bg-transparent border-0"
+              data-toggle="modal"
+              data-target="#device"
+              aria-label="Device Tab"
+              id="craftyTab"
+            >
+              <span class="crafty m-0 disabled d-none">
+                <img
+                  class="icon-sm"
+                  src="img/tab-crafty-0.svg"
+                  alt="Device"
+                /><br />
+                <small class="bg-blue">CRAFTY</small>
+              </span>
+              <span class="venty m-0 disabled d-none">
+                <img
+                  class="icon-sm"
+                  src="img/tab-venty-0.svg"
+                  alt="Device"
+                /><br />
+                <small class="bg-blue">VENTY</small>
+              </span>
+              <span class="veazy m-0 disabled d-none">
+                <img
+                  class="icon-sm"
+                  src="img/tab-veazy-0.svg"
+                  alt="Device"
+                /><br />
+                <small class="bg-blue">VEAZY</small>
+              </span>
+              <span class="volcano m-0 disabled d-none">
+                <img
+                  class="icon-sm"
+                  src="img/tab-volcano-0.svg"
+                  alt="Device"
+                /><br />
+                <small class="bg-blue">VOLCANO</small>
+              </span>
+            </button>
+          </div>
+          <div class="col-3 align-self-center text-center p-0">
+            <a
+              class="crafty d-none"
+              href="https://www.storz-bickel.com/en/support/crafty"
+              id="informationCrafty"
+              target="_blank"
+            >
+              <figure class="figure m-0 disabled">
+                <img
+                  class="icon-sm"
+                  src="img/tab-info-0.svg"
+                  alt="Information"
+                />
+                <figcaption class="figure-caption bg-blue">
+                  <small>Information</small>
+                </figcaption>
+              </figure>
+            </a>
+            <a
+              class="venty d-none"
+              href="https://www.storz-bickel.com/en/support/venty"
+              id="informationVenty"
+              target="_blank"
+            >
+              <figure class="figure m-0 disabled">
+                <img
+                  class="icon-sm"
+                  src="img/tab-info-0.svg"
+                  alt="Information"
+                />
+                <figcaption class="figure-caption bg-blue">
+                  <small>Information</small>
+                </figcaption>
+              </figure>
+            </a>
+            <a
+              class="veazy d-none"
+              href="https://www.storz-bickel.com/en/support/veazy"
+              id="informationVeazy"
+              target="_blank"
+            >
+              <figure class="figure m-0 disabled">
+                <img
+                  class="icon-sm"
+                  src="img/tab-info-0.svg"
+                  alt="Information"
+                />
+                <figcaption class="figure-caption bg-blue">
+                  <small>Information</small>
+                </figcaption>
+              </figure>
+            </a>
+            <a
+              class="volcano d-none"
+              href="https://www.storz-bickel.com/en/support/volcano"
+              id="informationVolcano"
+              target="_blank"
+            >
+              <figure class="figure m-0 disabled">
+                <img
+                  class="icon-sm"
+                  src="img/tab-info-0.svg"
+                  alt="Information"
+                />
+                <figcaption class="figure-caption bg-blue">
+                  <small>Information</small>
+                </figcaption>
+              </figure>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <div
+      class="modal"
+      id="waitModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+      data-backdrop="static"
+      data-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <img
+          class="absolute"
+          src="img/load.gif"
+          height="24"
+          width="24"
+          alt="Loading... "
+        />
+      </div>
+    </div>
+    <div
+      class="modal"
+      id="settings"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="settingsLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-0 border-0">
+          <div class="modal-header bg-orange rounded-0 pl-4">
+            <h4 class="modal-title pl-2" id="settingsLabel">SETTINGS</h4>
+            <button
+              type="button"
+              class="close text-white"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body rounded-0 pl-4 pr-1">
+            <ul class="list-group list-group-flush d-none findMyDeviceEna">
+              <li class="list-group-item">
+                <div class="col">Currently unavailable</div>
+              </li>
+            </ul>
+            <ul class="list-group list-group-flush findMyDeviceDis">
+              <li class="list-group-item">
+                <div class="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="vibration"
+                  />
+                  <label class="custom-control-label" for="vibration"
+                    >Vibration</label
+                  >
+                </div>
+              </li>
+              <li class="crafty list-group-item d-none" id="bluetoothLabel">
+                <div class="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="bluetooth"
+                  />
+                  <label class="custom-control-label" for="bluetooth">
+                    Permanent Bluetooth<br />
+                    <small
+                      >Keeps your device ready to connect at any time. While
+                      active, this feature uses a small amount of battery, even
+                      when device is powered off.</small
+                    >
+                  </label>
+                </div>
+              </li>
+              <li
+                class="veazy list-group-item d-none"
+                id="bluetoothLabelVeazyVenty"
+              >
+                <div class="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="bluetoothVeazyVenty"
+                  />
+                  <label class="custom-control-label" for="bluetoothVeazyVenty">
+                    Permanent Bluetooth<br />
+                    <small
+                      >Keeps your device ready to connect at any time. While
+                      active, this feature uses a small amount of battery, even
+                      when device is powered off.</small
+                    >
+                  </label>
+                </div>
+              </li>
+              <li class="venty veazy list-group-item d-none">
+                <div class="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="chargeOptimization"
+                  />
+                  <label class="custom-control-label" for="chargeOptimization">
+                    Charge Current Optimization<br />
+                    <small
+                      >To reduce battery aging due to slower charging</small
+                    >
+                  </label>
+                </div>
+              </li>
+              <li class="venty veazy list-group-item d-none">
+                <div class="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="chargeLimit"
+                  />
+                  <label class="custom-control-label" for="chargeLimit">
+                    Charge Voltage Limit<br />
+                    <small
+                      >To reduce battery aging by a ~90% charge limit</small
+                    >
+                  </label>
+                </div>
+              </li>
+              <li
+                class="venty veazy list-group-item d-none"
+                id="boostModeTimeoutGroup"
+              >
+                <div class="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="boostModeTimeout"
+                  />
+                  <label class="custom-control-label" for="boostModeTimeout">
+                    Permanent Boost<br />
+                    <small
+                      >Deactivate 90 sec. timeout of Boost&#47;Superboost
+                      temperature</small
+                    >
+                  </label>
+                </div>
+              </li>
+              <li class="venty veazy list-group-item d-none">
+                <div class="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="boostVisualization"
+                  />
+                  <label class="custom-control-label" for="boostVisualization">
+                    Boost &amp; Superboost Visualization Enabled<br />
+                    <small class="venty d-none"
+                      >Modes are visualized by a blinking °C or °F</small
+                    >
+                    <small class="veazy d-none"
+                      >Modes are visualized by a blinking LED</small
+                    >
+                  </label>
+                </div>
+              </li>
+              <li class="crafty list-group-item d-none">
+                <div class="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="indicator"
+                  />
+                  <label class="custom-control-label" for="indicator"
+                    >Charge Indicator Lamp</label
+                  >
+                </div>
+              </li>
+              <li class="volcano list-group-item d-none">
+                <div class="custom-control custom-switch">
+                  <input
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="cooling"
+                  />
+                  <label class="custom-control-label" for="cooling"
+                    >Display On Cooling</label
+                  >
+                </div>
+              </li>
+              <li class="list-group-item">
+                <label for="brightness">LED Brightness</label>
+                <input
+                  type="range"
+                  class="custom-range"
+                  min="0"
+                  max="100"
+                  step="10"
+                  id="brightness"
+                />
+              </li>
+              <li
+                class="crafty volcano list-group-item d-none"
+                id="automaticShutOff"
+              >
+                <label for="shutoff"
+                  >Automatic Shutoff
+                  <mark class="bg-grey" id="shutOffLabel">60 s</mark></label
+                >
+                <input
+                  type="range"
+                  class="custom-range"
+                  min="30"
+                  max="360"
+                  step="30"
+                  id="shutoff"
+                />
+              </li>
+              <li
+                class="crafty venty veazy list-group-item d-none"
+                id="factoryReset"
+              >
+                <div class="row align-items-center">
+                  <div class="col-6">Factory Reset</div>
+                  <div class="col-6 text-right">
+                    <button
+                      class="btn-sb bg-transparent"
+                      id="resetSettings"
+                      aria-label="Reset Settings"
+                      type="button"
+                    >
+                      Reset Settings
+                    </button>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal"
+      id="device"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="deviceLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-0 border-0">
+          <div class="modal-header bg-orange rounded-0 pl-4">
+            <h4 class="modal-title pl-2" id="deviceLabel">
+              <span class="crafty d-none">CRAFTY</span>
+              <span class="venty d-none">VENTY</span>
+              <span class="veazy d-none">VEAZY</span>
+              <span class="volcano d-none">VOLCANO</span>
+            </h4>
+            <button
+              type="button"
+              class="close text-white"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body rounded-0 pl-4 pr-1">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item findMyDeviceDis" id="useHoursItem">
+                <div class="row">
+                  <div class="col-6">Hours of Operation</div>
+                  <div class="col-6 text-right">
+                    <span class="badge badge-secondary badge-pill" id="useHours"
+                      >--</span
+                    >
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item" id="serialNumberItem">
+                <div class="row">
+                  <div class="col-6">Serial Number</div>
+                  <div class="col-6 text-right">
+                    <span
+                      class="badge badge-secondary badge-pill"
+                      id="serialNumber"
+                      >--</span
+                    >
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item" id="firmwareItem">
+                <div class="row">
+                  <div class="col-6">Firmware</div>
+                  <div class="col-6 text-right">
+                    <span class="badge badge-secondary badge-pill" id="firmware"
+                      >--</span
+                    >
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item" id="firmwareBLEItem">
+                <div class="row">
+                  <div class="col-6" id="firmwareBLEText">Firmware BLE</div>
+                  <div class="col-6 text-right">
+                    <span
+                      class="badge badge-secondary badge-pill"
+                      id="firmwareBLE"
+                      >--</span
+                    >
+                  </div>
+                </div>
+              </li>
+              <li
+                class="volcano venty veazy d-none list-group-item"
+                id="firmwareUpdateLiItem"
+              >
+                <div class="row align-items-center">
+                  <div class="col-6">Firmware Update</div>
+                  <div class="col-6 text-right">
+                    <button
+                      class="btn-sb bg-transparent"
+                      id="startFirmwareUpdate"
+                      aria-label="Start Firmware Update"
+                      type="button"
+                    >
+                      Start
+                    </button>
+                  </div>
+                </div>
+              </li>
+              <li class="list-group-item findMyDeviceDis" id="BLEAnalysisItem">
+                <div class="row align-items-center">
+                  <div class="col-6">Analysis</div>
+                  <div class="col-6 text-right">
+                    <button
+                      class="crafty venty veazy btn-sb bg-transparent d-none"
+                      id="startAnalysisMobile"
+                      aria-label="Start Analysis"
+                      type="button"
+                    >
+                      Start
+                    </button>
+                    <button
+                      class="volcano btn-sb bg-transparent d-none"
+                      id="startAnalysisVolcano"
+                      aria-label="Start VOLCANO Analysis"
+                      type="button"
+                    >
+                      Start
+                    </button>
+                  </div>
+                </div>
+              </li>
+              <li
+                class="crafty veazy list-group-item d-none"
+                id="BLEFindMyItem"
+              >
+                <div class="row align-items-center">
+                  <div class="col-6">Locate Device</div>
+                  <div class="col-6 text-right">
+                    <button
+                      class="crafty btn-sb bg-transparent d-none"
+                      id="findCrafty"
+                      aria-label="Find My"
+                      type="button"
+                    >
+                      Find My CRAFTY
+                    </button>
+                    <button
+                      class="venty btn-sb bg-transparent d-none"
+                      id="findVenty"
+                      aria-label="Find My"
+                      type="button"
+                    >
+                      Find My VENTY
+                    </button>
+                    <button
+                      class="veazy btn-sb bg-transparent d-none"
+                      id="findVeazy"
+                      aria-label="Find My"
+                      type="button"
+                    >
+                      Find My VEAZY
+                    </button>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal"
+      id="firmwareUpdateModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+      data-backdrop="false"
+      data-keyboard="false"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-0 border-0">
+          <div class="modal-header bg-orange rounded-0 pl-4">
+            <h4 class="modal-title pl-2">FIRMWARE UPDATE</h4>
+          </div>
+          <div class="modal-body rounded-0 pl-4 pr-1">
+            <p id="firmwareUpdateText">...</p>
+            <div
+              class="form-group"
+              style="display: none"
+              id="firmwareUpdateSNInput"
+            >
+              <div class="col-sm text-center">
+                <input
+                  name="prefix1"
+                  class="text-center"
+                  required
+                  id="prefix1"
+                  size="1"
+                  maxlength="1"
+                  value="V"
+                  readonly
+                />
+                <input
+                  name="prefix2"
+                  class="text-center"
+                  required
+                  id="prefix2"
+                  size="1"
+                  maxlength="1"
+                  value="Y"
+                  readonly
+                />
+                <input
+                  name="firstdigit"
+                  class="text-center"
+                  required
+                  id="firstdigit"
+                  size="1"
+                  maxlength="1"
+                  tabindex="4"
+                />
+                <input
+                  name="seconddigit"
+                  class="text-center"
+                  required
+                  id="seconddigit"
+                  size="1"
+                  maxlength="1"
+                  tabindex="5"
+                />
+                <input
+                  name="thirddigit"
+                  class="text-center"
+                  required
+                  id="thirddigit"
+                  size="1"
+                  maxlength="1"
+                  tabindex="6"
+                />
+                <input
+                  name="fourthdigit"
+                  class="text-center"
+                  required
+                  id="fourthdigit"
+                  size="1"
+                  maxlength="1"
+                  tabindex="7"
+                />
+                <input
+                  name="fifthdigit"
+                  class="text-center"
+                  required
+                  id="fifthdigit"
+                  size="1"
+                  maxlength="1"
+                  tabindex="8"
+                />
+                <input
+                  name="sixthdigit"
+                  class="text-center"
+                  required
+                  id="sixthdigit"
+                  size="1"
+                  maxlength="1"
+                  tabindex="9"
+                />
+                <p id="firmwareUpdateTextSerialNumber"><br /></p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer rounded-0 border-0">
+            <button
+              class="btn"
+              id="firmwareUpdateIgnore"
+              aria-label="Cancel Update"
+              data-bs-dismiss="modal"
+              type="button"
+            >
+              Cancel
+            </button>
+            <button
+              class="btn-sb bg-transparent"
+              id="firmwareUpdateStart"
+              aria-label="Update"
+              type="button"
+            >
+              Update
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal"
+      id="pleaseWaitDialog"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+      data-backdrop="static"
+      data-keyboard="false"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-0 border-0">
+          <div class="modal-header bg-orange rounded-0 pl-4">
+            <h4 class="modal-title pl-2">FIRMWARE UPDATE</h4>
+          </div>
+          <div class="modal-body rounded-0 pl-4 pr-1">
+            <div class="progress rounded-pill mt-2 mb-3">
+              <div
+                class="progress-bar progress-bar-striped progress-bar-animated"
+                id="progressFirmwareUpdate"
+                role="progressbar"
+                aria-valuenow="0"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                style="width: 0%"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("./service-worker.js")
+            .catch(function (err) {
+              console.log("Service Worker registration failed: " + err);
+            });
+        });
+      }
+    </script>
+    <script type="module">
+      import { Workbox } from "https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-window.prod.mjs";
+      if ("serviceWorker" in navigator) {
+        const wb = new Workbox("./service-worker.js");
+        wb.addEventListener("installed", (event) => {
+          if (event.isUpdate) {
+            if (
+              confirm(
+                "Please press OK to refresh and update to the latest STORZ & BICKEL Web App version."
+              )
+            ) {
+              window.location.reload();
+            }
+          }
+        });
+        wb.register().catch(function (err) {
+          console.log("Service Worker registration failed: " + err);
+        });
+      }
+    </script>
+    <script type="text/javascript" src="js/jquery-3.4.1.slim.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="js/crafty.js"></script>
+    <script type="text/javascript" src="js/qvap.js"></script>
+    <script type="text/javascript" src="js/volcano.js"></script>
+    <script type="text/javascript" src="js/workflow.js"></script>
+    <script>
+      $(function () {
+        $('[data-toggle="popover"]').popover();
+      });
+    </script>
+  </body>
+</html>

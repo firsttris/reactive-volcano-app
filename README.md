@@ -1,8 +1,10 @@
+# Reactive Vaporizer App
+
 # Introduction
 
-The Volcano, made by Storz & Bickel in Tuttlingen, Germany, is a well-known high-quality vaporizer. The Volcano can be controlled using the Bluetooth Web API. 
+The Volcano, Venty, and Veazy, made by Storz & Bickel in Tuttlingen, Germany, are well-known high-quality vaporizers. These devices can be controlled using the Bluetooth Web API.
 
-This project showcases how to use cutting-edge technology to control the Volcano via the Web Bluetooth API.
+This project showcases how to use cutting-edge technology to control these devices via the Web Bluetooth API.
 
 # Code Ownership
 
@@ -15,15 +17,14 @@ If there are any concerns or issues, please contact me before taking any legal a
 
 # Motivation
 
-The Motivation behind implementing a Volcano WebApp:
+The Motivation behind implementing a WebApp for Storz & Bickel devices:
 
-- Use cutting edge technology to build a Volcano App.
-- Interested in reverse engineering my Volcano with Web Bluetooth API.
+- Use cutting edge technology to build a vaporizer control app.
+- Interested in reverse engineering devices with Web Bluetooth API.
 - Showcase how a reactive application is the better choice for bidirectional Bluetooth communication.
 
 # Device Support
-Currently, this only supports the Volcano as this is the only device I own.   
-Venty and Crafty also uses Web Bluetooth API.
+This app supports the Volcano, Venty, and Veazy devices from Storz & Bickel. Note that available features may vary depending on the device model.
 
 # Test my App
 
@@ -44,30 +45,19 @@ This project is built upon a solid foundation of cutting-edge technologies to de
 The user interface is responsive and designed to work well on both desktop and mobile devices.
 
 ## Click on the Bluetooth icon to initiate Bluetooth discovery.    
-![Bluetooth Discovery](/docs/ui-connect2.png)
+![Bluetooth Discovery](/docs/bluetooth-connect.png)
 
 
-## Select your device to establish a connection.    
-![Device Selection](/docs/ui-connect-2.png)
+## Effortlessly control your Storz & Bickel device.    
+![User Interface](/docs/ui-1.png)
+![User Interface](/docs/ui-2.png)
 
-
-## Effortlessly control your Volcano.    
-![User Interface](/docs/ui.png)
+# Veazy Venty
+![User Interface](/docs/veazy1.png)
+![User Interface](/docs/veazy2.png)
 
 # Features
 The application offers a variety of features including:
-
-## Device Features
-
-- Temperature control
-- Heat regulation
-- Pump control
-- Brightness adjustment
-- Auto-shutdown time
-- Vibration control
-- Standby light
-- Device runtime
-- Reading serial number
 
 ## App Features
 
@@ -112,7 +102,7 @@ However you can still enable Web Bluetooth API in Chrome on Linux, follow these 
 
 To develop and build this project, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/reactive-volcano-app.git`
+1. Clone the repository: `git clone https://github.com/firsttris/reactive-volcano-app.git`
 2. Navigate into the project directory: `cd reactive-volcano-app`
 3. Install the dependencies: `npm install`
 5. Start the development server: `npm run dev`
@@ -142,11 +132,13 @@ Follow these steps to develop and test the application on an Android device:
 
 - It's important to remember that the volcano can maintain a Bluetooth connection with only one device at a time. To connect it to a different device, you must first disconnect the existing connection.
 
-# Issues
+# Contributing
 
 Want to start contributing to this project? 
 
 Please visit our [issues page](https://github.com/firsttris/reactive-volcano-app/issues) for the latest issues and feature requests.
+
+Feel free to submit pull requests or open issues for bugs and feature suggestions.
 
 # License
 

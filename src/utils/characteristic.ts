@@ -1,7 +1,4 @@
-import { CharateristicUUIDs } from "./uuids";
-import PQueue from 'p-queue';
-
-const queue = new PQueue({concurrency: 1});
+import { bluetoothQueue } from "./bluetoothQueue";
 
 export const attachEventListener = async (
   characteristic: BluetoothRemoteGATTCharacteristic,
@@ -34,17 +31,24 @@ export const handleInitialValue = async (
   handleValue(value);
 };
 
-export const getCharacteristic = async (service: BluetoothRemoteGATTService,
-  characteristicUUID: CharateristicUUIDs) => 
-  queue.add(async () => await service.getCharacteristic(characteristicUUID))
+export const getCharacteristic = async (
+  service: BluetoothRemoteGATTService,
+  characteristicUUID: string
+) =>
+  bluetoothQueue.add(async () => {
+    if (!service.device.gatt?.connected) {
+      return null;
+    }
+    return await service.getCharacteristic(characteristicUUID);
+  });
 
 export const createCharateristicWithEventListener = async (
   service: BluetoothRemoteGATTService,
-  characteristicUUID: CharateristicUUIDs,
+  characteristicUUID: string,
   handleValue: (value: DataView) => void
 ) => {
   const characteristic = await getCharacteristic(service, characteristicUUID);
-  if(!characteristic) {
+  if (!characteristic) {
     return;
   }
   await handleInitialValue(characteristic, handleValue);
@@ -53,11 +57,11 @@ export const createCharateristicWithEventListener = async (
 
 export const createCharateristic = async (
   service: BluetoothRemoteGATTService,
-  characteristicUUID: CharateristicUUIDs,
+  characteristicUUID: string,
   handleValue: (value: DataView) => void
 ) => {
   const characteristic = await getCharacteristic(service, characteristicUUID);
-  if(!characteristic) {
+  if (!characteristic) {
     return;
   }
   await handleInitialValue(characteristic, handleValue);

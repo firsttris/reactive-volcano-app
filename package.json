@@ -6,26 +6,29 @@
   "scripts": {
     "dev": "vite --host",
     "build": "tsc && vite build --base=/reactive-volcano-app/",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@fontsource/roboto": "^5.1.1",
+    "@fontsource/roboto": "^5.2.8",
     "@solidjs/router": "^0.15.3",
-    "p-queue": "^8.1.0",
+    "p-queue": "^9.0.0",
     "solid-icons": "^1.1.0",
-    "solid-js": "^1.9.4",
+    "solid-js": "^1.9.10",
     "solid-styled-components": "^0.28.5",
-    "uuid": "^11.0.5"
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@types/uuid": "^10.0.0",
-    "@types/web-bluetooth": "^0.0.20",
-    "@typescript-eslint/eslint-plugin": "^8.21.0",
-    "@typescript-eslint/parser": "^8.21.0",
-    "eslint": "^9.18.0",
+    "@types/uuid": "^11.0.0",
+    "@types/web-bluetooth": "^0.0.21",
+    "@typescript-eslint/eslint-plugin": "^8.46.3",
+    "@typescript-eslint/parser": "^8.46.3",
+    "eslint": "^9.39.1",
     "eslint-plugin-solid": "^0.14.5",
-    "typescript": "^5.7.3",
-    "vite-plugin-pwa": "^0.21.1",
-    "vite-plugin-solid": "^2.11.0"
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "vite-plugin-pwa": "^1.1.0",
+    "vite-plugin-solid": "^2.11.10"
   }
 }

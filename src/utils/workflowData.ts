@@ -1,7 +1,7 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 export interface WorkflowStep {
-  id: string,
+  id: string;
   temperature: number;
   holdTimeInSeconds: number;
   pumpTimeInSeconds: number;
@@ -163,13 +163,11 @@ export const workflow3: WorkflowStep[] = [
   },
 ];
 
-
 export interface Workflow {
   name: string;
   id: string;
   workflowSteps: WorkflowStep[];
 }
-
 
 export const initialListOfWorkflows: Workflow[] = [
   {
@@ -192,4 +190,4 @@ export const initialListOfWorkflows: Workflow[] = [
     id: uuidv4(),
     workflowSteps: workflow3,
   },
-]
+];

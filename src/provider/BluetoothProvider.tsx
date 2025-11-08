@@ -2,19 +2,33 @@ import { createContext, createSignal, useContext } from "solid-js";
 import type { Accessor, JSX, Setter } from "solid-js";
 import {
   ConnectionState,
+  DeviceType,
   ServiceUUIDs,
-  VolcanoCharacteristics,
-  initialCharacteristics,
+  VentyVeazyCharacteristicUUIDs,
 } from "../utils/uuids";
+import { bluetoothQueue } from "../utils/bluetoothQueue";
+
+type DeviceCharacteristics = Record<
+  string,
+  BluetoothRemoteGATTCharacteristic | undefined
+>;
 
 export type Methods = {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   connectionState: () => ConnectionState;
+  deviceInfo: () => DeviceInfo;
   getDeviceStateService: Accessor<BluetoothRemoteGATTService | undefined>;
   getDeviceControlService: Accessor<BluetoothRemoteGATTService | undefined>;
-  getCharacteristics: Accessor<VolcanoCharacteristics>;
-  setCharacteristics: Setter<VolcanoCharacteristics>;
+  getCharacteristics: Accessor<DeviceCharacteristics>;
+  setCharacteristics: Setter<DeviceCharacteristics>;
+};
+
+export type DeviceInfo = {
+  type: DeviceType;
+  name: string;
+  serialNumber?: string;
+  firmwareVersion?: string;
 };
 
 const BluetoothContext = createContext<Methods>();
@@ -24,48 +38,169 @@ type BluetoothProviderProps = {
 };
 
 export const BluetoothProvider = (props: BluetoothProviderProps) => {
-  const [ server, setServer ] = createSignal<BluetoothRemoteGATTServer>();
-  const [getDeviceStateService, setDeviceStateService] = createSignal<BluetoothRemoteGATTService>();
-  const [getDeviceControlService, setDeviceControlService] = createSignal<BluetoothRemoteGATTService>();
+  const [server, setServer] = createSignal<BluetoothRemoteGATTServer>();
+  const [getDeviceStateService, setDeviceStateService] =
+    createSignal<BluetoothRemoteGATTService>();
+  const [getDeviceControlService, setDeviceControlService] =
+    createSignal<BluetoothRemoteGATTService>();
   const [getCharacteristics, setCharacteristics] =
-    createSignal<VolcanoCharacteristics>(initialCharacteristics);
+    createSignal<DeviceCharacteristics>({});
 
   const [connectionState, setConnectionState] = createSignal<ConnectionState>(
     ConnectionState.NOT_CONNECTED
   );
 
-  const disconnect = async () => {
-    const currentServer = server();
-    if(!currentServer) {
-      console.log("No Gatt Server Connected"); 
-      return;
+  const [deviceInfo, setDeviceInfo] = createSignal<DeviceInfo>({
+    type: DeviceType.UNKNOWN,
+    name: "",
+  });
+
+  const detectDeviceType = (deviceName: string): DeviceType => {
+    const name = deviceName.toLowerCase();
+
+    // Check for Venty (VY in device name)
+    if (name.includes("vy") || name.includes("venty")) {
+      return DeviceType.VENTY;
     }
-    await currentServer.disconnect();
+
+    // Check for Veazy (VZ in device name)
+    if (name.includes("vz") || name.includes("veazy")) {
+      return DeviceType.VEAZY;
+    }
+
+    // Check for Volcano devices
+    if (
+      name.includes("volcano") ||
+      (name.includes("s&b") && name.includes("volcano"))
+    ) {
+      return DeviceType.VOLCANO;
+    }
+
+    // Fallback for other STORZ&BICKEL devices (likely Crafty/Volcano)
+    if (name.includes("storz") || name.includes("s&b")) {
+      return DeviceType.VOLCANO;
+    }
+
+    return DeviceType.UNKNOWN;
+  };
+
+  const disconnect = async () => {
+    // First: Stop notifications on characteristics before disconnecting
+    const characteristics = getCharacteristics();
+    if (characteristics.control) {
+      try {
+        console.log("🛑 Stopping notifications on control characteristic");
+        await characteristics.control.stopNotifications();
+      } catch (error) {
+        console.error("Error stopping notifications:", error);
+      }
+    }
+
+    const currentServer = server();
+    if (currentServer) {
+      try {
+        await currentServer.disconnect();
+      } catch (error) {
+        console.error("Error during disconnect:", error);
+      }
+    }
+
+    // Reset all state
     setConnectionState(ConnectionState.NOT_CONNECTED);
     setDeviceStateService(undefined);
     setDeviceControlService(undefined);
-  }
+    setCharacteristics({});
+    setDeviceInfo({ type: DeviceType.UNKNOWN, name: "" });
+    setServer(undefined);
+  };
 
-  const connect = async () => {
-    setConnectionState(ConnectionState.CONNECTING);
-    try {
-      const device = await navigator.bluetooth.requestDevice({
-        filters: [
-          { namePrefix: "STORZ&BICKEL" },
-          { namePrefix: "Storz&Bickel" },
-          { namePrefix: "S&B" },
-          { services: [ServiceUUIDs.DeviceState, ServiceUUIDs.DeviceControl] },
-        ],
-        acceptAllDevices: false,
-      });
+  const connectToDevice = async (
+    device: BluetoothDevice,
+    deviceType?: DeviceType
+  ) => {
+    if (!device.gatt) {
+      throw new Error("Device does not support GATT");
+    }
 
-      if (!device.gatt) {
-        console.error("Device does not support gatt");
-        return;
+    // Set device info
+    const deviceName = device.name || "";
+    const actualDeviceType = deviceType || detectDeviceType(deviceName);
+    setDeviceInfo({
+      type: actualDeviceType,
+      name: deviceName,
+    });
+
+    const server = await device.gatt.connect();
+    setServer(server);
+
+    // Connect based on device type
+    if (
+      actualDeviceType === DeviceType.VEAZY ||
+      actualDeviceType === DeviceType.VENTY
+    ) {
+      // Veazy/Venty connection
+      try {
+        const primaryService = await server.getPrimaryService(
+          ServiceUUIDs.Primary
+        );
+        setDeviceStateService(primaryService);
+        setDeviceControlService(primaryService); // Same service for both
+
+        // Initialize Veazy/Venty characteristics
+        try {
+          const controlCharacteristic = await primaryService.getCharacteristic(
+            VentyVeazyCharacteristicUUIDs.control
+          );
+
+          // First: Activate notifications (like legacy app)
+          await controlCharacteristic.startNotifications();
+
+          // Then: Send initialization commands immediately (like legacy app)
+          // This makes the device start sending data
+          await bluetoothQueue.add(async () => {
+            // CMD 0x02 - Reset/Initialize
+            const resetBuffer = new ArrayBuffer(20);
+            const resetView = new DataView(resetBuffer);
+            resetView.setUint8(0, 0x02);
+            await controlCharacteristic.writeValue(resetBuffer);
+
+            // CMD 0x1D - Status request
+            const statusBuffer = new ArrayBuffer(20);
+            const statusView = new DataView(statusBuffer);
+            statusView.setUint8(0, 0x1d);
+            await controlCharacteristic.writeValue(statusBuffer);
+
+            // CMD 0x01 - Basic data request
+            const basicBuffer = new ArrayBuffer(20);
+            const basicView = new DataView(basicBuffer);
+            basicView.setUint8(0, 0x01);
+            await controlCharacteristic.writeValue(basicBuffer);
+
+            // CMD 0x04 - Extended data request (important!)
+            const extendedBuffer = new ArrayBuffer(20);
+            const extendedView = new DataView(extendedBuffer);
+            extendedView.setUint8(0, 0x04);
+            await controlCharacteristic.writeValue(extendedBuffer);
+
+            console.log(
+              "Veazy/Venty initialization commands sent (0x02, 0x1D, 0x01, 0x04)"
+            );
+          });
+
+          setCharacteristics({ control: controlCharacteristic });
+        } catch (charError) {
+          console.error(
+            "Failed to get Veazy/Venty control characteristic:",
+            charError
+          );
+          // Don't throw here, as the characteristic might not be available on all devices
+        }
+      } catch (error) {
+        console.error("Failed to connect to Veazy/Venty service:", error);
+        throw error;
       }
-     
-      const server = await device.gatt.connect();
-      setServer(server)
+    } else {
+      // Volcano connection (existing logic)
       const stateService = await server.getPrimaryService(
         ServiceUUIDs.DeviceState
       );
@@ -74,20 +209,60 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
         ServiceUUIDs.DeviceControl
       );
       setDeviceControlService(controlService);
-    } catch (error) {
-      console.error((error as Error).message);
-      setConnectionState(ConnectionState.CONNECTION_FAILED);
-      alert((error as Error).message)
-      return;
     }
-    setConnectionState(ConnectionState.CONNECTED);
   };
+
+  const getDeviceFilters = (storedDeviceName?: string) => {
+    const baseFilters = [
+      { namePrefix: "STORZ&BICKEL" },
+      { namePrefix: "Storz&Bickel" },
+      { namePrefix: "S&B" },
+      { services: [ServiceUUIDs.DeviceState, ServiceUUIDs.DeviceControl] }, // Volcano services
+      { services: [ServiceUUIDs.Primary] }, // Veazy/Venty service
+    ];
+
+    // For reconnect, add exact name match as first priority
+    if (storedDeviceName) {
+      return [{ name: storedDeviceName }, ...baseFilters];
+    }
+
+    return baseFilters;
+  };
+
+  const getOptionalServices = () => [
+    "generic_access",
+    ServiceUUIDs.GenericAccess, // Generic Access for Veazy/Venty
+    ServiceUUIDs.Primary, // Veazy/Venty primary service
+  ];
+
+  const requestBluetoothDevice = async (storedDeviceName?: string) => {
+    return navigator.bluetooth.requestDevice({
+      filters: getDeviceFilters(storedDeviceName),
+      acceptAllDevices: false,
+      optionalServices: getOptionalServices(),
+    });
+  };
+
+  const connect = async () => {
+    setConnectionState(ConnectionState.CONNECTING);
+    try {
+      const device = await requestBluetoothDevice();
+      await connectToDevice(device);
+      setConnectionState(ConnectionState.CONNECTED);
+    } catch (error) {
+      console.error("Connection failed:", error);
+      setConnectionState(ConnectionState.CONNECTION_FAILED);
+      if (error instanceof Error) alert(error.message);
+    }
+  };
+
   return (
     <BluetoothContext.Provider
       value={{
         connect,
         disconnect,
         connectionState,
+        deviceInfo,
         getDeviceStateService,
         getDeviceControlService,
         getCharacteristics,
