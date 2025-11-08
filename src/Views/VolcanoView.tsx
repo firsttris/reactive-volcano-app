@@ -84,10 +84,8 @@ export const VolcanoView: Component = () => {
   return (
     <>
       {/* Main Controls */}
+      <ShutdownTime />
       <MainCard>
-        <div style={{ "margin-bottom": "20px" }}>
-          <ShutdownTime />
-        </div>
         <div style={{ "margin-bottom": "24px" }}>
           <Temperature />
         </div>

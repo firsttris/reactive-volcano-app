@@ -7,10 +7,9 @@ interface StyledDivProps {
 }
 
 const StyledDiv = styled("div")<StyledDivProps>`
-  display: flex;
+  display: ${(props) => (props.isVisible ? "flex" : "none")};
   align-items: center;
   justify-content: center;
-  visibility: ${(props) => (props.isVisible ? "visible" : "hidden")};
   font-family: CustomFont;
   background: rgba(255, 102, 0, 0.1);
   border: 1px solid var(--accent-color);

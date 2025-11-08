@@ -28,6 +28,7 @@ const TextContainer = styled("div")`
   font-size: 50px;
   color: var(--text-color);
   min-width: 160px;
+  margin-bottom: -10px;
 `;
 
 export const HeatAndPump = () => {

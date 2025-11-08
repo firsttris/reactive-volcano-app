@@ -21,6 +21,7 @@ const TempLabel = styled("span")`
 `;
 
 const DigitalText = styled("div")<{ isTarget?: boolean }>`
+  margin-bottom: -10px;
   font-family: "CustomFont";
   font-size: 72px;
   line-height: 1;
