@@ -79,21 +79,6 @@ export const Connect = () => {
     );
   };
 
-  // Check if there's a stored device for reconnection
-  const getStoredDevice = () => {
-    try {
-      const stored = localStorage.getItem("reactive-volcano-device");
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
-  };
-
-  const hasStoredDevice = () => {
-    const stored = getStoredDevice();
-    return stored && stored.type !== DeviceType.UNKNOWN;
-  };
-
   const getDeviceTypeText = () => {
     const device = deviceInfo();
     switch (device.type) {
@@ -135,7 +120,7 @@ export const Connect = () => {
           <Subtitle>{t("appSupportsDevices")}</Subtitle>
           <ConnectButton onClick={connect}>
             <BsBluetooth size="64px" />
-            {hasStoredDevice() ? t("connectNewDevice") : t("connectDevice")}
+            {t("connectDevice")}
           </ConnectButton>
         </Centered>
       </Show>
