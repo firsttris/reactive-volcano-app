@@ -115,7 +115,7 @@ export const WorkflowForm: Component = () => {
               value={holdTime()}
               label={`${t("holdTime")}: ${holdTime()} ${t("sec")}`}
               min={0}
-              step={1}
+              step={5}
               max={60}
               onInput={(value) => setHoldTime(value)}
             />
@@ -125,7 +125,7 @@ export const WorkflowForm: Component = () => {
               value={pumpTime()}
               label={`${t("pumpTime")}: ${pumpTime()} ${t("sec")}`}
               min={0}
-              step={1}
+              step={5}
               max={60}
               onInput={(value) => setPumpTime(value)}
             />

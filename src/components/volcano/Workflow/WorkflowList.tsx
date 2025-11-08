@@ -229,7 +229,7 @@ export const WorkflowList = () => {
           </StyledButton>
           <StyledButton onClick={() => addNewWorkflowStep()}>
             <FiPlus size={20} />
-            {t("newStep")}
+            {t("add")}
           </StyledButton>
           <StyledButton
             onClick={() => {
