@@ -53,6 +53,14 @@ const TempControls = styled("div")`
   justify-content: center;
   align-items: center;
   gap: 45px;
+
+  @media (max-width: 375px) {
+    gap: 25px;
+  }
+
+  @media (max-width: 320px) {
+    gap: 5px;
+  }
 `;
 
 export const Temperature = () => {
