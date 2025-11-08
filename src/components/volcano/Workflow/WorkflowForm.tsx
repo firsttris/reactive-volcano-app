@@ -15,14 +15,14 @@ const Container = styled("div")`
 `;
 
 const Card = styled("div")`
-  background: #2a2a2a;
+  background: var(--secondary-bg);
   border-radius: 16px;
   padding: 24px;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
 `;
 
 const Title = styled("h2")`
-  color: #f60;
+  color: var(--accent-color);
   font-size: 1.5rem;
   margin-bottom: 24px;
   text-align: center;
@@ -36,8 +36,8 @@ const Form = styled("form")`
 `;
 
 const SliderSection = styled("div")`
-  background: #1a1a1a;
-  border: 1px solid #444;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 20px;
 `;

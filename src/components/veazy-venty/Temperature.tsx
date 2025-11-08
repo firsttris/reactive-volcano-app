@@ -19,7 +19,7 @@ const Header = styled("div")`
 
   h2 {
     margin: 0 0 16px 0;
-    color: white;
+    color: var(--text-color);
     font-size: 1.5rem;
     font-weight: 700;
   }

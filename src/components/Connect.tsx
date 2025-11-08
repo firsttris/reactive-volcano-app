@@ -23,32 +23,32 @@ const ConnectButton = styled("button")`
   align-items: center;
   gap: 15px;
   padding: 30px;
-  border: 3px solid #f60;
+  border: 3px solid var(--accent-color);
   background: transparent;
   border-radius: 20px;
   cursor: pointer;
-  color: #f60;
+  color: var(--accent-color);
   font-size: 18px;
   font-weight: bold;
   transition: all 0.3s ease;
   min-width: 200px;
 
   &:hover {
-    background-color: #f60;
-    color: white;
+    background-color: var(--accent-color);
+    color: var(--text-color);
     transform: translateY(-2px);
     box-shadow: 0 8px 16px rgba(246, 96, 0, 0.3);
   }
 `;
 
 const Title = styled("h2")`
-  color: #333;
+  color: var(--text-color);
   margin-bottom: 10px;
   text-align: center;
 `;
 
 const Subtitle = styled("p")`
-  color: #666;
+  color: var(--secondary-text);
   text-align: center;
   max-width: 400px;
   line-height: 1.5;
@@ -77,21 +77,6 @@ export const Connect = () => {
       connectionState() === ConnectionState.NOT_CONNECTED ||
       connectionState() === ConnectionState.CONNECTION_FAILED
     );
-  };
-
-  // Check if there's a stored device for reconnection
-  const getStoredDevice = () => {
-    try {
-      const stored = localStorage.getItem("reactive-volcano-device");
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
-  };
-
-  const hasStoredDevice = () => {
-    const stored = getStoredDevice();
-    return stored && stored.type !== DeviceType.UNKNOWN;
   };
 
   const getDeviceTypeText = () => {
@@ -135,7 +120,7 @@ export const Connect = () => {
           <Subtitle>{t("appSupportsDevices")}</Subtitle>
           <ConnectButton onClick={connect}>
             <BsBluetooth size="64px" />
-            {hasStoredDevice() ? t("connectNewDevice") : t("connectDevice")}
+            {t("connectDevice")}
           </ConnectButton>
         </Centered>
       </Show>

@@ -19,10 +19,9 @@ const ConnectionBarContainer = styled("div")<ConnectionBarContainerProps>`
   padding: 8px 16px;
   background: ${(props) =>
     props.isDarkMode
-      ? "linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%)"
-      : "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)"};
-  border-bottom: 1px solid
-    ${(props) => (props.isDarkMode ? "#404040" : "#e9ecef")};
+      ? "linear-gradient(135deg, var(--secondary-bg) 0%, var(--bg-color) 100%)"
+      : "linear-gradient(135deg, var(--bg-color) 0%, var(--secondary-bg) 100%)"};
+  border-bottom: 1px solid var(--border-color);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   min-height: 50px;
   backdrop-filter: blur(10px);
@@ -60,7 +59,7 @@ const DeviceInfoRow = styled("div")`
 const FirmwareVersion = styled("div")`
   font-size: 0.8rem;
   opacity: 0.7;
-  color: #666;
+  color: var(--secondary-text);
 
   @media (max-width: 786px) {
     display: none;
@@ -70,7 +69,7 @@ const FirmwareVersion = styled("div")`
 const SerialNumber = styled("div")`
   font-size: 0.8rem;
   opacity: 0.7;
-  color: #666;
+  color: var(--secondary-text);
 
   @media (max-width: 480px) {
     display: none;
@@ -80,7 +79,7 @@ const SerialNumber = styled("div")`
 const StatusText = styled("div")`
   font-size: 0.9rem;
   font-weight: 500;
-  color: #666;
+  color: var(--secondary-text);
 `;
 
 const SpinningVsLoading = styled(VsLoading)`
@@ -100,15 +99,15 @@ const SpinningVsLoading = styled(VsLoading)`
 const DeviceName = styled("div")`
   font-weight: 600;
   font-size: 1rem;
-  color: #f60;
+  color: var(--accent-color);
   display: flex;
   align-items: center;
   gap: 6px;
 `;
 
 const DeviceTypeChip = styled("span")`
-  background: linear-gradient(135deg, #f60 0%, #ff7f39 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--accent-color) 0%, #ff7f39 100%);
+  color: var(--text-color);
   padding: 1px 6px;
   border-radius: 10px;
   font-size: 0.7rem;

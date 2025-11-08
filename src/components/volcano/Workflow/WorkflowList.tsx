@@ -14,15 +14,15 @@ const Container = styled("div")`
 `;
 
 const Card = styled("div")`
-  background: #2a2a2a;
+  background: var(--secondary-bg);
   border-radius: 16px;
   padding: 24px;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
   margin-bottom: 20px;
 `;
 
 const Title = styled("h2")`
-  color: #f60;
+  color: var(--accent-color);
   font-size: 1.5rem;
   margin-bottom: 24px;
   text-align: center;
@@ -38,8 +38,8 @@ const StepList = styled("ol")`
 
 const StepItem = styled("li")`
   counter-increment: step-counter;
-  background: #1a1a1a;
-  border: 1px solid #444;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 12px;
@@ -53,8 +53,8 @@ const StepItem = styled("li")`
     top: 16px;
     width: 32px;
     height: 32px;
-    background: #f60;
-    color: white;
+    background: var(--accent-color);
+    color: var(--text-color);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -64,7 +64,7 @@ const StepItem = styled("li")`
   }
 
   &:hover {
-    border-color: #f60;
+    border-color: var(--accent-color);
     background: rgba(255, 102, 0, 0.05);
   }
 `;
@@ -84,18 +84,18 @@ const StepContent = styled("div")`
 
 const StepDetails = styled("div")`
   flex: 1;
-  color: #ccc;
+  color: var(--secondary-text);
   font-size: 0.95rem;
 `;
 
 const StepLabel = styled("div")`
-  color: #999;
+  color: var(--secondary-text);
   font-size: 0.85rem;
   margin-bottom: 4px;
 `;
 
 const StepValue = styled("div")`
-  color: white;
+  color: var(--text-color);
   font-size: 1rem;
   font-weight: 600;
   font-family: CustomFont;
@@ -108,7 +108,7 @@ const StepActions = styled("div")`
 
 const IconButton = styled("button")`
   background: transparent;
-  border: 1px solid #555;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   width: 36px;
   height: 36px;
@@ -116,13 +116,13 @@ const IconButton = styled("button")`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #ccc;
+  color: var(--secondary-text);
   transition: all 0.2s ease;
 
   &:hover {
-    background: #333;
-    color: #f60;
-    border-color: #f60;
+    background: var(--secondary-bg);
+    color: var(--accent-color);
+    border-color: var(--accent-color);
     transform: scale(1.05);
   }
 
@@ -150,7 +150,7 @@ const StyledButton = styled(Button)`
 const EmptyState = styled("div")`
   text-align: center;
   padding: 40px;
-  color: #999;
+  color: var(--secondary-text);
   font-size: 1rem;
 `;
 

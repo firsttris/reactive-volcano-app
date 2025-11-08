@@ -16,11 +16,11 @@ import { ConnectionState } from "../utils/uuids";
 import { buildRoute } from "../routes";
 
 const MainCard = styled("div")`
-  background: #2a2a2a;
+  background: var(--secondary-bg);
   border-radius: 16px;
   padding: 24px;
   margin: 20px auto;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
   max-width: 600px;
 `;
 
@@ -28,13 +28,13 @@ const SettingsContainer = styled("div")`
   max-width: 600px;
   margin: 20px auto;
   padding: 20px;
-  background: #2a2a2a;
+  background: var(--secondary-bg);
   border-radius: 16px;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
 `;
 
 const SettingsTitle = styled("h2")`
-  color: #f60;
+  color: var(--accent-color);
   font-size: 1.5rem;
   margin-bottom: 24px;
   text-align: center;

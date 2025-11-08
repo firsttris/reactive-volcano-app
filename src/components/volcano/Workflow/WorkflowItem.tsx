@@ -14,8 +14,10 @@ interface WorkflowItemProps {
 
 const Card = styled("div")<{ isActive?: boolean }>`
   background: ${(props) =>
-    props.isActive ? "rgba(255, 102, 0, 0.1)" : "#1a1a1a"};
-  border: 2px solid ${(props) => (props.isActive ? "#f60" : "#444")};
+    props.isActive ? "rgba(255, 102, 0, 0.1)" : "var(--bg-color)"};
+  border: 2px solid
+    ${(props) =>
+      props.isActive ? "var(--accent-color)" : "var(--border-color)"};
   border-radius: 12px;
   padding: 16px;
   cursor: pointer;
@@ -23,7 +25,7 @@ const Card = styled("div")<{ isActive?: boolean }>`
   position: relative;
 
   &:hover {
-    border-color: #f60;
+    border-color: var(--accent-color);
     background: rgba(255, 102, 0, 0.05);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 102, 0, 0.2);
@@ -38,14 +40,14 @@ const WorkflowHeader = styled("div")`
 `;
 
 const WorkflowName = styled("div")`
-  color: white;
+  color: var(--text-color);
   font-size: 1.1rem;
   font-weight: 600;
   font-family: CustomFont;
 `;
 
 const StepCount = styled("div")`
-  color: #999;
+  color: var(--tertiary-text);
   font-size: 0.9rem;
   margin-bottom: 12px;
 `;
@@ -69,7 +71,7 @@ const IconButton = styled("button")<{
   border: ${(props) =>
     props.variant === "play" || props.variant === "stop"
       ? "none"
-      : "1px solid #555"};
+      : "1px solid var(--border-color)"};
   border-radius: 8px;
   width: 36px;
   height: 36px;
@@ -78,7 +80,9 @@ const IconButton = styled("button")<{
   justify-content: center;
   cursor: pointer;
   color: ${(props) =>
-    props.variant === "play" || props.variant === "stop" ? "white" : "#ccc"};
+    props.variant === "play" || props.variant === "stop"
+      ? "white"
+      : "var(--secondary-text)"};
   transition: all 0.2s ease;
 
   &:hover {
@@ -87,17 +91,17 @@ const IconButton = styled("button")<{
         return "linear-gradient(135deg, #ff7700 0%, #ff8800 100%)";
       if (props.variant === "stop")
         return "linear-gradient(135deg, #f44336 0%, #e57373 100%)";
-      return "#333";
+      return "var(--secondary-bg)";
     }};
     color: ${(props) =>
       props.variant === "edit" || props.variant === "delete"
-        ? "#f60"
+        ? "var(--accent-color)"
         : "white"};
     transform: scale(1.05);
     box-shadow: ${(props) =>
       props.variant === "play" || props.variant === "stop"
         ? "0 2px 8px rgba(255, 102, 0, 0.4)"
-        : "0 2px 8px rgba(0, 0, 0, 0.3)"};
+        : "0 2px 8px rgba(0, 0, 0, 0.1)"};
   }
 
   &:active {

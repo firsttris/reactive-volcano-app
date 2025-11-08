@@ -14,12 +14,12 @@ const SettingsContainer = styled("div")`
   max-width: 600px;
   margin: 20px auto;
   padding: 20px;
-  background: #2a2a2a;
+  background: var(--secondary-bg);
   border-radius: 8px;
 `;
 
 const SettingsTitle = styled("h2")`
-  color: #f60;
+  color: var(--accent-color);
   font-size: 1.5rem;
   margin-bottom: 20px;
   text-align: center;
@@ -29,13 +29,13 @@ const SettingsTitle = styled("h2")`
 const SettingItem = styled("div")`
   margin-bottom: 25px;
   padding: 15px;
-  background: #333;
+  background: var(--bg-color);
   border-radius: 5px;
 `;
 
 const SettingLabel = styled("label")`
   display: block;
-  color: #ccc;
+  color: var(--text-color);
   font-size: 1rem;
   margin-bottom: 10px;
   font-family: CustomFont;
@@ -85,13 +85,13 @@ const ModalContent = styled("div")`
 `;
 
 const ModalTitle = styled("h3")`
-  color: #f60;
+  color: var(--accent-color);
   margin-bottom: 15px;
   font-family: CustomFont;
 `;
 
 const ModalText = styled("p")`
-  color: #ccc;
+  color: var(--secondary-text);
   margin-bottom: 25px;
   font-family: CustomFont;
 `;

@@ -7,4 +7,38 @@ body {
   font-family: "Roboto", sans-serif;
   user-select: none;
   margin: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+:root {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --secondary-text: #666666;
+  --tertiary-text: #333333;
+  --secondary-bg: #f5f5f5;
+  --border-color: #cccccc;
+  --accent-color: #f60;
+  --battery-good: linear-gradient(90deg, #4CAF50, #81C784);
+  --battery-medium: linear-gradient(90deg, #FF9800, #FFB74D);
+  --battery-low: linear-gradient(90deg, #F44336, #E57373);
+  --battery-charging: linear-gradient(90deg, #f60, #ff8533);
+  --heating-color: #ff6600;
+  --reached-color: #00ff66;
+}
+
+.dark-mode {
+  --bg-color: #181a1b;
+  --text-color: #ffffff;
+  --secondary-text: #cccccc;
+  --tertiary-text: #aaaaaa;
+  --secondary-bg: #2a2c2e;
+  --border-color: #444444;
+  --accent-color: #f60;
+  --battery-good: linear-gradient(90deg, #4CAF50, #81C784);
+  --battery-medium: linear-gradient(90deg, #FF9800, #FFB74D);
+  --battery-low: linear-gradient(90deg, #F44336, #E57373);
+  --battery-charging: linear-gradient(90deg, #f60, #ff8533);
+  --heating-color: #ff6600;
+  --reached-color: #00ff66;
 }

@@ -15,24 +15,24 @@ interface SwitchButtonProps {
 const SwitchWrapper = styled("div")`
   width: 72px;
   height: 36px;
-  background: #444;
+  background: var(--secondary-bg);
   border-radius: 36px;
   position: relative;
   cursor: pointer;
   transition: background 0.3s;
-  border: 2px solid #555;
+  border: 2px solid var(--border-color);
 
   &:hover {
-    background: #4a4a4a;
-    border-color: #666;
+    background: var(--bg-color);
+    border-color: var(--text-color);
   }
 `;
 
 const SwitchButton = styled("div")<SwitchButtonProps>`
   width: 30px;
   height: 30px;
-  color: #000;
-  background: ${(props) => (props.isOn ? "#f60" : "#ddd")};
+  color: var(--text-color);
+  background: ${(props) => (props.isOn ? "#f60" : "var(--border-color)")};
   position: absolute;
   top: 3px;
   left: ${(props) => (props.isOn ? "39px" : "1px")};
@@ -49,7 +49,7 @@ const SwitchButton = styled("div")<SwitchButtonProps>`
 
 const Label = styled("div")`
   margin-left: 10px;
-  color: #ccc;
+  color: var(--text-color);
   font-size: 1rem;
 `;
 

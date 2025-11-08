@@ -16,22 +16,23 @@ const BaseModernButton = styled("button")`
   align-items: center;
   font-weight: 600;
   border-radius: 12px;
-  background: linear-gradient(135deg, #333 0%, #444 100%);
-  border: 2px solid #555;
-  color: white;
+  background: var(--secondary-bg);
+  border: 2px solid var(--border-color);
+  color: var(--text-color);
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    border-color: #ff6600;
-    background: linear-gradient(135deg, #444 0%, #555 100%);
+    border-color: var(--accent-color);
+    background: var(--bg-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   &:active {
-    background-color: #222;
+    background-color: var(--bg-color);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
     transform: translateY(2px);
-    color: #f60;
+    color: var(--accent-color);
   }
 `;
 
@@ -43,9 +44,9 @@ export const Button = styled("button")<ButtonProps>`
   align-items: center;
   height: 50px;
   width: 55px;
-  background-color: #333;
+  background-color: var(--secondary-bg);
   border: none;
-  color: white;
+  color: var(--text-color);
   text-align: center;
   text-decoration: none;
   font-size: 16px;
@@ -53,18 +54,20 @@ export const Button = styled("button")<ButtonProps>`
   transition-duration: 0.4s;
   border-radius: 3px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  background-color: ${(props) => (props.isActive ? "#222" : "#333")};
+  background-color: ${(props) =>
+    props.isActive ? "var(--bg-color)" : "var(--secondary-bg)"};
   box-shadow: ${(props) =>
     props.isActive
       ? "0 5px 10px rgba(0, 0, 0, 0.3)"
       : "0 4px 8px rgba(0, 0, 0, 0.2)"};
   transform: ${(props) => (props.isActive ? "translateY(4px)" : "none")};
-  color: ${(props) => (props.isActive ? "#f60" : "white")};
+  color: ${(props) =>
+    props.isActive ? "var(--accent-color)" : "var(--text-color)"};
   &:hover {
-    background-color: #444;
+    background-color: var(--border-color);
   }
   &:active {
-    background-color: #222;
+    background-color: var(--bg-color);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
     transform: translateY(4px);
   }
@@ -72,10 +75,10 @@ export const Button = styled("button")<ButtonProps>`
 
 export const ButtonWithOrangeAnimation = styled(Button)`
   &:active {
-    background-color: #222;
+    background-color: var(--bg-color);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
     transform: translateY(4px);
-    color: #f60;
+    color: var(--accent-color);
   }
 `;
 
@@ -84,6 +87,13 @@ export const RoundButton = styled(BaseModernButton)`
   width: 50px;
   height: 50px;
   font-size: 1rem;
+
+  &:hover {
+    border-color: var(--accent-color);
+    background: var(--bg-color);
+    color: var(--accent-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
 `;
 
 // Active Round Button (for heat/pump buttons with active state)
@@ -94,9 +104,10 @@ export const ActiveRoundButton = styled(BaseModernButton)<ButtonProps>`
   background: ${(props) =>
     props.isActive
       ? "linear-gradient(135deg, rgba(255, 102, 0, 0.2) 0%, rgba(255, 102, 0, 0.1) 100%)"
-      : "linear-gradient(135deg, #333 0%, #444 100%)"};
-  border: 2px solid ${(props) => (props.isActive ? "#ff6600" : "#555")};
-  color: ${(props) => (props.isActive ? "#ff6600" : "white")};
+      : "var(--secondary-bg)"};
+  border: 2px solid
+    ${(props) => (props.isActive ? "#ff6600" : "var(--border-color)")};
+  color: ${(props) => (props.isActive ? "#ff6600" : "var(--text-color)")};
 
   ${(props) =>
     props.isActive
@@ -122,11 +133,12 @@ export const ActiveRoundButton = styled(BaseModernButton)<ButtonProps>`
       : ""}
 
   &:hover {
-    border-color: #ff6600;
+    border-color: var(--accent-color);
     background: ${(props) =>
       props.isActive
         ? "linear-gradient(135deg, rgba(255, 102, 0, 0.3) 0%, rgba(255, 102, 0, 0.2) 100%)"
-        : "linear-gradient(135deg, #444 0%, #555 100%)"};
+        : "var(--bg-color)"};
+    color: var(--accent-color);
   }
 `;
 
@@ -145,9 +157,12 @@ export const WideButton = styled(BaseModernButton)<HeatingButtonProps>`
   background: ${(props) =>
     props.isHeating
       ? "linear-gradient(135deg, rgba(255, 102, 0, 0.2) 0%, rgba(255, 102, 0, 0.1) 100%)"
-      : "linear-gradient(135deg, #333 0%, #444 100%)"};
-  border: 2px solid ${(props) => (props.isHeating ? "#ff6600" : "#555")};
-  color: ${(props) => (props.isHeating ? "#ff6600" : "white")};
+      : "var(--secondary-bg)"};
+  border: 2px solid
+    ${(props) =>
+      props.isHeating ? "var(--accent-color)" : "var(--border-color)"};
+  color: ${(props) =>
+    props.isHeating ? "var(--accent-color)" : "var(--text-color)"};
 
   ${(props) =>
     props.isHeating
@@ -173,11 +188,12 @@ export const WideButton = styled(BaseModernButton)<HeatingButtonProps>`
       : ""}
 
   &:hover {
-    border-color: #ff6600;
+    border-color: var(--accent-color);
     background: ${(props) =>
       props.isHeating
         ? "linear-gradient(135deg, rgba(255, 102, 0, 0.3) 0%, rgba(255, 102, 0, 0.2) 100%)"
-        : "linear-gradient(135deg, #444 0%, #555 100%)"};
+        : "var(--bg-color)"};
+    color: var(--accent-color);
   }
 
   .icon {
