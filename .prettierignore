@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+build/
+
+# Legacy app (don't format external code)
+legacy-app/
+
+# Generated files
+*.min.js
+*.min.css
+
+# Documentation
+README.md
+CHANGELOG.md
+
+# Config files that might have specific formatting
+.github/

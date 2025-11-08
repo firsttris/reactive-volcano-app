@@ -1,4 +1,11 @@
-import { Component, createContext, createEffect, createSignal, onMount, useContext } from "solid-js";
+import {
+  Component,
+  createContext,
+  createEffect,
+  createSignal,
+  onMount,
+  useContext,
+} from "solid-js";
 import type { Accessor, JSX } from "solid-js";
 
 interface DarkModeContextType {
@@ -18,9 +25,8 @@ interface DarkModeProviderProps {
 export const DarkModeProvider: Component<DarkModeProviderProps> = (props) => {
   const [isDarkMode, setIsDarkMode] = createSignal(false);
 
-
   onMount(() => {
-    const isDarkMode = localStorage.getItem("isDarkModeVReverse") === "true"
+    const isDarkMode = localStorage.getItem("isDarkModeVReverse") === "true";
     toggleDarkMode(isDarkMode);
   });
 
@@ -47,9 +53,9 @@ export const DarkModeProvider: Component<DarkModeProviderProps> = (props) => {
 };
 
 export const useDarkMode = () => {
-    const context = useContext(DarkModeContext);
-    if (context === undefined) {
-      throw new Error("useStore must be used within a StoreProvider");
-    }
+  const context = useContext(DarkModeContext);
+  if (context === undefined) {
+    throw new Error("useStore must be used within a StoreProvider");
+  }
   return useContext(DarkModeContext);
 };

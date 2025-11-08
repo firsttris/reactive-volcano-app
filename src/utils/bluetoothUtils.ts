@@ -1,13 +1,20 @@
 export const convertBLEToUint16 = (bleBuffer: DataView): number => {
-  return bleBuffer.getUint16(0, true);
-};
+  // Robuste Konvertierung - kann mit verschiedenen Buffer-Größen umgehen
+  if (bleBuffer.byteLength === 0) {
+    return 0;
+  }
 
-export const convertBLEToUint24 = (bleBuffer: DataView): number => {
-  return bleBuffer.getUint16(0, true) + bleBuffer.getUint8(2) * 256 * 256;
-};
+  if (bleBuffer.byteLength === 1) {
+    // 1 Byte: Lese als Uint8
+    return bleBuffer.getUint8(0);
+  }
 
-export const convertBLEToUint32 = (bleBuffer: DataView): number => {
-  return bleBuffer.getUint32(0, true);
+  if (bleBuffer.byteLength >= 2) {
+    // 2+ Bytes: Lese als Uint16
+    return bleBuffer.getUint16(0, true);
+  }
+
+  return 0;
 };
 
 export const convertCelsiusToFahrenheit = (celsius: number): number => {
