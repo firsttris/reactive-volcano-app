@@ -117,6 +117,10 @@ export const useWorkflowScheduler = (
     // Continue with next step if not at the end
     if (currentStep() < workflowSteps.length) {
       await executeNextStep();
+    } else {
+      // Workflow finished after last step
+      console.log("Workflow completed!");
+      await stopWorkflow();
     }
   };
 
