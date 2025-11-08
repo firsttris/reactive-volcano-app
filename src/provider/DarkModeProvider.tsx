@@ -26,7 +26,8 @@ export const DarkModeProvider: Component<DarkModeProviderProps> = (props) => {
   const [isDarkMode, setIsDarkMode] = createSignal(false);
 
   onMount(() => {
-    const isDarkMode = localStorage.getItem("isDarkModeVReverse") === "true";
+    const stored = localStorage.getItem("isDarkModeVReverse");
+    const isDarkMode = stored === null ? false : stored === "true";
     toggleDarkMode(isDarkMode);
   });
 

@@ -5,11 +5,11 @@ import { TemperatureDisplay } from "../TemperatureDisplay";
 import { useTranslations } from "../../i18n/utils";
 
 const TemperatureCard = styled("div")`
-  background: #2a2a2a;
+  background: var(--secondary-bg);
   border-radius: 16px;
   padding: 32px 24px;
   margin-bottom: 24px;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
 `;
 
 const DigitalText = styled("div")<{
@@ -23,7 +23,11 @@ const DigitalText = styled("div")<{
   align-items: center;
   justify-content: center;
   color: ${(props) =>
-    props.setpointReached ? "#00ff66" : props.isHeating ? "#ff6600" : "white"};
+    props.setpointReached
+      ? "var(--reached-color)"
+      : props.isHeating
+        ? "var(--heating-color)"
+        : "var(--text-color)"};
   margin-top: 20px;
   transition: all 0.3s ease;
 
@@ -91,7 +95,7 @@ const TempDisplay = styled("div")`
 const TempLabel = styled("span")`
   display: block;
   font-size: 0.9rem;
-  color: #ccc;
+  color: var(--secondary-text);
   margin-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;

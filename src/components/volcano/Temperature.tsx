@@ -14,7 +14,7 @@ const TempDisplay = styled("div")`
 const TempLabel = styled("span")`
   display: block;
   font-size: 0.9rem;
-  color: #ccc;
+  color: var(--secondary-text);
   margin-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -28,7 +28,7 @@ const DigitalText = styled("div")<{ isTarget?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${(props) => (props.isTarget ? "white" : "#f60")};
+  color: ${(props) => (props.isTarget ? "var(--text-color)" : "#f60")};
   transition: all 0.3s ease;
 
   ${(props) =>

@@ -6,7 +6,7 @@ const SliderInput = styled("input")`
   height: 8px;
   -webkit-appearance: none;
   appearance: none;
-  background: #444;
+  background: var(--border-color);
   outline: none;
   border-radius: 4px;
   transition: all 0.2s;
@@ -17,13 +17,13 @@ const SliderInput = styled("input")`
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #f60;
+    background: var(--accent-color);
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(255, 102, 0, 0.5);
     transition: all 0.2s;
 
     &:hover {
-      background: #ff7700;
+      background: var(--accent-color);
       box-shadow: 0 2px 12px rgba(255, 102, 0, 0.7);
     }
   }
@@ -32,14 +32,14 @@ const SliderInput = styled("input")`
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #f60;
+    background: var(--accent-color);
     cursor: pointer;
     border: none;
     box-shadow: 0 2px 8px rgba(255, 102, 0, 0.5);
     transition: all 0.2s;
 
     &:hover {
-      background: #ff7700;
+      background: var(--accent-color);
       box-shadow: 0 2px 12px rgba(255, 102, 0, 0.7);
     }
   }
@@ -77,7 +77,7 @@ const Mark = styled("span")<MarkProps>`
   width: 1em;
   font-family: CustomFont;
   margin-left: ${(props) => (props.isFirst ? "5px" : "0px")};
-  color: #999;
+  color: var(--secondary-text);
   font-size: 0.9rem;
 `;
 
@@ -130,7 +130,7 @@ const LabelContainer = styled("div")`
   margin-left: 3px;
   display: flex;
   align-items: center;
-  color: #ccc;
+  color: var(--secondary-text);
   font-size: 1rem;
 `;
 

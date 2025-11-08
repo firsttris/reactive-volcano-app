@@ -13,10 +13,10 @@ const StyledDiv = styled("div")<StyledDivProps>`
   visibility: ${(props) => (props.isVisible ? "visible" : "hidden")};
   font-family: CustomFont;
   background: rgba(255, 102, 0, 0.1);
-  border: 1px solid #f60;
+  border: 1px solid var(--accent-color);
   border-radius: 8px;
   padding: 12px 20px;
-  color: #f60;
+  color: var(--accent-color);
   font-size: 1rem;
   font-weight: 600;
   text-align: center;

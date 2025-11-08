@@ -18,7 +18,7 @@ const BatteryContainer = styled("div")`
 `;
 
 const BatteryLabel = styled("div")`
-  color: #ccc;
+  color: var(--text-color);
   font-size: 0.9rem;
   margin-bottom: 8px;
   text-align: center;
@@ -27,10 +27,10 @@ const BatteryLabel = styled("div")`
 const BatteryBar = styled("div")<{ charging?: boolean }>`
   width: 100%;
   height: 20px;
-  background: #444;
+  background: var(--secondary-bg);
   border-radius: 10px;
   overflow: hidden;
-  border: 1px solid ${(props) => (props.charging ? "#f60" : "#666")};
+  border: 1px solid ${(props) => (props.charging ? "var(--accent-color)" : "var(--border-color)")};
   box-shadow: ${(props) =>
     props.charging ? "0 0 8px rgba(255, 102, 0, 0.6)" : "none"};
   position: relative;
@@ -67,12 +67,12 @@ const BatteryFill = styled("div")<{ level: number; charging?: boolean }>`
   width: ${(props) => props.level}%;
   background: ${(props) =>
     props.charging
-      ? "linear-gradient(90deg, #f60, #ff8533)"
+      ? "var(--battery-charging)"
       : props.level > 50
-        ? "linear-gradient(90deg, #4CAF50, #81C784)"
+        ? "var(--battery-good)"
         : props.level > 20
-          ? "linear-gradient(90deg, #FF9800, #FFB74D)"
-          : "linear-gradient(90deg, #F44336, #E57373)"};
+          ? "var(--battery-medium)"
+          : "var(--battery-low)"};
   transition: width 0.3s ease;
   animation: ${(props) =>
     props.charging ? "charging-pulse 1.5s ease-in-out infinite" : "none"};
