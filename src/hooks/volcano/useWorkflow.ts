@@ -1,53 +1,26 @@
-import { createEffect, createMemo, createSignal, onMount } from "solid-js";
+import { createMemo } from "solid-js";
 import {
   Workflow,
   WorkflowStep,
   initialListOfWorkflows,
 } from "../../utils/workflowData";
 import { v4 as uuidv4 } from "uuid";
-
-/**
- * Hook for managing workflow state and operations for Volcano devices.
- * Provides workflow list management, step operations, and localStorage persistence.
- */
+import { useIndexedDB } from "../utils/useIndexedDB";
 export const useWorkflow = () => {
-  const [workflowList, setWorkflowList] = createSignal<Workflow[]>(
+  const [workflowList, setWorkflowList] = useIndexedDB(
+    "workflowList",
     initialListOfWorkflows
   );
-  const [selectedWorkflowId, setSelectedWorkflowId] = createSignal<string>("");
+  const [selectedWorkflowId, setSelectedWorkflowId] = useIndexedDB(
+    "selectedWorkflowId",
+    ""
+  );
 
   const workflowSteps = createMemo(() => {
     const workflow = workflowList().find(
       (workflow) => workflow.id === selectedWorkflowId()
     );
     return workflow?.workflowSteps || [];
-  });
-
-  onMount(() => {
-    const selectedWorkflowIdFromLocalStorage =
-      localStorage.getItem("selectedWorkflowId");
-    if (!selectedWorkflowIdFromLocalStorage) return;
-    //console.log("selectedWorkflowId", selectedWorkflowIdFromLocalStorage);
-    setSelectedWorkflowId(selectedWorkflowIdFromLocalStorage);
-
-    const workflowListFromLocalStorage = localStorage.getItem("workflowList");
-    if (!workflowListFromLocalStorage) return;
-    //console.log("workflowList", workflowListFromLocalStorage);
-    try {
-      setWorkflowList(JSON.parse(workflowListFromLocalStorage));
-    } catch (error) {
-      console.log("error", error);
-    }
-  });
-
-  createEffect(() => {
-    if (selectedWorkflowId()) {
-      localStorage.setItem("selectedWorkflowId", selectedWorkflowId());
-    }
-
-    if (workflowList()) {
-      localStorage.setItem("workflowList", JSON.stringify(workflowList()));
-    }
   });
 
   const addWorkflowToList = () => {
