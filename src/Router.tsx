@@ -10,10 +10,10 @@ import { Layout } from "./components/Layout";
 import { ROUTES } from "./routes";
 
 export const Routes = () => {
-  const isProd = import.meta.env.MODE === "production";
+  const base = import.meta.env.BASE_URL;
 
   return (
-    <Router base={isProd ? "/reactive-volcano-app/" : undefined}>
+    <Router base={base !== "/" ? base : undefined}>
       <Route path={ROUTES.ROOT} component={Layout}>
         {/* Auto-navigation based on connected device */}
         <Route path={ROUTES.ROOT} component={DeviceRouter} />

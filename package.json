@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "tsc && vite build --base=/reactive-volcano-app/",
+    "build:root": "tsc && vite build",
     "preview": "vite preview",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
