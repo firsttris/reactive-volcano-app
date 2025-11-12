@@ -217,7 +217,7 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
         throw error;
       }
     } else if (actualDeviceType === DeviceType.CRAFTY) {
-      // Crafty connection
+      // Crafty connection - directly connect to Crafty services (like legacy app)
       try {
         const service1 = await server.getPrimaryService(ServiceUUIDs.Crafty1);
         const service2 = await server.getPrimaryService(ServiceUUIDs.Crafty2);
@@ -227,10 +227,12 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
         setCraftyService3(service3);
         // Use service1 as primary control service for compatibility
         setDeviceControlService(service1);
-        console.log("Crafty services connected");
+        console.log("Crafty services connected successfully");
       } catch (error) {
         console.error("Failed to connect to Crafty services:", error);
-        throw error;
+        throw new Error(
+          `Crafty connection failed. This might be an incompatible firmware version (${deviceName}). Error: ${(error as Error).message}`
+        );
       }
     } else {
       // Volcano connection (existing logic)
@@ -250,15 +252,17 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
       { namePrefix: "STORZ&BICKEL" },
       { namePrefix: "Storz&Bickel" },
       { namePrefix: "S&B" },
-      { services: [ServiceUUIDs.DeviceState, ServiceUUIDs.DeviceControl] }, // Volcano services
-      { services: [ServiceUUIDs.Primary] }, // Veazy/Venty service
+      // Check all service types simultaneously (like legacy app)
       {
         services: [
+          ServiceUUIDs.DeviceState,
+          ServiceUUIDs.DeviceControl,
+          ServiceUUIDs.Primary,
           ServiceUUIDs.Crafty1,
           ServiceUUIDs.Crafty2,
           ServiceUUIDs.Crafty3,
         ],
-      }, // Crafty services
+      },
     ];
 
     // For reconnect, add exact name match as first priority
@@ -273,6 +277,8 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
     "generic_access",
     ServiceUUIDs.GenericAccess, // Generic Access for Veazy/Venty
     ServiceUUIDs.Primary, // Veazy/Venty primary service
+    ServiceUUIDs.DeviceState, // Volcano services
+    ServiceUUIDs.DeviceControl,
     ServiceUUIDs.Crafty1, // Crafty services
     ServiceUUIDs.Crafty2,
     ServiceUUIDs.Crafty3,
