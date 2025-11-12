@@ -25,6 +25,8 @@ export const DeviceRouter = () => {
       case DeviceType.VENTY:
       case DeviceType.VEAZY:
         return buildRoute.ventyVeazyRoot();
+      case DeviceType.CRAFTY:
+        return buildRoute.craftyRoot();
       case DeviceType.UNKNOWN:
       default:
         return buildRoute.connect();

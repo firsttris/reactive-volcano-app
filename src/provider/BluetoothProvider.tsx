@@ -20,6 +20,9 @@ export type Methods = {
   deviceInfo: () => DeviceInfo;
   getDeviceStateService: Accessor<BluetoothRemoteGATTService | undefined>;
   getDeviceControlService: Accessor<BluetoothRemoteGATTService | undefined>;
+  getCraftyService1: Accessor<BluetoothRemoteGATTService | undefined>;
+  getCraftyService2: Accessor<BluetoothRemoteGATTService | undefined>;
+  getCraftyService3: Accessor<BluetoothRemoteGATTService | undefined>;
   getCharacteristics: Accessor<DeviceCharacteristics>;
   setCharacteristics: Setter<DeviceCharacteristics>;
 };
@@ -42,6 +45,12 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
   const [getDeviceStateService, setDeviceStateService] =
     createSignal<BluetoothRemoteGATTService>();
   const [getDeviceControlService, setDeviceControlService] =
+    createSignal<BluetoothRemoteGATTService>();
+  const [getCraftyService1, setCraftyService1] =
+    createSignal<BluetoothRemoteGATTService>();
+  const [getCraftyService2, setCraftyService2] =
+    createSignal<BluetoothRemoteGATTService>();
+  const [getCraftyService3, setCraftyService3] =
     createSignal<BluetoothRemoteGATTService>();
   const [getCharacteristics, setCharacteristics] =
     createSignal<DeviceCharacteristics>({});
@@ -66,6 +75,11 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
     // Check for Veazy (VZ in device name)
     if (name.includes("vz") || name.includes("veazy")) {
       return DeviceType.VEAZY;
+    }
+
+    // Check for Crafty devices
+    if (name.includes("crafty") || name.includes("cy")) {
+      return DeviceType.CRAFTY;
     }
 
     // Check for Volcano devices
@@ -109,6 +123,9 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
     setConnectionState(ConnectionState.NOT_CONNECTED);
     setDeviceStateService(undefined);
     setDeviceControlService(undefined);
+    setCraftyService1(undefined);
+    setCraftyService2(undefined);
+    setCraftyService3(undefined);
     setCharacteristics({});
     setDeviceInfo({ type: DeviceType.UNKNOWN, name: "" });
     setServer(undefined);
@@ -199,6 +216,22 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
         console.error("Failed to connect to Veazy/Venty service:", error);
         throw error;
       }
+    } else if (actualDeviceType === DeviceType.CRAFTY) {
+      // Crafty connection
+      try {
+        const service1 = await server.getPrimaryService(ServiceUUIDs.Crafty1);
+        const service2 = await server.getPrimaryService(ServiceUUIDs.Crafty2);
+        const service3 = await server.getPrimaryService(ServiceUUIDs.Crafty3);
+        setCraftyService1(service1);
+        setCraftyService2(service2);
+        setCraftyService3(service3);
+        // Use service1 as primary control service for compatibility
+        setDeviceControlService(service1);
+        console.log("Crafty services connected");
+      } catch (error) {
+        console.error("Failed to connect to Crafty services:", error);
+        throw error;
+      }
     } else {
       // Volcano connection (existing logic)
       const stateService = await server.getPrimaryService(
@@ -219,6 +252,13 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
       { namePrefix: "S&B" },
       { services: [ServiceUUIDs.DeviceState, ServiceUUIDs.DeviceControl] }, // Volcano services
       { services: [ServiceUUIDs.Primary] }, // Veazy/Venty service
+      {
+        services: [
+          ServiceUUIDs.Crafty1,
+          ServiceUUIDs.Crafty2,
+          ServiceUUIDs.Crafty3,
+        ],
+      }, // Crafty services
     ];
 
     // For reconnect, add exact name match as first priority
@@ -233,6 +273,9 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
     "generic_access",
     ServiceUUIDs.GenericAccess, // Generic Access for Veazy/Venty
     ServiceUUIDs.Primary, // Veazy/Venty primary service
+    ServiceUUIDs.Crafty1, // Crafty services
+    ServiceUUIDs.Crafty2,
+    ServiceUUIDs.Crafty3,
   ];
 
   const requestBluetoothDevice = async (storedDeviceName?: string) => {
@@ -265,6 +308,9 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
         deviceInfo,
         getDeviceStateService,
         getDeviceControlService,
+        getCraftyService1,
+        getCraftyService2,
+        getCraftyService3,
         getCharacteristics,
         setCharacteristics,
       }}
