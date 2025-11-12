@@ -67,22 +67,7 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
   const detectDeviceType = (deviceName: string): DeviceType => {
     const name = deviceName.toLowerCase();
 
-    // Check for Venty (VY in device name)
-    if (name.includes("vy") || name.includes("venty")) {
-      return DeviceType.VENTY;
-    }
-
-    // Check for Veazy (VZ in device name)
-    if (name.includes("vz") || name.includes("veazy")) {
-      return DeviceType.VEAZY;
-    }
-
-    // Check for Crafty devices
-    if (name.includes("crafty") || name.includes("cy")) {
-      return DeviceType.CRAFTY;
-    }
-
-    // Check for Volcano devices
+    // Check for Volcano devices (must include "volcano")
     if (
       name.includes("volcano") ||
       (name.includes("s&b") && name.includes("volcano"))
@@ -90,9 +75,30 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
       return DeviceType.VOLCANO;
     }
 
-    // Fallback for other STORZ&BICKEL devices (likely Crafty/Volcano)
+    // Check for Venty (VY in device name)
+    if (
+      (name.includes("vy") || name.includes("venty")) &&
+      name.includes("s&b")
+    ) {
+      return DeviceType.VENTY;
+    }
+
+    // Check for Veazy (VZ in device name)
+    if (
+      (name.includes("vz") || name.includes("veazy")) &&
+      name.includes("s&b")
+    ) {
+      return DeviceType.VEAZY;
+    }
+
+    // Check for Crafty devices (like legacy app: everything else is Crafty)
+    if (name.includes("crafty") || name.includes("cy")) {
+      return DeviceType.CRAFTY;
+    }
+
+    // Fallback for other STORZ&BICKEL devices (likely Crafty, not Volcano)
     if (name.includes("storz") || name.includes("s&b")) {
-      return DeviceType.VOLCANO;
+      return DeviceType.CRAFTY; // Changed from VOLCANO to CRAFTY like legacy app
     }
 
     return DeviceType.UNKNOWN;
