@@ -252,16 +252,24 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
       { namePrefix: "STORZ&BICKEL" },
       { namePrefix: "Storz&Bickel" },
       { namePrefix: "S&B" },
-      // Check all service types simultaneously (like legacy app)
+      // Separate filters for each device type (like legacy app)
       {
         services: [
-          ServiceUUIDs.DeviceState,
-          ServiceUUIDs.DeviceControl,
-          ServiceUUIDs.Primary,
           ServiceUUIDs.Crafty1,
           ServiceUUIDs.Crafty2,
           ServiceUUIDs.Crafty3,
         ],
+      },
+      {
+        services: [
+          ServiceUUIDs.DeviceState,
+          ServiceUUIDs.DeviceControl,
+          ServiceUUIDs.Service2,
+          ServiceUUIDs.Service5,
+        ],
+      },
+      {
+        services: [ServiceUUIDs.Primary],
       },
     ];
 
