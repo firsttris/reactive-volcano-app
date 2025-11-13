@@ -26,7 +26,7 @@ However you can still enable Web Bluetooth API in Chrome on Linux, follow these 
 
 To develop and build this project, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/firsttris/reactive-volcano-app.git`
+1. Clone the repository: `git clone https://github.com/sprokkel78/reactive-volcano-app.git`
 2. Navigate into the project directory: `cd reactive-volcano-app`
 3. Install the dependencies: `npm install`
 4. Start the development server: `npm run dev`
