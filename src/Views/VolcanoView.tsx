@@ -10,6 +10,7 @@ import { VibrationSwitch } from "../components/volcano/VibrationSwitch";
 import { DarkModeSwitch } from "../components/DarkModeSwitch";
 import { StandbyDisplaySwitch } from "../components/volcano/StandbyDisplaySwitch";
 import { WorkFlowSection } from "../components/volcano/Workflow/WorkflowSection";
+import { HeatingTimeDisplay } from "../components/volcano/HeatingTimeDisplay";
 import { useTranslations } from "../i18n/utils";
 import { useBluetooth } from "../provider/BluetoothProvider";
 import { ConnectionState } from "../utils/uuids";
@@ -114,6 +115,9 @@ export const VolcanoView: Component = () => {
             <DarkModeSwitch />
           </SwitchContainer>
         </SwitchesContainer>
+        <SettingItem>
+          <HeatingTimeDisplay />
+        </SettingItem>
       </SettingsContainer>
     </>
   );
