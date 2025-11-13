@@ -134,6 +134,28 @@ export const useWorkflow = () => {
     ]);
   };
 
+  const renameWorkflow = (workflowId: string, newName: string) => {
+    const workflows = workflowList();
+    const workflowIndex = findWorkflowIndex(workflowId);
+
+    if (workflowIndex === -1) {
+      console.log(`Workflow with id ${workflowId} not found`);
+      return;
+    }
+
+    const workflow = workflows[workflowIndex];
+    const updatedWorkflow = {
+      ...workflow,
+      name: newName,
+    };
+
+    setWorkflowList([
+      ...workflows.slice(0, workflowIndex),
+      updatedWorkflow,
+      ...workflows.slice(workflowIndex + 1),
+    ]);
+  };
+
   const editWorkflowStepInList = (
     workflowId: string,
     workflowStepId: string,
@@ -227,6 +249,174 @@ export const useWorkflow = () => {
     ]);
   };
 
+  const exportWorkflow = (workflowId: string) => {
+    const workflow = workflowList().find((w) => w.id === workflowId);
+    if (!workflow) {
+      console.error(`Workflow with id ${workflowId} not found`);
+      return;
+    }
+
+    // Create export data without internal IDs to avoid conflicts on import
+    const exportData = {
+      name: workflow.name,
+      workflowSteps: workflow.workflowSteps.map((step) => ({
+        temperature: step.temperature,
+        holdTimeInSeconds: step.holdTimeInSeconds,
+        pumpTimeInSeconds: step.pumpTimeInSeconds,
+      })),
+      exportedAt: new Date().toISOString(),
+      version: "1.0",
+    };
+
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataUri =
+      "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+
+    const exportFileDefaultName = `${workflow.name.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_workflow.json`;
+
+    const linkElement = document.createElement("a");
+    linkElement.setAttribute("href", dataUri);
+    linkElement.setAttribute("download", exportFileDefaultName);
+    linkElement.click();
+  };
+
+  const importWorkflow = (file: File) => {
+    return new Promise<void>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const importData = JSON.parse(content);
+
+          // Validate the import data structure
+          if (!importData.name || !Array.isArray(importData.workflowSteps)) {
+            throw new Error("Invalid workflow file structure");
+          }
+
+          // Validate each step
+          for (const step of importData.workflowSteps) {
+            if (
+              typeof step.temperature !== "number" ||
+              typeof step.holdTimeInSeconds !== "number" ||
+              typeof step.pumpTimeInSeconds !== "number"
+            ) {
+              throw new Error("Invalid workflow step data");
+            }
+          }
+
+          // Create new workflow with fresh IDs
+          const newWorkflow: Workflow = {
+            id: uuidv4(),
+            name: importData.name,
+            workflowSteps: importData.workflowSteps.map((step: any) => ({
+              id: uuidv4(),
+              temperature: step.temperature,
+              holdTimeInSeconds: step.holdTimeInSeconds,
+              pumpTimeInSeconds: step.pumpTimeInSeconds,
+            })),
+          };
+
+          setWorkflowList([...workflowList(), newWorkflow]);
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.readAsText(file);
+    });
+  };
+
+  const exportAllWorkflows = () => {
+    const allWorkflows = workflowList();
+
+    // Create export data without internal IDs
+    const exportData = {
+      workflows: allWorkflows.map((workflow) => ({
+        name: workflow.name,
+        workflowSteps: workflow.workflowSteps.map((step) => ({
+          temperature: step.temperature,
+          holdTimeInSeconds: step.holdTimeInSeconds,
+          pumpTimeInSeconds: step.pumpTimeInSeconds,
+        })),
+      })),
+      exportedAt: new Date().toISOString(),
+      version: "1.0",
+      totalWorkflows: allWorkflows.length,
+    };
+
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataUri =
+      "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+
+    const exportFileDefaultName = `all_workflows_${new Date().toISOString().split("T")[0]}.json`;
+
+    const linkElement = document.createElement("a");
+    linkElement.setAttribute("href", dataUri);
+    linkElement.setAttribute("download", exportFileDefaultName);
+    linkElement.click();
+  };
+
+  const importAllWorkflows = (file: File) => {
+    return new Promise<void>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const importData = JSON.parse(content);
+
+          // Validate the import data structure
+          if (!importData.workflows || !Array.isArray(importData.workflows)) {
+            throw new Error("Invalid workflows file structure");
+          }
+
+          // Validate each workflow
+          const newWorkflows: Workflow[] = [];
+          for (const workflowData of importData.workflows) {
+            if (
+              !workflowData.name ||
+              !Array.isArray(workflowData.workflowSteps)
+            ) {
+              throw new Error("Invalid workflow structure in file");
+            }
+
+            // Validate each step
+            for (const step of workflowData.workflowSteps) {
+              if (
+                typeof step.temperature !== "number" ||
+                typeof step.holdTimeInSeconds !== "number" ||
+                typeof step.pumpTimeInSeconds !== "number"
+              ) {
+                throw new Error("Invalid workflow step data");
+              }
+            }
+
+            // Create new workflow with fresh IDs
+            const newWorkflow: Workflow = {
+              id: uuidv4(),
+              name: workflowData.name,
+              workflowSteps: workflowData.workflowSteps.map((step: any) => ({
+                id: uuidv4(),
+                temperature: step.temperature,
+                holdTimeInSeconds: step.holdTimeInSeconds,
+                pumpTimeInSeconds: step.pumpTimeInSeconds,
+              })),
+            };
+
+            newWorkflows.push(newWorkflow);
+          }
+
+          setWorkflowList(newWorkflows);
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.readAsText(file);
+    });
+  };
+
   return {
     workflowSteps,
     selectedWorkflowId,
@@ -241,5 +431,10 @@ export const useWorkflow = () => {
     setWorkflowList,
     updateWorkflowStepsInList,
     addNewWorkflowStep,
+    renameWorkflow,
+    exportWorkflow,
+    importWorkflow,
+    exportAllWorkflows,
+    importAllWorkflows,
   };
 };

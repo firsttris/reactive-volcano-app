@@ -72,6 +72,20 @@ export const ui = {
     battery: "Battery",
     charging: "⚡ Charging",
     deleteWorkflow: "Delete workflow",
+    exportWorkflow: "Export Workflow",
+    importWorkflow: "Import Workflow",
+    importWorkflowDescription: "Import a single workflow from a JSON file",
+    exportWorkflowDescription: "Download this workflow as a JSON file",
+    invalidWorkflowFile: "Invalid workflow file",
+    workflowImported: "Workflow imported successfully",
+    exportAllWorkflows: "Export All Workflows",
+    importAllWorkflows: "Import All Workflows",
+    exportAllWorkflowsDescription: "Download all workflows as a JSON file",
+    importAllWorkflowsDescription:
+      "Import workflows from a JSON file (will replace all existing workflows)",
+    workflowsExported: "All workflows exported successfully",
+    workflowsImported: "All workflows imported successfully",
+    confirmImportAll: "This will replace all existing workflows. Are you sure?",
   },
   de: {
     settings: "Einstellungen",
@@ -138,6 +152,22 @@ export const ui = {
     battery: "Akku",
     charging: "⚡ Lädt",
     deleteWorkflow: "Workflow löschen",
+    exportWorkflow: "Workflow exportieren",
+    importWorkflow: "Workflow importieren",
+    exportWorkflowDescription: "Dieses Workflow als JSON-Datei herunterladen",
+    importWorkflowDescription: "Ein Workflow aus einer JSON-Datei importieren",
+    invalidWorkflowFile: "Ungültige Workflow-Datei",
+    workflowImported: "Workflow erfolgreich importiert",
+    exportAllWorkflows: "Alle Workflows exportieren",
+    importAllWorkflows: "Alle Workflows importieren",
+    exportAllWorkflowsDescription:
+      "Alle Workflows als JSON-Datei herunterladen",
+    importAllWorkflowsDescription:
+      "Workflows aus einer JSON-Datei importieren (ersetzt alle vorhandenen Workflows)",
+    workflowsExported: "Alle Workflows erfolgreich exportiert",
+    workflowsImported: "Alle Workflows erfolgreich importiert",
+    confirmImportAll:
+      "Dies ersetzt alle vorhandenen Workflows. Sind Sie sicher?",
   },
 } as const;
 

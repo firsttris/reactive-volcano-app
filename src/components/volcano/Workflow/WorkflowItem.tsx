@@ -1,5 +1,13 @@
-import { Component, Show } from "solid-js";
-import { FiPlay, FiSquare, FiEdit2, FiTrash2 } from "solid-icons/fi";
+import { Component, Show, createSignal } from "solid-js";
+import {
+  FiPlay,
+  FiSquare,
+  FiEdit2,
+  FiTrash2,
+  FiCheck,
+  FiX,
+  FiDownload,
+} from "solid-icons/fi";
 import { styled } from "solid-styled-components";
 import { useNavigate } from "@solidjs/router";
 import { Workflow } from "../../../utils/workflowData";
@@ -39,6 +47,48 @@ const WorkflowHeader = styled("div")`
   margin-bottom: 12px;
 `;
 
+const NameContainer = styled("div")`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+`;
+
+const NameInput = styled("input")`
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: var(--text-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: CustomFont;
+  flex: 1;
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent-color);
+  }
+`;
+
+const SmallIconButton = styled("button")`
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--secondary-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: var(--accent-color);
+    background: var(--secondary-bg);
+  }
+`;
+
 const WorkflowName = styled("div")`
   color: var(--text-color);
   font-size: 1.1rem;
@@ -59,7 +109,7 @@ const ActionButtons = styled("div")`
 `;
 
 const IconButton = styled("button")<{
-  variant?: "play" | "stop" | "edit" | "delete";
+  variant?: "play" | "stop" | "edit" | "delete" | "export";
 }>`
   background: ${(props) => {
     if (props.variant === "play")
@@ -127,9 +177,17 @@ const ProgressFill = styled("div")<{ progress: number }>`
 
 export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
   const { workflow } = useVolcanoDeviceContext();
-  const { setSelectedWorkflowId, deleteWorkflowFromList } = workflow;
+  const {
+    setSelectedWorkflowId,
+    deleteWorkflowFromList,
+    renameWorkflow,
+    exportWorkflow,
+  } = workflow;
   const navigate = useNavigate();
   const t = useTranslations();
+
+  const [isEditingName, setIsEditingName] = createSignal(false);
+  const [editedName, setEditedName] = createSignal(props.workflow.name);
 
   const workflowSteps = () => props.workflow.workflowSteps;
   const {
@@ -170,10 +228,63 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
     }
   };
 
+  const handleExport = (e: MouseEvent) => {
+    e.stopPropagation();
+    exportWorkflow(props.workflow.id);
+  };
+
+  const handleStartEditName = (e: Event) => {
+    e.stopPropagation();
+    setEditedName(props.workflow.name);
+    setIsEditingName(true);
+  };
+
+  const handleSaveName = (e: Event) => {
+    e.stopPropagation();
+    const newName = editedName().trim();
+    if (newName && newName !== props.workflow.name) {
+      renameWorkflow(props.workflow.id, newName);
+    }
+    setIsEditingName(false);
+  };
+
+  const handleCancelEditName = (e: Event) => {
+    e.stopPropagation();
+    setIsEditingName(false);
+    setEditedName(props.workflow.name);
+  };
+
   return (
     <Card isActive={schedulerIsRunning()}>
       <WorkflowHeader>
-        <WorkflowName>{props.workflow.name}</WorkflowName>
+        <NameContainer>
+          <Show
+            when={isEditingName()}
+            fallback={
+              <>
+                <WorkflowName>{props.workflow.name}</WorkflowName>
+                <SmallIconButton onClick={handleStartEditName}>
+                  <FiEdit2 size={14} />
+                </SmallIconButton>
+              </>
+            }
+          >
+            <NameInput
+              value={editedName()}
+              onInput={(e) => setEditedName(e.currentTarget.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSaveName(e);
+                if (e.key === "Escape") handleCancelEditName(e);
+              }}
+            />
+            <SmallIconButton onClick={handleSaveName}>
+              <FiCheck size={14} />
+            </SmallIconButton>
+            <SmallIconButton onClick={handleCancelEditName}>
+              <FiX size={14} />
+            </SmallIconButton>
+          </Show>
+        </NameContainer>
       </WorkflowHeader>
       <StepCount>
         {workflowSteps().length}{" "}
@@ -198,6 +309,13 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
         </Show>
         <IconButton variant="edit" onClick={handleEdit}>
           <FiEdit2 size={18} />
+        </IconButton>
+        <IconButton
+          variant="export"
+          onClick={handleExport}
+          title={t("exportWorkflowDescription")}
+        >
+          <FiDownload size={18} />
         </IconButton>
         <IconButton variant="delete" onClick={handleDelete}>
           <FiTrash2 size={18} />
