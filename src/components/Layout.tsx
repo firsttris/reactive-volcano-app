@@ -19,7 +19,7 @@ const ResponsiveContainer = styled("div")`
 
 export const Layout = (props: RouteSectionProps) => {
   return (
-    <div style={{ display: "flex", "flex-direction": "column" }}>
+    <div style={{ display: "flex", "flex-direction": "column", "background-image": "url('./bg-volcano.png')", "background-position": "center", "background-size": "cover", "background-repeat": "no-repeat"}}>
       <ConnectionBar />
       <ResponsiveContainer>
         <div style={{ "margin-left": "20px", "margin-right": "20px" }}>
