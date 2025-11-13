@@ -2,7 +2,7 @@ import { createEffect, createSignal, onMount } from "solid-js";
 
 // IndexedDB setup (shared across the app)
 const DB_NAME = "VolcanoWorkflowDB";
-const DB_VERSION = 2; // Increased version to upgrade the database
+const DB_VERSION = 3; // Increased version to upgrade the database
 const STORE_NAME = "keyValueStore"; // Single store for all key-value pairs
 
 const openDB = (): Promise<IDBDatabase> => {
@@ -72,6 +72,7 @@ export const useIndexedDB = <T>(key: string, defaultValue: T) => {
 
   createEffect(() => {
     const val = value();
+    if (JSON.stringify(val) === JSON.stringify(defaultValue)) return;
     saveToDB(key, val).catch((error) =>
       console.error(`Error saving ${key} to IndexedDB:`, error)
     );
