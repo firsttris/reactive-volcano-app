@@ -30,7 +30,7 @@ To develop and build this project, follow these steps:
 2. Navigate into the project directory: `cd reactive-volcano-app`
 3. Install the dependencies: `npm install`
 5. Start the development server: `npm run dev`
-6. To build the project, use: `npm run build`
+6. To build the project, use: `npm run build:root`
 
 # Connection Issues and Pitfalls
 
