@@ -6,6 +6,8 @@ import {
   FiTrash2,
   FiCheck,
   FiX,
+  FiDownload,
+  FiUpload,
 } from "solid-icons/fi";
 import { styled } from "solid-styled-components";
 import { useNavigate } from "@solidjs/router";
@@ -108,7 +110,7 @@ const ActionButtons = styled("div")`
 `;
 
 const IconButton = styled("button")<{
-  variant?: "play" | "stop" | "edit" | "delete";
+  variant?: "play" | "stop" | "edit" | "delete" | "export" | "import";
 }>`
   background: ${(props) => {
     if (props.variant === "play")
@@ -176,8 +178,13 @@ const ProgressFill = styled("div")<{ progress: number }>`
 
 export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
   const { workflow } = useVolcanoDeviceContext();
-  const { setSelectedWorkflowId, deleteWorkflowFromList, renameWorkflow } =
-    workflow;
+  const {
+    setSelectedWorkflowId,
+    deleteWorkflowFromList,
+    renameWorkflow,
+    exportWorkflow,
+    importWorkflow,
+  } = workflow;
   const navigate = useNavigate();
   const t = useTranslations();
 
@@ -221,6 +228,31 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
     if (confirm(`${t("deleteWorkflow")} "${props.workflow.name}"?`)) {
       deleteWorkflowFromList(props.workflow.id);
     }
+  };
+
+  const handleExport = (e: MouseEvent) => {
+    e.stopPropagation();
+    exportWorkflow(props.workflow.id);
+  };
+
+  const handleImport = (e: MouseEvent) => {
+    e.stopPropagation();
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = async (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (file) {
+        try {
+          await importWorkflow(file);
+        } catch (error) {
+          console.error(
+            `${t("invalidWorkflowFile")}: ${(error as Error).message}`
+          );
+        }
+      }
+    };
+    input.click();
   };
 
   const handleStartEditName = (e: Event) => {
@@ -299,6 +331,20 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
         </Show>
         <IconButton variant="edit" onClick={handleEdit}>
           <FiEdit2 size={18} />
+        </IconButton>
+        <IconButton
+          variant="export"
+          onClick={handleExport}
+          title={t("exportWorkflowDescription")}
+        >
+          <FiDownload size={18} />
+        </IconButton>
+        <IconButton
+          variant="import"
+          onClick={handleImport}
+          title={t("importWorkflowDescription")}
+        >
+          <FiUpload size={18} />
         </IconButton>
         <IconButton variant="delete" onClick={handleDelete}>
           <FiTrash2 size={18} />

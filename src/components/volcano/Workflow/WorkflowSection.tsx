@@ -3,7 +3,7 @@ import { WorkflowItem } from "./WorkflowItem";
 import { styled } from "solid-styled-components";
 import { useVolcanoDeviceContext } from "../../../provider/VolcanoDeviceProvider";
 import { Button } from "../../Button";
-import { FiPlus } from "solid-icons/fi";
+import { FiPlus, FiDownload, FiUpload } from "solid-icons/fi";
 import { useTranslations } from "../../../i18n/utils";
 
 const WorkflowContainer = styled("div")`
@@ -34,6 +34,32 @@ const Container = styled("div")`
   }
 `;
 
+const BulkOperationsContainer = styled("div")`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+`;
+
+const BulkOperationButton = styled(Button)`
+  width: 100%;
+  height: 50px;
+  background: var(--secondary-bg);
+  border: 2px dashed var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1rem;
+  color: var(--text-color);
+
+  &:hover {
+    border-color: var(--accent-color);
+    background: var(--bg-color);
+    color: var(--accent-color);
+  }
+`;
+
 const AddWorkflowButton = styled(Button)`
   width: 100%;
   height: 50px;
@@ -56,7 +82,37 @@ const AddWorkflowButton = styled(Button)`
 export const WorkFlowSection = () => {
   const { workflow } = useVolcanoDeviceContext();
   const t = useTranslations();
-  const { workflowList, addWorkflowToList } = workflow;
+  const {
+    workflowList,
+    addWorkflowToList,
+    exportAllWorkflows,
+    importAllWorkflows,
+  } = workflow;
+
+  const handleExportAll = () => {
+    exportAllWorkflows();
+  };
+
+  const handleImportAll = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = async (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (file) {
+        if (confirm(t("confirmImportAll"))) {
+          try {
+            await importAllWorkflows(file);
+          } catch (error) {
+            console.error(
+              `${t("invalidWorkflowFile")}: ${(error as Error).message}`
+            );
+          }
+        }
+      }
+    };
+    input.click();
+  };
 
   return (
     <WorkflowContainer>
@@ -70,6 +126,22 @@ export const WorkFlowSection = () => {
         <FiPlus size={24} />
         <span>{t("addWorkflow")}</span>
       </AddWorkflowButton>
+      <BulkOperationsContainer>
+        <BulkOperationButton
+          onClick={handleExportAll}
+          title={t("exportAllWorkflowsDescription")}
+        >
+          <FiDownload size={24} />
+          {t("exportAllWorkflows")}
+        </BulkOperationButton>
+        <BulkOperationButton
+          onClick={handleImportAll}
+          title={t("importAllWorkflowsDescription")}
+        >
+          <FiUpload size={24} />
+          {t("importAllWorkflows")}
+        </BulkOperationButton>
+      </BulkOperationsContainer>
     </WorkflowContainer>
   );
 };
