@@ -1,0 +1,29 @@
+Searched text for `oldCraftyFirmware` (`**/legacy-app/crafty.js`), no results
+
+Ran terminal command: grep -r "oldCraftyFirmware" /home/tristan/Projects/reactive-volcano-app/legacy-app/
+
+Read [](file:///home/tristan/Projects/reactive-volcano-app/legacy-app/crafty.js#350-350), lines 350 to 400
+
+Die Legacy-App unterscheidet zwischen "alter" und "neuer" Crafty-Firmware basierend auf der Firmware-Version:
+
+**oldCraftyFirmware = true wenn:**
+- `minorFirmwareVersion < 51` UND `majorFirmwareVersion <= 2`
+
+**Dann werden ausgeblendet/deaktiviert:**
+- Settings Tab (Alert: "Settings Tab is not available with your firmware version.")
+- Bluetooth-Label und Bluetooth-Button
+- Firmware BLE Item
+- Logo On Button
+- Automatic Shutoff
+- BLE Analysis Item
+- Factory Reset
+- BLE Find My Item
+
+**UI-Änderungen:**
+- Zeigt altes Crafty-Logo (nicht Crafty Plus)
+- Zeigt alten Schriftzug
+
+**Funktionale Unterschiede:**
+- Viele Features sind nur für neue Firmware verfügbar (`if (oldCraftyFirmware == false)`)
+
+In der aktuellen App gibt es diese Unterscheidung wahrscheinlich nicht. Soll ich das auch implementieren? Das würde bedeuten, die Firmware-Version zu lesen und basierend darauf Features zu aktivieren/deaktivieren.
