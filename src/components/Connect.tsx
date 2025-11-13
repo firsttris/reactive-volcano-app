@@ -24,7 +24,7 @@ const ConnectButton = styled("button")`
   gap: 15px;
   padding: 30px;
   border: 3px solid var(--accent-color);
-  background: transparent;
+  background-color: #000000;
   border-radius: 20px;
   cursor: pointer;
   color: var(--accent-color);
@@ -42,13 +42,13 @@ const ConnectButton = styled("button")`
 `;
 
 const Title = styled("h2")`
-  color: var(--text-color);
+  color: #000000;
   margin-bottom: 10px;
   text-align: center;
 `;
 
 const Subtitle = styled("p")`
-  color: var(--secondary-text);
+  color: #000000;
   text-align: center;
   max-width: 400px;
   line-height: 1.5;
