@@ -41,14 +41,16 @@ const ConnectButton = styled("button")`
   }
 `;
 
-const Title = styled("h2")`
-  color: #000000;
+const Title = styled("h1")`
+  background-color: #000000;
+  color: #ff6600;
   margin-bottom: 10px;
   text-align: center;
 `;
 
-const Subtitle = styled("p")`
-  color: #000000;
+const Subtitle = styled("h3")`
+  background-color: #000000;
+  color: #ff6600;
   text-align: center;
   max-width: 400px;
   line-height: 1.5;
@@ -61,7 +63,9 @@ const LoadingContainer = styled("div")`
   margin-top: 40px;
 `;
 
-const LoadingSubtitle = styled("p")`
+const LoadingSubtitle = styled("h3")`
+  background-color: #000000;
+  color: #ff6600;
   margin-top: 35px;
 `;
 
