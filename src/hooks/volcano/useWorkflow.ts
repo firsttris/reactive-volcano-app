@@ -134,6 +134,28 @@ export const useWorkflow = () => {
     ]);
   };
 
+  const renameWorkflow = (workflowId: string, newName: string) => {
+    const workflows = workflowList();
+    const workflowIndex = findWorkflowIndex(workflowId);
+
+    if (workflowIndex === -1) {
+      console.log(`Workflow with id ${workflowId} not found`);
+      return;
+    }
+
+    const workflow = workflows[workflowIndex];
+    const updatedWorkflow = {
+      ...workflow,
+      name: newName,
+    };
+
+    setWorkflowList([
+      ...workflows.slice(0, workflowIndex),
+      updatedWorkflow,
+      ...workflows.slice(workflowIndex + 1),
+    ]);
+  };
+
   const editWorkflowStepInList = (
     workflowId: string,
     workflowStepId: string,
@@ -241,5 +263,6 @@ export const useWorkflow = () => {
     setWorkflowList,
     updateWorkflowStepsInList,
     addNewWorkflowStep,
+    renameWorkflow,
   };
 };
