@@ -47,6 +47,7 @@ const FlexContainer = styled("div")`
   flex-direction: column;
   align-items: center;
   gap: 20px;
+
 `;
 
 const TempControls = styled("div")`
