@@ -29,9 +29,9 @@ To develop and build this project, follow these steps:
 1. Clone the repository: `git clone https://github.com/firsttris/reactive-volcano-app.git`
 2. Navigate into the project directory: `cd reactive-volcano-app`
 3. Install the dependencies: `npm install`
-5. Start the development server: `npm run dev`
-6. To build the project, use: `npm run build:root`
-7. Copy the contents from the dist/ directory to the webserver location.
+4. Start the development server: `npm run dev`
+5. To build the project, use: `npm run build:root`
+6. Copy the contents from the dist/ directory to the webserver location.
 
 # Connection Issues and Pitfalls
 
