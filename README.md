@@ -32,6 +32,7 @@ To develop and build this project, follow these steps:
 4. Start the development server: `npm run dev`
 5. To build the project, use: `npm run build:root`
 6. Copy the contents from the dist/ directory to the webserver location.
+7. Copy the file bg-volcano.png to the webserver location.
 
 # Connection Issues and Pitfalls
 
