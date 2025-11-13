@@ -186,11 +186,11 @@ export const WorkflowList = () => {
                     </StepDetails>
                     <StepDetails>
                       <StepLabel>{t("holdTime")}</StepLabel>
-                      <StepValue>{workflowItem.holdTimeInSeconds}s</StepValue>
+                      <StepValue>{workflowItem.holdTimeInSeconds}</StepValue>
                     </StepDetails>
                     <StepDetails>
                       <StepLabel>{t("pumpTime")}</StepLabel>
-                      <StepValue>{workflowItem.pumpTimeInSeconds}s</StepValue>
+                      <StepValue>{workflowItem.pumpTimeInSeconds}</StepValue>
                     </StepDetails>
                     <StepActions>
                       <IconButton
