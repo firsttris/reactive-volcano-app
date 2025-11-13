@@ -87,6 +87,7 @@ export const WorkFlowSection = () => {
     addWorkflowToList,
     exportAllWorkflows,
     importAllWorkflows,
+    importWorkflow,
   } = workflow;
 
   const handleExportAll = () => {
@@ -108,6 +109,25 @@ export const WorkFlowSection = () => {
               `${t("invalidWorkflowFile")}: ${(error as Error).message}`
             );
           }
+        }
+      }
+    };
+    input.click();
+  };
+
+  const handleImportWorkflow = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = async (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (file) {
+        try {
+          await importWorkflow(file);
+        } catch (error) {
+          console.error(
+            `${t("invalidWorkflowFile")}: ${(error as Error).message}`
+          );
         }
       }
     };
@@ -140,6 +160,13 @@ export const WorkFlowSection = () => {
         >
           <FiUpload size={24} />
           {t("importAllWorkflows")}
+        </BulkOperationButton>
+        <BulkOperationButton
+          onClick={handleImportWorkflow}
+          title={t("importWorkflowDescription")}
+        >
+          <FiUpload size={24} />
+          {t("importWorkflow")}
         </BulkOperationButton>
       </BulkOperationsContainer>
     </WorkflowContainer>

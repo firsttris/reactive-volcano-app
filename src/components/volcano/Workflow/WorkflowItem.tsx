@@ -7,7 +7,6 @@ import {
   FiCheck,
   FiX,
   FiDownload,
-  FiUpload,
 } from "solid-icons/fi";
 import { styled } from "solid-styled-components";
 import { useNavigate } from "@solidjs/router";
@@ -110,7 +109,7 @@ const ActionButtons = styled("div")`
 `;
 
 const IconButton = styled("button")<{
-  variant?: "play" | "stop" | "edit" | "delete" | "export" | "import";
+  variant?: "play" | "stop" | "edit" | "delete" | "export";
 }>`
   background: ${(props) => {
     if (props.variant === "play")
@@ -183,7 +182,6 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
     deleteWorkflowFromList,
     renameWorkflow,
     exportWorkflow,
-    importWorkflow,
   } = workflow;
   const navigate = useNavigate();
   const t = useTranslations();
@@ -233,26 +231,6 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
   const handleExport = (e: MouseEvent) => {
     e.stopPropagation();
     exportWorkflow(props.workflow.id);
-  };
-
-  const handleImport = (e: MouseEvent) => {
-    e.stopPropagation();
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
-    input.onchange = async (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (file) {
-        try {
-          await importWorkflow(file);
-        } catch (error) {
-          console.error(
-            `${t("invalidWorkflowFile")}: ${(error as Error).message}`
-          );
-        }
-      }
-    };
-    input.click();
   };
 
   const handleStartEditName = (e: Event) => {
@@ -338,13 +316,6 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
           title={t("exportWorkflowDescription")}
         >
           <FiDownload size={18} />
-        </IconButton>
-        <IconButton
-          variant="import"
-          onClick={handleImport}
-          title={t("importWorkflowDescription")}
-        >
-          <FiUpload size={18} />
         </IconButton>
         <IconButton variant="delete" onClick={handleDelete}>
           <FiTrash2 size={18} />
