@@ -1,5 +1,5 @@
 import { createEffect, createSignal } from "solid-js";
-import { CharateristicUUIDs } from "../../utils/uuids";
+import { VolcanoCharacteristicUUIDs } from "../../utils/uuids";
 import { createCharateristic } from "../../utils/characteristic";
 import { useBluetooth } from "../../provider/BluetoothProvider";
 
@@ -15,17 +15,17 @@ export function useDeviceInformation() {
     if (!stateService) return;
     createCharateristic(
       stateService,
-      CharateristicUUIDs.serialNumber,
+      VolcanoCharacteristicUUIDs.serialNumber,
       handleSerialNumber
     );
     createCharateristic(
       stateService,
-      CharateristicUUIDs.firmwareVersion,
+      VolcanoCharacteristicUUIDs.firmwareVersion,
       handleFirmwareVersion
     );
     createCharateristic(
       stateService,
-      CharateristicUUIDs.firmwareBLEVersion,
+      VolcanoCharacteristicUUIDs.firmwareBLEVersion,
       handleBLEFirmwareVersion
     );
   });

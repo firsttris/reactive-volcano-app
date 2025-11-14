@@ -4,7 +4,7 @@ import {
   convertToUInt16BLE,
 } from "../../utils/bluetoothUtils";
 import { createCharateristic } from "../../utils/characteristic";
-import { CharateristicUUIDs } from "../../utils/uuids";
+import { VolcanoCharacteristicUUIDs } from "../../utils/uuids";
 import { useBluetooth } from "../../provider/BluetoothProvider";
 import { useWriteToCharacteristic } from "./useWriteToCharacteristic";
 
@@ -18,7 +18,7 @@ export const useBrightness = () => {
     if (!controlService) return;
     const brightness = await createCharateristic(
       controlService,
-      CharateristicUUIDs.brightness,
+      VolcanoCharacteristicUUIDs.brightness,
       handleBrightness
     );
     if (!brightness) {
