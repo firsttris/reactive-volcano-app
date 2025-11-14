@@ -36,7 +36,7 @@ export const useProjectRegister = () => {
     }
     setCharacteristics((prev) => ({
       ...prev,
-      handleProjectRegister: projectRegisterChar,
+      projectRegister: projectRegisterChar,
     }));
 
     // sicherheitscode is write-only
@@ -65,9 +65,9 @@ export const useProjectRegister = () => {
   });
 
   onCleanup(() => {
-    const { handleProjectRegister } = getCharacteristics();
-    if (handleProjectRegister) {
-      detachEventListener(handleProjectRegister, handleProjectRegister);
+    const { projectRegister } = getCharacteristics();
+    if (projectRegister) {
+      detachEventListener(projectRegister, handleProjectRegister);
     }
   });
 

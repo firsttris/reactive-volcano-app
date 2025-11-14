@@ -5,6 +5,7 @@ import { WorkflowForm } from "./components/volcano/Workflow/WorkflowForm";
 import { WorkflowWrapper } from "./components/volcano/Workflow/WorkflowWrapper";
 import { VolcanoView } from "./Views/VolcanoView";
 import { VentyVeazyView } from "./Views/VentyVeazyView";
+import { CraftyView } from "./Views/CraftyView";
 import { DeviceRouter } from "./components/DeviceRouter";
 import { Layout } from "./components/Layout";
 import { ROUTES } from "./routes";
@@ -40,6 +41,9 @@ export const Routes = () => {
 
           {/* Venty/Veazy device routes */}
           <Route path={ROUTES.DEVICE.VENTY_VEAZY} component={VentyVeazyView} />
+
+          {/* Crafty device routes */}
+          <Route path={ROUTES.DEVICE.CRAFTY} component={CraftyView} />
         </Route>
       </Route>
     </Router>
