@@ -1,6 +1,6 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
 import { convertBLEToUint16 } from "../../utils/bluetoothUtils";
-import { CharateristicUUIDs } from "../../utils/uuids";
+import { VolcanoCharacteristicUUIDs } from "../../utils/uuids";
 import {
   createCharateristicWithEventListener,
   detachEventListener,
@@ -18,7 +18,7 @@ export const useHeatingTime = () => {
     if (!controlService) return;
     const hoursOfHeating = await createCharateristicWithEventListener(
       controlService,
-      CharateristicUUIDs.hoursOfHeating,
+      VolcanoCharacteristicUUIDs.hoursOfHeating,
       handleHoursOfHeating
     );
     if (!hoursOfHeating) {
@@ -30,7 +30,7 @@ export const useHeatingTime = () => {
     }));
     const minutesOfHeating = await createCharateristicWithEventListener(
       controlService,
-      CharateristicUUIDs.minutesOfHeating,
+      VolcanoCharacteristicUUIDs.minutesOfHeating,
       handleMinutesOfHeating
     );
     if (!minutesOfHeating) {

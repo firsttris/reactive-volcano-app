@@ -3,7 +3,7 @@ import {
   convertBLEToUint16,
   convertToUInt32BLE,
 } from "../../utils/bluetoothUtils";
-import { CharateristicUUIDs } from "../../utils/uuids";
+import { VolcanoCharacteristicUUIDs } from "../../utils/uuids";
 import {
   createCharateristicWithEventListener,
   detachEventListener,
@@ -23,7 +23,7 @@ export const useTemperature = () => {
     if (!service) return;
     const targetTemperature = await createCharateristicWithEventListener(
       service,
-      CharateristicUUIDs.targetTemperature,
+      VolcanoCharacteristicUUIDs.targetTemperature,
       handleTargetTemperature
     );
     if (!targetTemperature) {
@@ -35,7 +35,7 @@ export const useTemperature = () => {
     }));
     const currentTemperature = await createCharateristicWithEventListener(
       service,
-      CharateristicUUIDs.currentTemperature,
+      VolcanoCharacteristicUUIDs.currentTemperature,
       handleCurrentTemperature
     );
     if (!currentTemperature) {

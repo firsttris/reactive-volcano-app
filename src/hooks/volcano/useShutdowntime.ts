@@ -3,7 +3,7 @@ import {
   convertBLEToUint16,
   convertToUInt16BLE,
 } from "../../utils/bluetoothUtils";
-import { CharateristicUUIDs } from "../../utils/uuids";
+import { VolcanoCharacteristicUUIDs } from "../../utils/uuids";
 import {
   createCharateristicWithEventListener,
   detachEventListener,
@@ -24,7 +24,7 @@ export const useShutdowntime = () => {
     if (!controlService) return;
     const shutoffTime = await createCharateristic(
       controlService,
-      CharateristicUUIDs.shutoffTime,
+      VolcanoCharacteristicUUIDs.shutoffTime,
       handleShutoffTime
     );
     if (!shutoffTime) {
@@ -36,7 +36,7 @@ export const useShutdowntime = () => {
     }));
     const currentAutoOffValue = await createCharateristicWithEventListener(
       controlService,
-      CharateristicUUIDs.currentAutoOffValue,
+      VolcanoCharacteristicUUIDs.currentAutoOffValue,
       handleAutoOffTimeInSec
     );
     if (!currentAutoOffValue) {

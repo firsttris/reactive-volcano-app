@@ -3,7 +3,7 @@ import {
   convertBLEToUint16,
   convertToUInt8BLE,
 } from "../../utils/bluetoothUtils";
-import { CharateristicUUIDs, States } from "../../utils/uuids";
+import { VolcanoCharacteristicUUIDs, States } from "../../utils/uuids";
 import {
   createCharateristicWithEventListener,
   detachEventListener,
@@ -30,7 +30,7 @@ export const useDeviceStatus = () => {
     if (!stateService) return;
     const activity = await createCharateristicWithEventListener(
       stateService,
-      CharateristicUUIDs.activity,
+      VolcanoCharacteristicUUIDs.activity,
       handleActivity
     );
     if (!activity) {
@@ -48,7 +48,7 @@ export const useDeviceStatus = () => {
 
     const heaterOnCharacteristic = await getCharacteristic(
       service,
-      CharateristicUUIDs.heaterOn
+      VolcanoCharacteristicUUIDs.heaterOn
     );
     if (!heaterOnCharacteristic) {
       return Promise.reject("heaterOnCharacteristic not found");
@@ -59,7 +59,7 @@ export const useDeviceStatus = () => {
     }));
     const heaterOffCharacteristic = await getCharacteristic(
       service,
-      CharateristicUUIDs.heaterOff
+      VolcanoCharacteristicUUIDs.heaterOff
     );
     if (!heaterOffCharacteristic) {
       return Promise.reject("heaterOffCharacteristic not found");
@@ -70,7 +70,7 @@ export const useDeviceStatus = () => {
     }));
     const pumpOffCharacteristic = await getCharacteristic(
       service,
-      CharateristicUUIDs.pumpOff
+      VolcanoCharacteristicUUIDs.pumpOff
     );
     if (!pumpOffCharacteristic) {
       return Promise.reject("pumpOffCharacteristic not found");
@@ -81,7 +81,7 @@ export const useDeviceStatus = () => {
     }));
     const pumpOnCharacteristic = await getCharacteristic(
       service,
-      CharateristicUUIDs.pumpOn
+      VolcanoCharacteristicUUIDs.pumpOn
     );
     if (!pumpOnCharacteristic) {
       return Promise.reject("pumpOnCharacteristic not found");
