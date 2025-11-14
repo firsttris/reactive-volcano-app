@@ -42,14 +42,14 @@ const ConnectButton = styled("button")`
 `;
 
 const Title = styled("h1")`
-  background-color: #333333;
+  background-color: #000000;
   color: #ff6600;
   margin-bottom: 10px;
   text-align: center;
 `;
 
 const Subtitle = styled("h3")`
-  background-color: #333333;
+  background-color: #000000;
   color: #ff6600;
   text-align: center;
   max-width: 400px;
@@ -64,7 +64,7 @@ const LoadingContainer = styled("div")`
 `;
 
 const LoadingSubtitle = styled("h3")`
-  background-color: #333333;
+  background-color: #000000;
   color: #ff6600;
   margin-top: 35px;
 `;
@@ -121,11 +121,11 @@ export const Connect = () => {
       <Show when={isNotConnected()}>
         <Centered>
           <Title>{t("connectYourDevice")}</Title>
-          <Subtitle>{t("appSupportsDevices")}</Subtitle>
           <ConnectButton onClick={connect}>
             <BsBluetooth size="64px" />
             {t("connectDevice")}
           </ConnectButton>
+          <Subtitle>{t("appSupportsDevices")}</Subtitle>
         </Centered>
       </Show>
 
