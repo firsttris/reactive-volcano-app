@@ -13,7 +13,7 @@ import { useWriteToCharacteristic } from "../volcano/useWriteToCharacteristic";
 
 export const useProjectRegister = () => {
   const [getProjectRegister, setProjectRegister] = createSignal(0);
-  const { getDeviceControlService, getCharacteristics, setCharacteristics } =
+  const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
@@ -23,7 +23,7 @@ export const useProjectRegister = () => {
   };
 
   const handleCharacteristics = async () => {
-    const service = getDeviceControlService();
+    const service = getCraftyControlService();
     if (!service) return;
 
     const projectRegisterChar = await createCharateristicWithEventListener(

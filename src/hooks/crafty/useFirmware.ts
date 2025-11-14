@@ -11,7 +11,7 @@ export const useFirmware = () => {
   const [getFirmwareVersion, setFirmwareVersion] = createSignal("");
   const [getFirmwareBLEVersion, setFirmwareBLEVersion] = createSignal("");
   const [getStatusRegister2, setStatusRegister2] = createSignal(0);
-  const { getDeviceControlService, getCharacteristics, setCharacteristics } =
+  const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
 
   const handleFirmwareVersion = (value: DataView) => {
@@ -30,7 +30,7 @@ export const useFirmware = () => {
   };
 
   const handleCharacteristics = async () => {
-    const service = getDeviceControlService();
+    const service = getCraftyControlService();
     if (!service) return;
 
     const firmwareVersion = await createCharateristicWithEventListener(

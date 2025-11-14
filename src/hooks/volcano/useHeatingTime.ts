@@ -10,11 +10,11 @@ import { useBluetooth } from "../../provider/BluetoothProvider";
 export const useHeatingTime = () => {
   const [getHoursOfHeating, setHoursOfHeating] = createSignal<number>(0);
   const [getMinutesOfHeating, setMinutesOfHeating] = createSignal<number>(0);
-  const { getDeviceControlService, getCharacteristics, setCharacteristics } =
+  const { getVolcanoControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
 
   const handleCharacteristics = async () => {
-    const controlService = getDeviceControlService();
+    const controlService = getVolcanoControlService();
     if (!controlService) return;
     const hoursOfHeating = await createCharateristicWithEventListener(
       controlService,
