@@ -46,6 +46,13 @@ export enum VentyVeazyServiceUUIDs {
   GenericAccess = "00001800-0000-1000-8000-00805f9b34fb",
 }
 
+// Crafty Services
+export enum CraftyServiceUUIDs {
+  Crafty1 = "00000001-4c45-4b43-4942-265a524f5453",
+  Crafty2 = "00000002-4c45-4b43-4942-265a524f5453",
+  Crafty3 = "00000003-4c45-4b43-4942-265a524f5453",
+}
+
 // Volcano Characteristics
 export enum VolcanoCharacteristicUUIDs {
   display = "1010000d-5354-4f52-5a26-4249434b454c",
@@ -85,6 +92,11 @@ export const ServiceUUIDs = {
   // Veazy/Venty services
   Primary: VentyVeazyServiceUUIDs.Primary,
   GenericAccess: VentyVeazyServiceUUIDs.GenericAccess,
+
+  // Crafty services
+  Crafty1: CraftyServiceUUIDs.Crafty1,
+  Crafty2: CraftyServiceUUIDs.Crafty2,
+  Crafty3: CraftyServiceUUIDs.Crafty3,
 };
 
 export const CharateristicUUIDs = {

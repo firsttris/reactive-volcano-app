@@ -204,6 +204,13 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
       { namePrefix: "STORZ&BICKEL" },
       { namePrefix: "Storz&Bickel" },
       { namePrefix: "S&B" },
+      {
+        services: [
+          ServiceUUIDs.Crafty1,
+          ServiceUUIDs.Crafty2,
+          ServiceUUIDs.Crafty3,
+        ],
+      }, // Crafty services
       { services: [ServiceUUIDs.DeviceState, ServiceUUIDs.DeviceControl] }, // Volcano services
       { services: [ServiceUUIDs.Primary] }, // Veazy/Venty service
     ];
