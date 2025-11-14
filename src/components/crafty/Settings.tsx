@@ -180,9 +180,9 @@ export const Settings: Component = () => {
         <SettingItem>
           <SettingLabel>Boost Temperature</SettingLabel>
           <Slider
-            min={0}
+            min={150}
             max={250}
-            step={1}
+            step={5}
             value={getBoostTemperature()}
             label={`Boost Temperature: ${getBoostTemperature()} °C`}
             onInput={setBoostTemp}
@@ -195,7 +195,7 @@ export const Settings: Component = () => {
           <Slider
             min={0}
             max={100}
-            step={1}
+            step={10}
             value={getLedBrightness()}
             label={`${t("deviceBrightness")}: ${getLedBrightness()} %`}
             onInput={setLedBrightness}
@@ -207,7 +207,7 @@ export const Settings: Component = () => {
           <SettingLabel>{t("autoMaticShutdownTime")}</SettingLabel>
           <Slider
             min={0}
-            max={3600}
+            max={600}
             step={60}
             value={getAutoOffCountdown()}
             label={`${t("autoMaticShutdownTime")}: ${Math.floor(getAutoOffCountdown() / 60)} min`}

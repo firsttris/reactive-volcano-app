@@ -15,7 +15,7 @@ export const useSettings = () => {
   const [getLedBrightness, setLedBrightness] = createSignal(0);
   const [getAutoOffCountdown, setAutoOffCountdown] = createSignal(0);
   const [getAutoOffCurrentValue, setAutoOffCurrentValue] = createSignal(0);
-  const { getDeviceControlService, getCharacteristics, setCharacteristics } =
+  const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
@@ -35,7 +35,7 @@ export const useSettings = () => {
   };
 
   const handleCharacteristics = async () => {
-    const service = getDeviceControlService();
+    const service = getCraftyControlService();
     if (!service) return;
 
     const ledBrightness = await createCharateristicWithEventListener(

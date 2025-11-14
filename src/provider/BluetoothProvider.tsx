@@ -1,5 +1,5 @@
 import { createContext, createSignal, useContext } from "solid-js";
-import type { Accessor, JSX, Setter } from "solid-js";
+import type { JSX } from "solid-js";
 import {
   ConnectionState,
   DeviceType,
@@ -13,18 +13,6 @@ type DeviceCharacteristics = Record<
   BluetoothRemoteGATTCharacteristic | undefined
 >;
 
-export type Methods = {
-  connect: () => Promise<void>;
-  disconnect: () => Promise<void>;
-  connectionState: () => ConnectionState;
-  deviceInfo: () => DeviceInfo;
-  getDeviceStateService: Accessor<BluetoothRemoteGATTService | undefined>;
-  getDeviceControlService: Accessor<BluetoothRemoteGATTService | undefined>;
-  getCraftyStatusService: Accessor<BluetoothRemoteGATTService | undefined>;
-  getCharacteristics: Accessor<DeviceCharacteristics>;
-  setCharacteristics: Setter<DeviceCharacteristics>;
-};
-
 export type DeviceInfo = {
   type: DeviceType;
   name: string;
@@ -32,20 +20,33 @@ export type DeviceInfo = {
   firmwareVersion?: string;
 };
 
-const BluetoothContext = createContext<Methods>();
+const BluetoothContext =
+  createContext<ReturnType<typeof createBluetoothMethods>>();
 
 type BluetoothProviderProps = {
   children: JSX.Element;
 };
 
-export const BluetoothProvider = (props: BluetoothProviderProps) => {
+const createBluetoothMethods = () => {
   const [server, setServer] = createSignal<BluetoothRemoteGATTServer>();
-  const [getDeviceStateService, setDeviceStateService] =
+
+  // Volcano services
+  const [getVolcanoStateService, setVolcanoStateService] =
     createSignal<BluetoothRemoteGATTService>();
-  const [getDeviceControlService, setDeviceControlService] =
+  const [getVolcanoControlService, setVolcanoControlService] =
+    createSignal<BluetoothRemoteGATTService>();
+
+  const [getVentyVeazyService, setVentyVeazyService] =
+    createSignal<BluetoothRemoteGATTService>();
+
+  //Crafty services
+  const [getCraftyDeviceInfoService, setCraftyDeviceInfoService] =
+    createSignal<BluetoothRemoteGATTService>();
+  const [getCraftyControlService, setCraftyControlService] =
     createSignal<BluetoothRemoteGATTService>();
   const [getCraftyStatusService, setCraftyStatusService] =
     createSignal<BluetoothRemoteGATTService>();
+
   const [getCharacteristics, setCharacteristics] =
     createSignal<DeviceCharacteristics>({});
 
@@ -72,7 +73,6 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
   };
 
   const disconnect = async () => {
-    // First: Stop notifications on characteristics before disconnecting
     const characteristics = getCharacteristics();
     if (characteristics.control) {
       try {
@@ -94,8 +94,15 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
 
     // Reset all state
     setConnectionState(ConnectionState.NOT_CONNECTED);
-    setDeviceStateService(undefined);
-    setDeviceControlService(undefined);
+
+    setVolcanoStateService(undefined);
+    setVolcanoControlService(undefined);
+    // Venty/Veazy
+    setVentyVeazyService(undefined);
+    //Crafty
+    setCraftyDeviceInfoService(undefined);
+    setCraftyControlService(undefined);
+    setCraftyStatusService(undefined);
     setCharacteristics({});
     setDeviceInfo({ type: DeviceType.UNKNOWN, name: "" });
     setServer(undefined);
@@ -106,8 +113,7 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
       const primaryService = await server.getPrimaryService(
         ServiceUUIDs.Primary
       );
-      setDeviceStateService(primaryService);
-      setDeviceControlService(primaryService); // Same service for both
+      setVentyVeazyService(primaryService); // Device-specific service
 
       // Initialize Veazy/Venty characteristics
       try {
@@ -166,10 +172,10 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
 
   const connectToCrafty = async (server: BluetoothRemoteGATTServer) => {
     const craftyService1 = await server.getPrimaryService(ServiceUUIDs.Crafty1);
-    setDeviceStateService(craftyService1);
+    setCraftyControlService(craftyService1);
     const craftyService2 = await server.getPrimaryService(ServiceUUIDs.Crafty2);
     // Assuming Crafty2 is control service, adjust as needed
-    setDeviceControlService(craftyService2);
+    setCraftyDeviceInfoService(craftyService2);
     const craftyService3 = await server.getPrimaryService(ServiceUUIDs.Crafty3);
     // Crafty3 is used for additional characteristics like status registers, usage time, etc.
     setCraftyStatusService(craftyService3);
@@ -179,11 +185,11 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
     const stateService = await server.getPrimaryService(
       ServiceUUIDs.DeviceState
     );
-    setDeviceStateService(stateService);
+    setVolcanoStateService(stateService); // Device-specific state service
     const controlService = await server.getPrimaryService(
       ServiceUUIDs.DeviceControl
     );
-    setDeviceControlService(controlService);
+    setVolcanoControlService(controlService); // Device-specific control service
   };
 
   const connectToDevice = async (device: BluetoothDevice) => {
@@ -260,20 +266,27 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
     }
   };
 
+  return {
+    connect,
+    disconnect,
+    connectionState,
+    deviceInfo,
+    getVolcanoStateService,
+    getVolcanoControlService,
+    getVentyVeazyService,
+    getCraftyControlService,
+    getCraftyDeviceInfoService,
+    getCraftyStatusService,
+    getCharacteristics,
+    setCharacteristics,
+  };
+};
+
+export const BluetoothProvider = (props: BluetoothProviderProps) => {
+  const methods = createBluetoothMethods();
+
   return (
-    <BluetoothContext.Provider
-      value={{
-        connect,
-        disconnect,
-        connectionState,
-        deviceInfo,
-        getDeviceStateService,
-        getDeviceControlService,
-        getCraftyStatusService,
-        getCharacteristics,
-        setCharacteristics,
-      }}
-    >
+    <BluetoothContext.Provider value={methods}>
       {props.children}
     </BluetoothContext.Provider>
   );

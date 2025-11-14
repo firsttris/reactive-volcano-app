@@ -10,11 +10,11 @@ import { useWriteToCharacteristic } from "./useWriteToCharacteristic";
 
 export const useVibration = () => {
   const [isVibrationOn, setIsVibrationOn] = createSignal<boolean>(false);
-  const { getDeviceStateService, setCharacteristics } = useBluetooth();
+  const { getVolcanoStateService, setCharacteristics } = useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
   const handleCharacteristics = async () => {
-    const service = getDeviceStateService();
+    const service = getVolcanoStateService();
     if (!service) return;
     const vibration = await createCharateristic(
       service,

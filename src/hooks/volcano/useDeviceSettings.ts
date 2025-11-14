@@ -15,12 +15,12 @@ export const useDeviceSetting = () => {
   const [isCelsius, setIsCelsius] = createSignal<boolean>(true);
   const [isDisplayOnCooling, setIsDisplayOnCooling] =
     createSignal<boolean>(true);
-  const { getDeviceStateService, getCharacteristics, setCharacteristics } =
+  const { getVolcanoStateService, getCharacteristics, setCharacteristics } =
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
   const handleCharacteristics = async () => {
-    const stateService = getDeviceStateService();
+    const stateService = getVolcanoStateService();
     if (!stateService) return;
     const display = await createCharateristicWithEventListener(
       stateService,

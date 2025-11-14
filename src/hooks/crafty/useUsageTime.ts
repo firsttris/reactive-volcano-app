@@ -10,7 +10,7 @@ import { useBluetooth } from "../../provider/BluetoothProvider";
 export const useUsageTime = () => {
   const [getUseHours, setUseHours] = createSignal(0);
   const [getUseMinutes, setUseMinutes] = createSignal(0);
-  const { getDeviceControlService, getCharacteristics, setCharacteristics } =
+  const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
 
   const handleUseHours = (value: DataView) => {
@@ -24,7 +24,7 @@ export const useUsageTime = () => {
   };
 
   const handleCharacteristics = async () => {
-    const service = getDeviceControlService();
+    const service = getCraftyControlService();
     if (!service) return;
 
     const useHoursCharacteristic = await createCharateristicWithEventListener(
