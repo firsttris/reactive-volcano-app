@@ -3,7 +3,7 @@ import {
   convertBLEToUint16,
   convertToUInt32BLE,
 } from "../../utils/bluetoothUtils";
-import { CharateristicUUIDs, States } from "../../utils/uuids";
+import { VolcanoCharacteristicUUIDs, States } from "../../utils/uuids";
 import { createCharateristic } from "../../utils/characteristic";
 import { useBluetooth } from "../../provider/BluetoothProvider";
 import { useWriteToCharacteristic } from "./useWriteToCharacteristic";
@@ -18,7 +18,7 @@ export const useVibration = () => {
     if (!service) return;
     const vibration = await createCharateristic(
       service,
-      CharateristicUUIDs.vibration,
+      VolcanoCharacteristicUUIDs.vibration,
       handleVibration
     );
     if (!vibration) {

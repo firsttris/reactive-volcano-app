@@ -3,7 +3,7 @@ import {
   convertBLEToUint16,
   convertToUInt32BLE,
 } from "../../utils/bluetoothUtils";
-import { CharateristicUUIDs, States } from "../../utils/uuids";
+import { VolcanoCharacteristicUUIDs, States } from "../../utils/uuids";
 import {
   createCharateristicWithEventListener,
   detachEventListener,
@@ -24,7 +24,7 @@ export const useDeviceSetting = () => {
     if (!stateService) return;
     const display = await createCharateristicWithEventListener(
       stateService,
-      CharateristicUUIDs.display,
+      VolcanoCharacteristicUUIDs.display,
       handleDisplayValue
     );
     if (!display) {

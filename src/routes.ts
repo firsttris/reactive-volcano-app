@@ -27,6 +27,7 @@ export const ROUTES = {
       },
     },
     VENTY_VEAZY: "/venty-veazy",
+    CRAFTY: "/crafty",
   },
 } as const;
 
@@ -59,6 +60,11 @@ export const buildRoute = {
    * Build a route to the Venty/Veazy device view
    */
   ventyVeazyRoot: () => "/device/venty-veazy" as const,
+
+  /**
+   * Build a route to the Crafty device view
+   */
+  craftyRoot: () => "/device/crafty" as const,
 
   /**
    * Build a route to the connection screen

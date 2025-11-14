@@ -20,6 +20,7 @@ export type Methods = {
   deviceInfo: () => DeviceInfo;
   getDeviceStateService: Accessor<BluetoothRemoteGATTService | undefined>;
   getDeviceControlService: Accessor<BluetoothRemoteGATTService | undefined>;
+  getCraftyStatusService: Accessor<BluetoothRemoteGATTService | undefined>;
   getCharacteristics: Accessor<DeviceCharacteristics>;
   setCharacteristics: Setter<DeviceCharacteristics>;
 };
@@ -43,6 +44,8 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
     createSignal<BluetoothRemoteGATTService>();
   const [getDeviceControlService, setDeviceControlService] =
     createSignal<BluetoothRemoteGATTService>();
+  const [getCraftyStatusService, setCraftyStatusService] =
+    createSignal<BluetoothRemoteGATTService>();
   const [getCharacteristics, setCharacteristics] =
     createSignal<DeviceCharacteristics>({});
 
@@ -56,32 +59,16 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
   });
 
   const detectDeviceType = (deviceName: string): DeviceType => {
-    const name = deviceName.toLowerCase();
-
-    // Check for Venty (VY in device name)
-    if (name.includes("vy") || name.includes("venty")) {
+    if (deviceName.includes("S&B VOLCANO")) {
+      return DeviceType.VOLCANO;
+    }
+    if (deviceName.includes("S&B VY")) {
       return DeviceType.VENTY;
     }
-
-    // Check for Veazy (VZ in device name)
-    if (name.includes("vz") || name.includes("veazy")) {
+    if (deviceName.includes("S&B VZ")) {
       return DeviceType.VEAZY;
     }
-
-    // Check for Volcano devices
-    if (
-      name.includes("volcano") ||
-      (name.includes("s&b") && name.includes("volcano"))
-    ) {
-      return DeviceType.VOLCANO;
-    }
-
-    // Fallback for other STORZ&BICKEL devices (likely Crafty/Volcano)
-    if (name.includes("storz") || name.includes("s&b")) {
-      return DeviceType.VOLCANO;
-    }
-
-    return DeviceType.UNKNOWN;
+    return DeviceType.CRAFTY;
   };
 
   const disconnect = async () => {
@@ -114,17 +101,99 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
     setServer(undefined);
   };
 
-  const connectToDevice = async (
-    device: BluetoothDevice,
-    deviceType?: DeviceType
-  ) => {
+  const connectToVeazyVenty = async (server: BluetoothRemoteGATTServer) => {
+    try {
+      const primaryService = await server.getPrimaryService(
+        ServiceUUIDs.Primary
+      );
+      setDeviceStateService(primaryService);
+      setDeviceControlService(primaryService); // Same service for both
+
+      // Initialize Veazy/Venty characteristics
+      try {
+        const controlCharacteristic = await primaryService.getCharacteristic(
+          VentyVeazyCharacteristicUUIDs.control
+        );
+
+        // First: Activate notifications (like legacy app)
+        await controlCharacteristic.startNotifications();
+
+        // Then: Send initialization commands immediately (like legacy app)
+        // This makes the device start sending data
+        await bluetoothQueue.add(async () => {
+          // CMD 0x02 - Reset/Initialize
+          const resetBuffer = new ArrayBuffer(20);
+          const resetView = new DataView(resetBuffer);
+          resetView.setUint8(0, 0x02);
+          await controlCharacteristic.writeValue(resetBuffer);
+
+          // CMD 0x1D - Status request
+          const statusBuffer = new ArrayBuffer(20);
+          const statusView = new DataView(statusBuffer);
+          statusView.setUint8(0, 0x1d);
+          await controlCharacteristic.writeValue(statusBuffer);
+
+          // CMD 0x01 - Basic data request
+          const basicBuffer = new ArrayBuffer(20);
+          const basicView = new DataView(basicBuffer);
+          basicView.setUint8(0, 0x01);
+          await controlCharacteristic.writeValue(basicBuffer);
+
+          // CMD 0x04 - Extended data request (important!)
+          const extendedBuffer = new ArrayBuffer(20);
+          const extendedView = new DataView(extendedBuffer);
+          extendedView.setUint8(0, 0x04);
+          await controlCharacteristic.writeValue(extendedBuffer);
+
+          console.log(
+            "Veazy/Venty initialization commands sent (0x02, 0x1D, 0x01, 0x04)"
+          );
+        });
+
+        setCharacteristics({ control: controlCharacteristic });
+      } catch (charError) {
+        console.error(
+          "Failed to get Veazy/Venty control characteristic:",
+          charError
+        );
+        // Don't throw here, as the characteristic might not be available on all devices
+      }
+    } catch (error) {
+      console.error("Failed to connect to Veazy/Venty service:", error);
+      throw error;
+    }
+  };
+
+  const connectToCrafty = async (server: BluetoothRemoteGATTServer) => {
+    const craftyService1 = await server.getPrimaryService(ServiceUUIDs.Crafty1);
+    setDeviceStateService(craftyService1);
+    const craftyService2 = await server.getPrimaryService(ServiceUUIDs.Crafty2);
+    // Assuming Crafty2 is control service, adjust as needed
+    setDeviceControlService(craftyService2);
+    const craftyService3 = await server.getPrimaryService(ServiceUUIDs.Crafty3);
+    // Crafty3 is used for additional characteristics like status registers, usage time, etc.
+    setCraftyStatusService(craftyService3);
+  };
+
+  const connectToVolcano = async (server: BluetoothRemoteGATTServer) => {
+    const stateService = await server.getPrimaryService(
+      ServiceUUIDs.DeviceState
+    );
+    setDeviceStateService(stateService);
+    const controlService = await server.getPrimaryService(
+      ServiceUUIDs.DeviceControl
+    );
+    setDeviceControlService(controlService);
+  };
+
+  const connectToDevice = async (device: BluetoothDevice) => {
     if (!device.gatt) {
       throw new Error("Device does not support GATT");
     }
 
     // Set device info
     const deviceName = device.name || "";
-    const actualDeviceType = deviceType || detectDeviceType(deviceName);
+    const actualDeviceType = detectDeviceType(deviceName);
     setDeviceInfo({
       type: actualDeviceType,
       name: deviceName,
@@ -138,106 +207,41 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
       actualDeviceType === DeviceType.VEAZY ||
       actualDeviceType === DeviceType.VENTY
     ) {
-      // Veazy/Venty connection
-      try {
-        const primaryService = await server.getPrimaryService(
-          ServiceUUIDs.Primary
-        );
-        setDeviceStateService(primaryService);
-        setDeviceControlService(primaryService); // Same service for both
-
-        // Initialize Veazy/Venty characteristics
-        try {
-          const controlCharacteristic = await primaryService.getCharacteristic(
-            VentyVeazyCharacteristicUUIDs.control
-          );
-
-          // First: Activate notifications (like legacy app)
-          await controlCharacteristic.startNotifications();
-
-          // Then: Send initialization commands immediately (like legacy app)
-          // This makes the device start sending data
-          await bluetoothQueue.add(async () => {
-            // CMD 0x02 - Reset/Initialize
-            const resetBuffer = new ArrayBuffer(20);
-            const resetView = new DataView(resetBuffer);
-            resetView.setUint8(0, 0x02);
-            await controlCharacteristic.writeValue(resetBuffer);
-
-            // CMD 0x1D - Status request
-            const statusBuffer = new ArrayBuffer(20);
-            const statusView = new DataView(statusBuffer);
-            statusView.setUint8(0, 0x1d);
-            await controlCharacteristic.writeValue(statusBuffer);
-
-            // CMD 0x01 - Basic data request
-            const basicBuffer = new ArrayBuffer(20);
-            const basicView = new DataView(basicBuffer);
-            basicView.setUint8(0, 0x01);
-            await controlCharacteristic.writeValue(basicBuffer);
-
-            // CMD 0x04 - Extended data request (important!)
-            const extendedBuffer = new ArrayBuffer(20);
-            const extendedView = new DataView(extendedBuffer);
-            extendedView.setUint8(0, 0x04);
-            await controlCharacteristic.writeValue(extendedBuffer);
-
-            console.log(
-              "Veazy/Venty initialization commands sent (0x02, 0x1D, 0x01, 0x04)"
-            );
-          });
-
-          setCharacteristics({ control: controlCharacteristic });
-        } catch (charError) {
-          console.error(
-            "Failed to get Veazy/Venty control characteristic:",
-            charError
-          );
-          // Don't throw here, as the characteristic might not be available on all devices
-        }
-      } catch (error) {
-        console.error("Failed to connect to Veazy/Venty service:", error);
-        throw error;
-      }
+      await connectToVeazyVenty(server);
+    } else if (actualDeviceType === DeviceType.CRAFTY) {
+      await connectToCrafty(server);
     } else {
-      // Volcano connection (existing logic)
-      const stateService = await server.getPrimaryService(
-        ServiceUUIDs.DeviceState
-      );
-      setDeviceStateService(stateService);
-      const controlService = await server.getPrimaryService(
-        ServiceUUIDs.DeviceControl
-      );
-      setDeviceControlService(controlService);
+      await connectToVolcano(server);
     }
   };
 
-  const getDeviceFilters = (storedDeviceName?: string) => {
+  const getDeviceFilters = () => {
     const baseFilters = [
       { namePrefix: "STORZ&BICKEL" },
       { namePrefix: "Storz&Bickel" },
       { namePrefix: "S&B" },
+      {
+        services: [
+          ServiceUUIDs.Crafty1,
+          ServiceUUIDs.Crafty2,
+          ServiceUUIDs.Crafty3,
+        ],
+      }, // Crafty services
       { services: [ServiceUUIDs.DeviceState, ServiceUUIDs.DeviceControl] }, // Volcano services
       { services: [ServiceUUIDs.Primary] }, // Veazy/Venty service
     ];
-
-    // For reconnect, add exact name match as first priority
-    if (storedDeviceName) {
-      return [{ name: storedDeviceName }, ...baseFilters];
-    }
 
     return baseFilters;
   };
 
   const getOptionalServices = () => [
     "generic_access",
-    ServiceUUIDs.GenericAccess, // Generic Access for Veazy/Venty
-    ServiceUUIDs.Primary, // Veazy/Venty primary service
+    ServiceUUIDs.GenericAccess,
   ];
 
-  const requestBluetoothDevice = async (storedDeviceName?: string) => {
+  const requestBluetoothDevice = async () => {
     return navigator.bluetooth.requestDevice({
-      filters: getDeviceFilters(storedDeviceName),
+      filters: getDeviceFilters(),
       acceptAllDevices: false,
       optionalServices: getOptionalServices(),
     });
@@ -265,6 +269,7 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
         deviceInfo,
         getDeviceStateService,
         getDeviceControlService,
+        getCraftyStatusService,
         getCharacteristics,
         setCharacteristics,
       }}
