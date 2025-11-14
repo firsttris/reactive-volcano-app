@@ -20,6 +20,7 @@ export type Methods = {
   deviceInfo: () => DeviceInfo;
   getDeviceStateService: Accessor<BluetoothRemoteGATTService | undefined>;
   getDeviceControlService: Accessor<BluetoothRemoteGATTService | undefined>;
+  getCraftyStatusService: Accessor<BluetoothRemoteGATTService | undefined>;
   getCharacteristics: Accessor<DeviceCharacteristics>;
   setCharacteristics: Setter<DeviceCharacteristics>;
 };
@@ -42,6 +43,8 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
   const [getDeviceStateService, setDeviceStateService] =
     createSignal<BluetoothRemoteGATTService>();
   const [getDeviceControlService, setDeviceControlService] =
+    createSignal<BluetoothRemoteGATTService>();
+  const [getCraftyStatusService, setCraftyStatusService] =
     createSignal<BluetoothRemoteGATTService>();
   const [getCharacteristics, setCharacteristics] =
     createSignal<DeviceCharacteristics>({});
@@ -161,6 +164,17 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
     }
   };
 
+  const connectToCrafty = async (server: BluetoothRemoteGATTServer) => {
+    const craftyService1 = await server.getPrimaryService(ServiceUUIDs.Crafty1);
+    setDeviceStateService(craftyService1);
+    const craftyService2 = await server.getPrimaryService(ServiceUUIDs.Crafty2);
+    // Assuming Crafty2 is control service, adjust as needed
+    setDeviceControlService(craftyService2);
+    const craftyService3 = await server.getPrimaryService(ServiceUUIDs.Crafty3);
+    // Crafty3 is used for additional characteristics like status registers, usage time, etc.
+    setCraftyStatusService(craftyService3);
+  };
+
   const connectToVolcano = async (server: BluetoothRemoteGATTServer) => {
     const stateService = await server.getPrimaryService(
       ServiceUUIDs.DeviceState
@@ -194,6 +208,8 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
       actualDeviceType === DeviceType.VENTY
     ) {
       await connectToVeazyVenty(server);
+    } else if (actualDeviceType === DeviceType.CRAFTY) {
+      await connectToCrafty(server);
     } else {
       await connectToVolcano(server);
     }
@@ -253,6 +269,7 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
         deviceInfo,
         getDeviceStateService,
         getDeviceControlService,
+        getCraftyStatusService,
         getCharacteristics,
         setCharacteristics,
       }}
