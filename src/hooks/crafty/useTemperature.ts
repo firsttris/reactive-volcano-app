@@ -15,7 +15,7 @@ export const useTemperature = () => {
   const [getTargetTemperature, setTargetTemperature] = createSignal(0);
   const [getCurrentTemperature, setCurrentTemperature] = createSignal(0);
   const [getBoostTemperature, setBoostTemperature] = createSignal(0);
-  const { getDeviceControlService, getCharacteristics, setCharacteristics } =
+  const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
@@ -38,7 +38,7 @@ export const useTemperature = () => {
   };
 
   const handleCharacteristics = async () => {
-    const service = getDeviceControlService();
+    const service = getCraftyControlService();
     if (!service) return;
 
     const targetTemperature = await createCharateristicWithEventListener(

@@ -18,15 +18,15 @@ export const useDeviceStatus = () => {
   const [isAutoShutdownActive, setIsAutoShutdownActive] =
     createSignal<boolean>(false);
   const {
-    getDeviceStateService,
-    getDeviceControlService,
+    getVolcanoStateService,
+    getVolcanoControlService,
     getCharacteristics,
     setCharacteristics,
   } = useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
   const handleDeviceStateCharacteristics = async () => {
-    const stateService = getDeviceStateService();
+    const stateService = getVolcanoStateService();
     if (!stateService) return;
     const activity = await createCharateristicWithEventListener(
       stateService,
@@ -43,7 +43,7 @@ export const useDeviceStatus = () => {
   };
 
   const handleDeviceControlCharacteristics = async () => {
-    const service = getDeviceControlService();
+    const service = getVolcanoControlService();
     if (!service) return;
 
     const heaterOnCharacteristic = await getCharacteristic(

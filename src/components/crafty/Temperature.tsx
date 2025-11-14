@@ -46,21 +46,25 @@ const FlexContainer = styled("div")`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 0px;
 `;
 
 const TempControls = styled("div")`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 45px;
+  width: 100%;
+  max-width: 300px;
+  padding: 0 20px;
 
   @media (max-width: 375px) {
-    gap: 25px;
+    max-width: 250px;
+    padding: 0 15px;
   }
 
   @media (max-width: 320px) {
-    gap: 5px;
+    max-width: 200px;
+    padding: 0 10px;
   }
 `;
 

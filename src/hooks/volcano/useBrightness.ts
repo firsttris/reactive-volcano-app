@@ -10,11 +10,11 @@ import { useWriteToCharacteristic } from "./useWriteToCharacteristic";
 
 export const useBrightness = () => {
   const [getBrightness, setBrightness] = createSignal(0);
-  const { getDeviceControlService, setCharacteristics } = useBluetooth();
+  const { getVolcanoControlService, setCharacteristics } = useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
   const handleCharacteristics = async () => {
-    const controlService = getDeviceControlService();
+    const controlService = getVolcanoControlService();
     if (!controlService) return;
     const brightness = await createCharateristic(
       controlService,

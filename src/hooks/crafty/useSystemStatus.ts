@@ -15,7 +15,7 @@ export const useSystemStatus = () => {
   const [getSystemStatus, setSystemStatus] = createSignal(0);
   const [getAkkuStatus, setAkkuStatus] = createSignal(0);
   const [getAkkuStatus2, setAkkuStatus2] = createSignal(0);
-  const { getDeviceControlService, getCharacteristics, setCharacteristics } =
+  const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
@@ -35,7 +35,7 @@ export const useSystemStatus = () => {
   };
 
   const handleCharacteristics = async () => {
-    const service = getDeviceControlService();
+    const service = getCraftyControlService();
     if (!service) return;
 
     const systemStatusCharacteristic =

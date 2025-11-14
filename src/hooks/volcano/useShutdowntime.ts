@@ -15,12 +15,12 @@ import { useWriteToCharacteristic } from "./useWriteToCharacteristic";
 export const useShutdowntime = () => {
   const [getAutoOffTimeInSec, setAutoOffTime] = createSignal<number>(0);
   const [getShutoffTimeInSec, setShutoffTime] = createSignal<number>(0);
-  const { getDeviceControlService, getCharacteristics, setCharacteristics } =
+  const { getVolcanoControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
   const handleCharacteristics = async () => {
-    const controlService = getDeviceControlService();
+    const controlService = getVolcanoControlService();
     if (!controlService) return;
     const shutoffTime = await createCharateristic(
       controlService,

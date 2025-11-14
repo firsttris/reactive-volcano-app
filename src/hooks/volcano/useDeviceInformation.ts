@@ -8,10 +8,10 @@ export function useDeviceInformation() {
   const [getFirmwareVersion, setFirmwareVersion] = createSignal<string>("");
   const [getBleFirmwareVersion, setBleFirmwareVersion] =
     createSignal<string>("");
-  const { getDeviceStateService } = useBluetooth();
+  const { getVolcanoStateService } = useBluetooth();
 
   createEffect(() => {
-    const stateService = getDeviceStateService();
+    const stateService = getVolcanoStateService();
     if (!stateService) return;
     createCharateristic(
       stateService,
