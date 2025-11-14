@@ -117,4 +117,5 @@ export enum DeviceType {
   VEAZY = "VEAZY",
   VENTY = "VENTY",
   UNKNOWN = "UNKNOWN",
+  CRAFTY = "CRAFTY",
 }
