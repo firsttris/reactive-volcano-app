@@ -5,17 +5,10 @@ import { styled } from "solid-styled-components";
 
 const Container = styled("div")`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 45px;
-
-  @media (max-width: 375px) {
-    gap: 25px;
-  }
-
-  @media (max-width: 320px) {
-    gap: 5px;
-  }
+  gap: 20px;
 `;
 
 const TextContainer = styled("div")`
@@ -43,16 +36,13 @@ export const HeaterControl = () => {
 
   return (
     <Container>
-      <div>
-        <ActiveRoundButton
-          isActive={getPowerChanged() > 0}
-          onClick={toggleHeater}
-        >
-          <SiFireship size="30px" />
-        </ActiveRoundButton>
-      </div>
       <TextContainer>Crafty</TextContainer>
-      <div></div>
+      <ActiveRoundButton
+        isActive={getPowerChanged() > 0}
+        onClick={toggleHeater}
+      >
+        <SiFireship size="30px" />
+      </ActiveRoundButton>
     </Container>
   );
 };
