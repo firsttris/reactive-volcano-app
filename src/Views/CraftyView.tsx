@@ -19,6 +19,7 @@ const MainCard = styled("div")`
 `;
 
 const CraftyViewContent: Component = () => {
+  console.log("Crafty View: Rendering Crafty view");
   const navigate = useNavigate();
   const { connectionState } = useBluetooth();
 

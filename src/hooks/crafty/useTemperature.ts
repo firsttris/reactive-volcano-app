@@ -22,24 +22,31 @@ export const useTemperature = () => {
   const handleTargetTemperature = (value: DataView) => {
     const convertedValue = convertBLEToUint16(value);
     const targetTemperature = Math.round(convertedValue / 10.0);
+    console.log("Crafty Temperature: Target temperature updated to", targetTemperature);
     setTargetTemperature(targetTemperature);
   };
 
   const handleCurrentTemperature = (value: DataView) => {
     const convertedValue = convertBLEToUint16(value);
     const currentTemperature = Math.round(convertedValue / 10.0);
+    console.log("Crafty Temperature: Current temperature updated to", currentTemperature);
     setCurrentTemperature(currentTemperature);
   };
 
   const handleBoostTemperature = (value: DataView) => {
     const convertedValue = convertBLEToUint16(value);
     const boostTemperature = Math.round(convertedValue / 10.0);
+    console.log("Crafty Temperature: Boost temperature updated to", boostTemperature);
     setBoostTemperature(boostTemperature);
   };
 
   const handleCharacteristics = async () => {
     const service = getCraftyControlService();
-    if (!service) return;
+    if (!service) {
+      console.log("Crafty Temperature: No Crafty control service available");
+      return;
+    }
+    console.log("Crafty Temperature: Setting up temperature characteristics");
 
     const targetTemperature = await createCharateristicWithEventListener(
       service,
@@ -47,8 +54,10 @@ export const useTemperature = () => {
       handleTargetTemperature
     );
     if (!targetTemperature) {
+      console.error("Crafty Temperature: writeTempCharacteristic not found");
       return Promise.reject("writeTempCharacteristic not found");
     }
+    console.log("Crafty Temperature: Target temperature characteristic set up");
     setCharacteristics((prev) => ({
       ...prev,
       writeTemp: targetTemperature,
@@ -60,8 +69,10 @@ export const useTemperature = () => {
       handleCurrentTemperature
     );
     if (!currentTemperature) {
+      console.error("Crafty Temperature: currTemperatureChangedCharacteristic not found");
       return Promise.reject("currTemperatureChangedCharacteristic not found");
     }
+    console.log("Crafty Temperature: Current temperature characteristic set up");
     setCharacteristics((prev) => ({
       ...prev,
       currTemperatureChanged: currentTemperature,
@@ -73,8 +84,10 @@ export const useTemperature = () => {
       handleBoostTemperature
     );
     if (!boostTemperature) {
+      console.error("Crafty Temperature: writeBoostTempCharacteristic not found");
       return Promise.reject("writeBoostTempCharacteristic not found");
     }
+    console.log("Crafty Temperature: Boost temperature characteristic set up");
     setCharacteristics((prev) => ({
       ...prev,
       writeBoostTemp: boostTemperature,
@@ -82,6 +95,7 @@ export const useTemperature = () => {
   };
 
   const setTemperature = async (value: number) => {
+    console.log("Crafty Temperature: Setting target temperature to", value);
     await writeValueToCharacteristic(
       "writeTemp",
       value * 10,
@@ -90,6 +104,7 @@ export const useTemperature = () => {
   };
 
   const setBoostTemp = async (value: number) => {
+    console.log("Crafty Temperature: Setting boost temperature to", value);
     await writeValueToCharacteristic(
       "writeBoostTemp",
       value * 10,

@@ -24,6 +24,7 @@ type CraftyDeviceProviderProps = {
 };
 
 export const CraftyDeviceProvider = (props: CraftyDeviceProviderProps) => {
+  console.log("Crafty Device Provider: Initializing Crafty device provider");
   // Alle Bluetooth-Hooks werden hier zentral einmal instanziiert
   const temperature = useTemperature();
   const power = usePower();
