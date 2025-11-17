@@ -171,14 +171,19 @@ const createBluetoothMethods = () => {
   };
 
   const connectToCrafty = async (server: BluetoothRemoteGATTServer) => {
+    console.log("Crafty: Connecting to Crafty device...");
     const craftyService1 = await server.getPrimaryService(ServiceUUIDs.Crafty1);
+    console.log("Crafty: Got Crafty1 service", craftyService1);
     setCraftyControlService(craftyService1);
     const craftyService2 = await server.getPrimaryService(ServiceUUIDs.Crafty2);
+    console.log("Crafty: Got Crafty2 service", craftyService2);
     // Assuming Crafty2 is control service, adjust as needed
     setCraftyDeviceInfoService(craftyService2);
     const craftyService3 = await server.getPrimaryService(ServiceUUIDs.Crafty3);
+    console.log("Crafty: Got Crafty3 service", craftyService3);
     // Crafty3 is used for additional characteristics like status registers, usage time, etc.
     setCraftyStatusService(craftyService3);
+    console.log("Crafty: Crafty services connected successfully");
   };
 
   const connectToVolcano = async (server: BluetoothRemoteGATTServer) => {
@@ -215,6 +220,7 @@ const createBluetoothMethods = () => {
     ) {
       await connectToVeazyVenty(server);
     } else if (actualDeviceType === DeviceType.CRAFTY) {
+      console.log("Crafty: Detected Crafty device, connecting...");
       await connectToCrafty(server);
     } else {
       await connectToVolcano(server);
