@@ -1,5 +1,8 @@
 # Reactive Vaporizer App (fork)
 
+![Screenshot](https://github.com/sprokkel78/reactive-volcano-app/blob/main/screenshots/screenshot.png)
+
+
 # Introduction
 
 This fork is made for personal use.
