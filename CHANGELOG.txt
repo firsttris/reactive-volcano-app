@@ -1,5 +1,6 @@
 CHANGELOG
 ---------
 
+2025/11/17 - Moved Device Runtime to top.
 2025/11/13 - Added a background to the app.
 2025/11/12 - Increased PumpTime to 180sec, and PumpSteps to 10sec.

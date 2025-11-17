@@ -91,6 +91,7 @@ export const VolcanoView: Component = () => {
           <Temperature />
         </div>
         <HeatAndPump />
+        <HeatingTimeDisplay />
       </MainCard>
 
       {/* Workflows */}
@@ -116,7 +117,6 @@ export const VolcanoView: Component = () => {
           </SwitchContainer>
         </SwitchesContainer>
         <SettingItem>
-          <HeatingTimeDisplay />
         </SettingItem>
       </SettingsContainer>
     </>
