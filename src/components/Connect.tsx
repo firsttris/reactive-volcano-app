@@ -106,6 +106,9 @@ export const Connect = () => {
         case DeviceType.VEAZY:
           navigate(buildRoute.ventyVeazyRoot());
           break;
+        case DeviceType.CRAFTY:
+          navigate(buildRoute.craftyRoot());
+          break;
         default:
           // Stay on connect page if device type is unknown
           break;
