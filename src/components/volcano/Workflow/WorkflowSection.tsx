@@ -135,7 +135,6 @@ export const WorkFlowSection = () => {
 
   return (
     <WorkflowContainer>
-    <div style={{ "margin-bottom": "20px", "background-image": "url('./background.png')", "background-position": "center", "background-size": "cover", "background-repeat": "no-repeat" }}>
       <WorkflowTitle>{t("workflows")}</WorkflowTitle>
       <Container>
         <For each={workflowList()}>
@@ -169,7 +168,6 @@ export const WorkFlowSection = () => {
           {t("importWorkflow")}
         </BulkOperationButton>
       </BulkOperationsContainer>
-     </div>
     </WorkflowContainer>
   );
 };

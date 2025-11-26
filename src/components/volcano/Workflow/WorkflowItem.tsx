@@ -254,7 +254,6 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
 
   return (
     <Card isActive={schedulerIsRunning()}>
-     <div style={{ "margin-bottom": "20px", "background-image": "url('./background.png')", "background-position": "center", "background-size": "cover", "background-repeat": "no-repeat" }}>
       <WorkflowHeader>
         <NameContainer>
           <Show
@@ -325,7 +324,6 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
           <ProgressFill progress={progress()} />
         </ProgressBar>
       </Show>
-     </div>
     </Card>
   );
 };

@@ -90,7 +90,7 @@ export const VolcanoView: Component = () => {
         <HeatingTimeDisplay />
       </MainCard>
 
-      {/* Workflows */}
+      {/* Workflows */} 
       <WorkFlowSection />
 
       {/* Settings */}

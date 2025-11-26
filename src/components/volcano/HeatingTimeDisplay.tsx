@@ -11,7 +11,8 @@ const Container = styled("div")`
 `;
 
 const Title = styled("h3")`
-  color: var(--accent-color);
+  color: #ffffff;
+  font-weight: bold;
   font-size: 1.2rem;
   margin-bottom: 8px;
   font-family: CustomFont;

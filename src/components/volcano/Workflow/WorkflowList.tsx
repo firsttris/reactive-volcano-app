@@ -11,10 +11,6 @@ const Container = styled("div")`
   max-width: 800px;
   margin: 20px auto;
   padding: 20px;
-  background-image: url('./background.png');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
 `;
 
 const Card = styled("div")`
@@ -22,11 +18,6 @@ const Card = styled("div")`
   padding: 24px;
   border: 1px solid var(--border-color);
   margin-bottom: 20px;
-  background-image: url('./background.png');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-
 `;
 
 const Title = styled("h2")`
@@ -178,7 +169,6 @@ export const WorkflowList = () => {
   return (
     <Container>
       <Card>
-      <div style={{ "margin-bottom": "20px", "background-image": "url('./background.png')", "background-position": "center", "background-size": "cover", "background-repeat": "no-repeat" }}>
         <Title>{t("editWorkflowSteps")}</Title>
         <Show
           when={workflowSteps().length > 0}
@@ -250,7 +240,6 @@ export const WorkflowList = () => {
             {t("save")}
           </StyledButton>
         </ButtonGroup>
-      </div>
       </Card>
     </Container>
   );
