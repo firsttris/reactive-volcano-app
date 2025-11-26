@@ -22,7 +22,7 @@ const MainCard = styled("div")`
   padding: 24px;
   margin: 20px auto;
   border: 1px solid var(--border-color);
-  min-width: 800px;
+  min-width: 795px;
 `;
 
 const SettingsContainer = styled("div")`
