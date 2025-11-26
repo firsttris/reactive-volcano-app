@@ -5,4 +5,4 @@ CHANGELOG
 2025/11/24 - Changed interface size from 600px to 800px.
 2025/11/17 - Moved Device Runtime to top.
 2025/11/13 - Added a background to the app.
-2025/11/12 - Increased PumpTime to 180sec, and PumpSteps to 10sec.
+2025/11/12 - Increased PumpTime to 180sec.
