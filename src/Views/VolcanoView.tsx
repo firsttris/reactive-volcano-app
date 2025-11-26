@@ -17,19 +17,17 @@ import { ConnectionState } from "../utils/uuids";
 import { buildRoute } from "../routes";
 
 const MainCard = styled("div")`
-  background: var(--secondary-bg);
   border-radius: 16px;
-  padding: 24px;
+  padding: 20px;
   margin: 20px auto;
   border: 1px solid var(--border-color);
-  min-width: 795px;
+  min-width: 800px;
 `;
 
 const SettingsContainer = styled("div")`
   min-width: 800px;
   margin: 20px auto;
   padding: 20px;
-  background: var(--secondary-bg);
   border-radius: 16px;
   border: 1px solid var(--border-color);
 `;
@@ -87,9 +85,7 @@ export const VolcanoView: Component = () => {
       {/* Main Controls */}
       <ShutdownTime />
       <MainCard>
-        <div style={{ "margin-bottom": "24px" }}>
-          <Temperature />
-        </div>
+        <Temperature />
         <HeatAndPump />
         <HeatingTimeDisplay />
       </MainCard>
@@ -119,6 +115,7 @@ export const VolcanoView: Component = () => {
         <SettingItem>
         </SettingItem>
       </SettingsContainer>
+
     </>
   );
 };

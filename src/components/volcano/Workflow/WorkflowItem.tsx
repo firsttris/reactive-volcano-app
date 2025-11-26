@@ -21,8 +21,6 @@ interface WorkflowItemProps {
 }
 
 const Card = styled("div")<{ isActive?: boolean }>`
-  background: ${(props) =>
-    props.isActive ? "rgba(255, 102, 0, 0.1)" : "var(--bg-color)"};
   border: 2px solid
     ${(props) =>
       props.isActive ? "var(--accent-color)" : "var(--border-color)"};
@@ -256,6 +254,7 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
 
   return (
     <Card isActive={schedulerIsRunning()}>
+     <div style={{ "margin-bottom": "20px", "background-image": "url('./background.png')", "background-position": "center", "background-size": "cover", "background-repeat": "no-repeat" }}>
       <WorkflowHeader>
         <NameContainer>
           <Show
@@ -326,6 +325,7 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
           <ProgressFill progress={progress()} />
         </ProgressBar>
       </Show>
+     </div>
     </Card>
   );
 };

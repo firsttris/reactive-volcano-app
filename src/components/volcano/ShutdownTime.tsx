@@ -17,7 +17,7 @@ const StyledDiv = styled("div")<StyledDivProps>`
   padding: 12px 20px;
   color: var(--accent-color);
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 800;
   text-align: center;
 `;
 

@@ -1,3 +1,4 @@
+
 import { Component, createEffect, createMemo, createSignal } from "solid-js";
 import { Slider } from "../../Slider";
 import { useTranslations } from "../../../i18n/utils";
@@ -12,13 +13,22 @@ const Container = styled("div")`
   max-width: 800px;
   margin: 20px auto;
   padding: 20px;
+  background-image: url('./background.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
 `;
 
 const Card = styled("div")`
-  background: var(--secondary-bg);
   border-radius: 16px;
   padding: 24px;
   border: 1px solid var(--border-color);
+  background-image: url('./background.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
 `;
 
 const Title = styled("h2")`
@@ -98,6 +108,7 @@ export const WorkflowForm: Component = () => {
   return (
     <Container>
       <Card>
+      <div style={{ "margin-bottom": "20px", "background-image": "url('./background.png')", "background-position": "center", "background-size": "cover", "background-repeat": "no-repeat" }}>
         <Title>{t("editStep")}</Title>
         <Form onSubmit={handleSubmit}>
           <SliderSection>
@@ -144,6 +155,7 @@ export const WorkflowForm: Component = () => {
             </StyledButton>
           </ButtonGroup>
         </Form>
+      </div>
       </Card>
     </Container>
   );

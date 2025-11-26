@@ -10,7 +10,6 @@ const WorkflowContainer = styled("div")`
   min-width: 800px;
   margin: 20px auto;
   padding: 20px;
-  background: var(--secondary-bg);
   border-radius: 16px;
   border: 1px solid var(--border-color);
 `;
@@ -136,6 +135,7 @@ export const WorkFlowSection = () => {
 
   return (
     <WorkflowContainer>
+    <div style={{ "margin-bottom": "20px", "background-image": "url('./background.png')", "background-position": "center", "background-size": "cover", "background-repeat": "no-repeat" }}>
       <WorkflowTitle>{t("workflows")}</WorkflowTitle>
       <Container>
         <For each={workflowList()}>
@@ -169,6 +169,7 @@ export const WorkFlowSection = () => {
           {t("importWorkflow")}
         </BulkOperationButton>
       </BulkOperationsContainer>
+     </div>
     </WorkflowContainer>
   );
 };
