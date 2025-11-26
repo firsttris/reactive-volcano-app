@@ -9,7 +9,7 @@ import { styled } from "solid-styled-components";
 import { FiSave, FiX } from "solid-icons/fi";
 
 const Container = styled("div")`
-  max-width: 600px;
+  max-width: 800px;
   margin: 20px auto;
   padding: 20px;
 `;
@@ -124,9 +124,9 @@ export const WorkflowForm: Component = () => {
             <Slider
               value={pumpTime()}
               label={`${t("pumpTime")}: ${pumpTime()} ${t("sec")}`}
-              min={0}
-              step={10}
-              max={160}
+              min={30}
+              step={5}
+              max={180}
               onInput={(value) => setPumpTime(value)}
             />
           </SliderSection>

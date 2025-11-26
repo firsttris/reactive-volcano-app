@@ -8,7 +8,7 @@ import { styled } from "solid-styled-components";
 import { useTranslations } from "../../../i18n/utils";
 
 const Container = styled("div")`
-  max-width: 600px;
+  max-width: 800px;
   margin: 20px auto;
   padding: 20px;
 `;
