@@ -6,7 +6,7 @@ const ResponsiveContainer = styled("div")`
   display: flex;
   flex-direction: column;
   margin: 25px;
-  max-width: 600px;
+  max-width: 800px;
   width: 100%;
   margin-left: auto;
   margin-right: auto;

@@ -7,7 +7,7 @@ import { FiPlus, FiDownload, FiUpload } from "solid-icons/fi";
 import { useTranslations } from "../../../i18n/utils";
 
 const WorkflowContainer = styled("div")`
-  max-width: 600px;
+  min-width: 800px;
   margin: 20px auto;
   padding: 20px;
   background: var(--secondary-bg);
