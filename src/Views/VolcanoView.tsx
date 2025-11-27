@@ -30,10 +30,10 @@ const ImageBgTop = styled("div")`
 
 `;
 
-const ImageBgBottom = styled("div")`
+const ImageBgFooter = styled("div")`
   min-width: 800px;
   min-height: 150px;
-  background-image: url('/background-2.png');
+  background-image: url('/background-3.png');
   background-position: center;
   background-size: cover;
   border-radius: 16px;
@@ -143,7 +143,7 @@ export const VolcanoView: Component = () => {
         <SettingItem>
         </SettingItem>
       </SettingsContainer>
-     <ImageBgBottom />
+     <ImageBgFooter />
     </>
   );
 };
