@@ -31,7 +31,7 @@ const ImageBgTop = styled("div")`
 
 const ImageBgLine = styled("div")`
   min-width: 800px;
-  min-height: 30px;
+  min-height: 20px;
   background-image: url('/background-2.png');
   background-position: center;
   background-size: 800px;
