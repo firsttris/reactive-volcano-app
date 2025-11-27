@@ -29,6 +29,20 @@ const ImageBgTop = styled("div")`
 
 `;
 
+const ImageBgLine = styled("div")`
+  min-width: 800px;
+  min-height: 75px;
+  background-image: url('/background-2.png');
+  background-position: center;
+  background-size: 800px;
+  background-repeat: no-repeat;
+  padding: 20px;
+  margin: 20px auto;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+
+`;
+
 const ImageBgFooter = styled("div")`
   min-width: 800px;
   min-height: 150px;
@@ -115,9 +129,11 @@ export const VolcanoView: Component = () => {
         <HeatAndPump />
         <HeatingTimeDisplay />
       </MainCard>
+      <ImageBgLine />
 
       {/* Workflows */} 
       <WorkFlowSection />
+      <ImageBgLine />
 
       {/* Settings */}
       <SettingsContainer>
@@ -141,6 +157,7 @@ export const VolcanoView: Component = () => {
         <SettingItem>
         </SettingItem>
       </SettingsContainer>
+      <ImageBgLine />
      <ImageBgFooter />
     </>
   );
