@@ -35,7 +35,7 @@ To develop and build this project, follow these steps:
 4. Start the development server: `npm run dev`
 5. To build the project, use: `npm run build:root`
 6. Copy the contents from the dist/ directory to the webserver location.
-7. Copy the file background.png to the webserver location.
+7. Connect to your webserver location with your BLE browser.
 
 # Connection Issues and Pitfalls
 
