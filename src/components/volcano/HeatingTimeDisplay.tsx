@@ -21,7 +21,7 @@ const Title = styled("h3")`
 const TimeDisplay = styled("div")`
   font-family: "CustomFont";
   font-size: 1.5rem;
-  color: var(--text-color);
+  color: #ffffff;
   display: flex;
   align-items: center;
 `;

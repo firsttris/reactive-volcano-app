@@ -14,7 +14,7 @@ const TempDisplay = styled("div")`
 const TempLabel = styled("span")`
   display: block;
   font-size: 0.9rem;
-  color: var(--secondary-text);
+  color: #ffffff;
   margin-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
