@@ -51,7 +51,6 @@ const ImageBgFooter = styled("div")`
   background-size: 800px;
   background-repeat: no-repeat;
   padding: 20px;
-  margin: 20px auto;
 
 `;
 
