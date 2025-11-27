@@ -31,7 +31,7 @@ const ImageBgTop = styled("div")`
 
 const ImageBgLine = styled("div")`
   min-width: 800px;
-  min-height: 75px;
+  min-height: 30px;
   background-image: url('/background-2.png');
   background-position: center;
   background-size: 800px;
@@ -39,7 +39,6 @@ const ImageBgLine = styled("div")`
   padding: 20px;
   margin: 20px auto;
   border-radius: 16px;
-  border: 1px solid var(--border-color);
 
 `;
 
