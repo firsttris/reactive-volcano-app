@@ -22,11 +22,10 @@ const ImageBgTop = styled("div")`
   min-height: 150px;
   background-image: url('/background-1.png');
   background-position: center;
-  background-size: cover;
-  border-radius: 16px;
+  background-size: 800px;
+  background-repeat: no-repeat;
   padding: 20px;
   margin: 20px auto;
-  border: 1px solid var(--border-color);
 
 `;
 
@@ -35,11 +34,10 @@ const ImageBgFooter = styled("div")`
   min-height: 150px;
   background-image: url('/background-3.png');
   background-position: center;
-  background-size: cover;
-  border-radius: 16px;
+  background-size: 800px;
+  background-repeat: no-repeat;
   padding: 20px;
   margin: 20px auto;
-  border: 1px solid var(--border-color);
 
 `;
 
