@@ -16,6 +16,33 @@ import { useBluetooth } from "../provider/BluetoothProvider";
 import { ConnectionState } from "../utils/uuids";
 import { buildRoute } from "../routes";
 
+
+const ImageBgTop = styled("div")`
+  min-width: 800px;
+  min-height: 150px;
+  background-image: url('/background-1.png');
+  background-position: center;
+  background-size: cover;
+  border-radius: 16px;
+  padding: 20px;
+  margin: 20px auto;
+  border: 1px solid var(--border-color);
+
+`;
+
+const ImageBgBottom = styled("div")`
+  min-width: 800px;
+  min-height: 150px;
+  background-image: url('/background-2.png');
+  background-position: center;
+  background-size: cover;
+  border-radius: 16px;
+  padding: 20px;
+  margin: 20px auto;
+  border: 1px solid var(--border-color);
+
+`;
+
 const MainCard = styled("div")`
   border-radius: 16px;
   padding: 20px;
@@ -83,6 +110,7 @@ export const VolcanoView: Component = () => {
   return (
     <>
       {/* Main Controls */}
+      <ImageBgTop />
       <ShutdownTime />
       <MainCard>
         <Temperature />
@@ -115,7 +143,7 @@ export const VolcanoView: Component = () => {
         <SettingItem>
         </SettingItem>
       </SettingsContainer>
-
+     <ImageBgBottom />
     </>
   );
 };
