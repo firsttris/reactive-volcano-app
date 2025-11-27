@@ -13,16 +13,7 @@
     <title>S&B BLE Fork v1.1</title>
   </head>
   <body>
-  <audio id="bg-audio" src="/sound.mp3" loop hidden></audio>
     <div id="root"></div>
     <script type="module" src="/src/index.tsx"></script>
-
-    <script>
-    // enable audio after ANY click/tap
-    window.addEventListener('click', () => {
-      const a = document.getElementById('bg-audio');
-      a.play().catch(() => {});
-    }, { once: true });
-    </script>
   </body>
 </html>

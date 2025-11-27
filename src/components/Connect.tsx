@@ -9,7 +9,7 @@ import { buildRoute } from "../routes";
 import { useTranslations } from "../i18n/utils";
 
 const Centered = styled("div")`
-  height: 700px;
+  height: 580px;
   display: flex;
   flex-direction: column;
   justify-content: center;

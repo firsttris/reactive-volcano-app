@@ -16,6 +16,17 @@ import { useBluetooth } from "../provider/BluetoothProvider";
 import { ConnectionState } from "../utils/uuids";
 import { buildRoute } from "../routes";
 
+const AudioCard = styled("div")`
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  min-width: 760px;
+  min-height: 30px;
+  padding: 20px;
+  margin: 20px;
+  display: flex;
+  justify-content: center; /* center the audio player */
+  background-color: var(--card-bg-color, #fff); /* optional background */
+`;
 
 const ImageBgTop = styled("div")`
   min-width: 800px;
@@ -156,6 +167,9 @@ export const VolcanoView: Component = () => {
         </SettingItem>
       </SettingsContainer>
       <ImageBgLine />
+      <AudioCard>
+       <div style="align: center"><audio controls src="/sound.mp3" loop /></div>
+      </AudioCard>
      <ImageBgFooter />
     </>
   );
