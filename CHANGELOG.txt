@@ -1,8 +1,19 @@
 CHANGELOG
 ---------
 
-2025/11/24 - Made the interface for volcano transparent.
-2025/11/24 - Changed interface size from 600px to 800px.
-2025/11/17 - Moved Device Runtime to top.
-2025/11/13 - Added a background to the app.
-2025/11/12 - Increased PumpTime to 180sec.
+# S&B BLE Fork v1.3
+- Changes to interface.
+- Changes to sound file.
+
+# S&B BLE Fork v1.2
+- added sound.
+- update to interface.
+
+# S&B BLE Fork v1.1
+- Made the interface for volcano transparent.
+- Changed interface size from 600px to 800px.
+
+# S&B BLE Fork v1.0
+- Moved Device Runtime to top.
+- Added a background to the app.
+- Increased PumpTime to 180sec.
