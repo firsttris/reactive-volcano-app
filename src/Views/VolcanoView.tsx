@@ -18,7 +18,7 @@ import { buildRoute } from "../routes";
 
 const YTVideo = styled("div")`
   min-width: 800px;
-  min-height: 500px;
+  min-height: 480px;
   padding: 20px;
   margin: 20px auto;
   border: 1px solid var(--border-color);
@@ -157,7 +157,7 @@ export const VolcanoView: Component = () => {
         <HeatingTimeDisplay />
       </MainCard>
       <YTVideo>
-        <iframe width="800" height="500" src="https://www.youtube.com/embed/2wYtJwDkKIk?si=oNif7cIBLopPzclP?autoplay=1&loop=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>      
+        <iframe width="800" height="480" src="https://www.youtube.com/embed/2wYtJwDkKIk?si=oNif7cIBLopPzclP?autoplay=1&loop=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>      
       </YTVideo>
       <AudioCard>
        <div style="align: center, min-width: 800px"><audio controls src="/sound.mp3" loop /></div>

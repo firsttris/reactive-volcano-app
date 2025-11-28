@@ -54,7 +54,7 @@ export const ui = {
     connectingTo: "Connecting to",
     targetTemperature: "Target Temperature",
     ventyVeazyTemperatureControl: "Venty/Veazy Temperature Control",
-    currentTemperature: "Temperature Control",
+    currentTemperature: "Current Temperature",
     hybrid: "Volcano Hybrid",
     deviceWillShutdownIn: "Device will Shutdown in",
     sec: "sec",
