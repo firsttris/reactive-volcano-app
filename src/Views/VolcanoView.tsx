@@ -16,9 +16,17 @@ import { useBluetooth } from "../provider/BluetoothProvider";
 import { ConnectionState } from "../utils/uuids";
 import { buildRoute } from "../routes";
 
-const YTVideo = styled("div")`
+const ZenStudioTitle = styled("div")`
+  color: white;
+  font-size: 1.5rem;
+  margin-bottom: 24px;
+  text-align: center;
+  font-family: CustomFont;
+`;
+
+const ZenStudio = styled("div")`
   min-width: 800px;
-  min-height: 480px;
+  min-height: 800px;
   padding: 20px;
   margin: 20px auto;
   border: 1px solid var(--border-color);
@@ -26,9 +34,15 @@ const YTVideo = styled("div")`
 
 `;
 
+const YTVideo = styled("div")`
+  min-width: 800px;
+  min-height: 480px;
+  padding: 20px;
+  margin: 20px auto;
+
+`;
+
 const AudioCard1 = styled("div")`
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
   min-width: 800px;
   min-height: 30px;
   padding: 20px;
@@ -47,8 +61,6 @@ const AudioCard1 = styled("div")`
 `;
 
 const AudioCard = styled("div")`
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
   min-width: 800px;
   min-height: 30px;
   padding: 20px;
@@ -176,15 +188,19 @@ export const VolcanoView: Component = () => {
         <HeatAndPump />
         <HeatingTimeDisplay />
       </MainCard>
-      <YTVideo>
-        <iframe width="800" height="480" src="https://www.youtube.com/embed/2wYtJwDkKIk?si=oNif7cIBLopPzclP?autoplay=1&loop=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>      
-      </YTVideo>
-      <AudioCard>
-       <div style="align: center, min-width: 800px"><audio controls src="/sound.mp3" loop /></div>
-      </AudioCard>
-      <AudioCard1>
-       <div style="align: center, min-width: 800px"><audio controls src="/sound-1.mp3" loop /></div>
-      </AudioCard1>
+
+      <ZenStudio>
+       <ZenStudioTitle>{t("zenstudio")}</ZenStudioTitle>
+       <YTVideo>
+         <iframe width="800" height="480" src="https://www.youtube.com/embed/2wYtJwDkKIk?si=oNif7cIBLopPzclP?autoplay=1&loop=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>      
+       </YTVideo>
+       <AudioCard1>
+        <div style="align: center, min-width: 800px"><audio controls src="/sound-1.mp3" loop /></div>
+       </AudioCard1>
+       <AudioCard>
+        <div style="align: center, min-width: 800px"><audio controls src="/sound.mp3" loop /></div>
+       </AudioCard>
+      </ZenStudio>
 
       {/* Workflows */} 
       <WorkFlowSection />

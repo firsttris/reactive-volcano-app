@@ -10,6 +10,7 @@ export const defaultLang = (() =>
 
 export const ui = {
   en: {
+    zenstudio: "Zen Studio",
     settings: "Settings",
     darkMode: "Dark Mode",
     standbyLight: "Standby Light",
@@ -88,6 +89,7 @@ export const ui = {
     confirmImportAll: "This will replace all existing workflows. Are you sure?",
   },
   de: {
+    zenstudio: "Zen Studio",
     settings: "Einstellungen",
     darkMode: "Dunkelmodus",
     standbyLight: "Standby-Licht",
