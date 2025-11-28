@@ -26,6 +26,26 @@ const YTVideo = styled("div")`
 
 `;
 
+const AudioCard1 = styled("div")`
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  min-width: 800px;
+  min-height: 30px;
+  padding: 20px;
+  display: flex;
+  align: center;
+  justify-content: center; /* center the audio player */
+  background-color: var(--card-bg-color, transparent); /* optional background */
+
+  audio {
+    width: 800px;       /* fixed width */
+    max-width: 100%;    /* responsive fallback */
+    background-color: black;
+    color: white;
+    border-radius: 8px;
+  }
+`;
+
 const AudioCard = styled("div")`
   border-radius: 16px;
   border: 1px solid var(--border-color);
@@ -162,6 +182,9 @@ export const VolcanoView: Component = () => {
       <AudioCard>
        <div style="align: center, min-width: 800px"><audio controls src="/sound.mp3" loop /></div>
       </AudioCard>
+      <AudioCard1>
+       <div style="align: center, min-width: 800px"><audio controls src="/sound-1.mp3" loop /></div>
+      </AudioCard1>
 
       {/* Workflows */} 
       <WorkFlowSection />
