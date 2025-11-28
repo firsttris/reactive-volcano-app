@@ -3,7 +3,7 @@ CHANGELOG
 
 # S&B BLE Fork v1.3
 - Changes to interface.
-- Changes to sound file. (rainfall, stream)
+- Changes to sound files. (rainfall, artic winds)
 - Added YT Video. (firewood)
 
 # S&B BLE Fork v1.2
