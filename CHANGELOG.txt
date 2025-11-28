@@ -4,6 +4,7 @@ CHANGELOG
 # S&B BLE Fork v1.3
 - Changes to interface.
 - Changes to sound file.
+- Added YT Video.
 
 # S&B BLE Fork v1.2
 - added sound.
