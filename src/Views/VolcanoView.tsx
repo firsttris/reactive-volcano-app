@@ -26,24 +26,25 @@ const ZenStudioTitle = styled("div")`
 
 const ZenStudio = styled("div")`
   min-width: 800px;
-  min-height: 800px;
-  padding: 20px;
   margin: 20px auto;
-  border: 1px solid var(--border-color);
+  padding: 20px;
   border-radius: 16px;
-
+  border: 1px solid var(--border-color);
 `;
 
 const YTVideo = styled("div")`
-  min-width: 800px;
+  min-width: 700px;
   min-height: 480px;
   padding: 20px;
   margin: 20px auto;
+  display: flex;
+  align: center;
+  justify-content: center; /* center the audio player */
 
 `;
 
 const AudioCard1 = styled("div")`
-  min-width: 800px;
+  min-width: 750px;
   min-height: 30px;
   padding: 20px;
   display: flex;
@@ -61,7 +62,7 @@ const AudioCard1 = styled("div")`
 `;
 
 const AudioCard = styled("div")`
-  min-width: 800px;
+  min-width: 750px;
   min-height: 30px;
   padding: 20px;
   display: flex;
