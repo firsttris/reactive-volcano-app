@@ -42,7 +42,7 @@ To create a docker app, follow these steps:
 1. Clone the repository: `git clone https://github.com/sprokkel78/reactive-volcano-app.git`
 2. Navigate into the project directory: `cd reactive-volcano-app`
 3. Install the dependencies: `npm install`
-5. To build the project, use: `npm run build`
+5. To build the project, use: `npm run build:root`
 6. To build the docker, use: `docker build -t reactive-volcano-app . (notice the . at the end)`
 7. To run the docker, use: `docker run -p 8080:80 reactive-volcano-app`
 7. Connect to your webserver location at port 8080 with your BLE browser.
