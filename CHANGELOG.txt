@@ -2,7 +2,8 @@ CHANGELOG
 ---------
 
 # S&B BLE Fork v1.3
-- added Zen Studio.
+- added docker app creation.
+- added Zen Studio. (earth/fire/wind/water)
 - Changes to interface.
 - Changes to sound files. (rainfall, artic winds)
 - Added YT Video. (firewood)
