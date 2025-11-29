@@ -5,7 +5,7 @@ FROM httpd:2.4-alpine
 RUN rm -rf /usr/local/apache2/htdocs/*
 
 # Copy your locally built dist/ folder into Apache root
-COPY dist/* /usr/local/apache2/htdocs/
+COPY dist/ /usr/local/apache2/htdocs/
 
 # Expose port 80
 EXPOSE 80
