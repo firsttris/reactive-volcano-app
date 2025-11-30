@@ -20,7 +20,7 @@ const TempLabel = styled("span")`
   letter-spacing: 1px;
 `;
 
-const DigitalText = styled("div")<{ isTarget?: boolean }>`
+const DigitalText1 = styled("div")<{ isTarget?: boolean }>`
   margin-bottom: -10px;
   font-family: "CustomFont";
   font-size: 72px;
@@ -35,6 +35,29 @@ const DigitalText = styled("div")<{ isTarget?: boolean }>`
   ${(props) =>
     !props.isTarget
       ? `
+        text-shadow: 
+          0 0 10px rgba(255, 102, 0, 0.8),
+          0 0 20px rgba(255, 102, 0, 0.6);
+      `
+      : ""}
+`;
+
+const DigitalText2 = styled("div")<{ isTarget?: boolean }>`
+  margin-bottom: -10px;
+  font-family: "CustomFont";
+  font-size: 72px;
+  line-height: 1;
+  min-width: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${(props) => (props.isTarget ? "var(--text-color)" : "#f60")};
+  transition: all 0.3s ease;
+
+  ${(props) =>
+    props.isTarget
+      ? `
+        color: gold;      
         text-shadow: 
           0 0 10px rgba(255, 102, 0, 0.8),
           0 0 20px rgba(255, 102, 0, 0.6);
@@ -85,23 +108,23 @@ export const Temperature = () => {
     <FlexContainer>
       <TempDisplay>
         <TempLabel>{t("currentTemperature")}</TempLabel>
-        <DigitalText>
+        <DigitalText1>
           <TemperatureDisplay
             value={getCurrentTemperature()}
             unit={isCelsius() ? "C" : "F"}
           />
-        </DigitalText>
+        </DigitalText1>
       </TempDisplay>
       <TempControls>
         <RoundButton onClick={decreaseTemperature}>
           <FaSolidMinus size="24px" />
         </RoundButton>
-        <DigitalText isTarget={true}>
+        <DigitalText2 isTarget={true}>
           <TemperatureDisplay
             value={getTargetTemperature()}
             unit={isCelsius() ? "C" : "F"}
           />
-        </DigitalText>
+        </DigitalText2>
         <RoundButton onClick={increaseTemperature}>
           <FaSolidPlus size="24px" />
         </RoundButton>
