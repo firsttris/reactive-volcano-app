@@ -26,7 +26,7 @@ const TextContainer = styled("div")`
   justify-content: center;
   font-family: "CustomFont";
   font-size: 25px;
-  color: #ffffff;
+  color: green;
   min-width: 160px;
   margin-bottom: -10px;
 `;
