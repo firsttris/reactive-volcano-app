@@ -11,7 +11,7 @@ const Container = styled("div")`
 `;
 
 const Title = styled("h3")`
-  color: gold;
+  color: #f60;
   font-weight: bold;
   font-size: 1.2rem;
   margin-bottom: 8px;
