@@ -3,6 +3,7 @@ CHANGELOG
 
 # S&B BLE Fork v1.4
 - Changed color of selected temperature to gold.
+- added a fish tank.
 
 # S&B BLE Fork v1.3
 - added docker app creation.

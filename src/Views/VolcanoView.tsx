@@ -43,6 +43,17 @@ const YTVideo = styled("div")`
 
 `;
 
+const FishTank = styled("div")`
+  min-width: 800px;
+  min-height: 450px;
+  padding: 20px;
+  margin: 20px auto;
+  display: flex;
+  align: center;
+  justify-content: center; /* center the audio player */
+
+`;
+
 const AudioCard1 = styled("div")`
   min-width: 750px;
   min-height: 30px;
@@ -229,7 +240,10 @@ export const VolcanoView: Component = () => {
         </SettingItem>
       </SettingsContainer>
       <ImageBgLine />
-     <ImageBgFooter />
+      <FishTank>
+	<iframe width="800" height="480" src="https://www.youtube.com/embed/1zcIUk66HX4?si=_CRmoZZ-756DNcyJ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </FishTank>
+      <ImageBgFooter />
     </>
   );
 };
