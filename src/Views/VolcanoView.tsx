@@ -33,7 +33,7 @@ const ZenStudio = styled("div")`
 `;
 
 const YTVideo = styled("div")`
-  min-width: 700px;
+  min-width: 800px;
   min-height: 450px;
   padding: 20px;
   margin: 20px auto;
@@ -51,6 +51,8 @@ const FishTank = styled("div")`
   display: flex;
   align: center;
   justify-content: center; /* center the audio player */
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
 
 `;
 
