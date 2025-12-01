@@ -33,7 +33,7 @@ const ZenStudio = styled("div")`
 `;
 
 const YTVideo = styled("div")`
-  min-width: 800px;
+  min-width: 700px;
   min-height: 450px;
   padding: 20px;
   margin: 20px auto;
