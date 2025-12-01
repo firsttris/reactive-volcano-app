@@ -203,19 +203,6 @@ export const VolcanoView: Component = () => {
         <HeatingTimeDisplay />
       </MainCard>
 
-      <ZenStudio>
-       <ZenStudioTitle>{t("zenstudio")}</ZenStudioTitle>
-       <YTVideo>
-         <iframe width="800" height="480" src="https://www.youtube.com/embed/2wYtJwDkKIk?si=oNif7cIBLopPzclP?autoplay=1&loop=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>      
-       </YTVideo>
-       <AudioCard1>
-        <div style="align: center, min-width: 800px"><audio controls src="/sound-1.mp3" loop /></div>
-       </AudioCard1>
-       <AudioCard>
-        <div style="align: center, min-width: 800px"><audio controls src="/sound.mp3" loop /></div>
-       </AudioCard>
-      </ZenStudio>
-
       {/* Workflows */} 
       <WorkFlowSection />
 
@@ -242,6 +229,20 @@ export const VolcanoView: Component = () => {
         </SettingItem>
       </SettingsContainer>
       <ImageBgLine />
+      <ZenStudio>
+       <ZenStudioTitle>{t("zenstudio")}</ZenStudioTitle>
+       <YTVideo>
+         <iframe width="800" height="480" src="https://www.youtube.com/embed/2wYtJwDkKIk?si=oNif7cIBLopPzclP?autoplay=1&loop=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>      
+       </YTVideo>
+       <AudioCard1>
+        <div style="align: center, min-width: 800px"><audio controls src="/sound-1.mp3" loop /></div>
+       </AudioCard1>
+       <AudioCard>
+        <div style="align: center, min-width: 800px"><audio controls src="/sound.mp3" loop /></div>
+       </AudioCard>
+      </ZenStudio>
+
+
       <FishTank>
 	<iframe width="800" height="480" src="https://www.youtube.com/embed/1zcIUk66HX4?si=_CRmoZZ-756DNcyJ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
       </FishTank>
