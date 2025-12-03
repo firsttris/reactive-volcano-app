@@ -145,7 +145,7 @@ const SettingsContainer = styled("div")`
 `;
 
 const SettingsTitle = styled("h2")`
-  color: var(--accent-color);
+  color: #ffffff;
   font-size: 1.5rem;
   margin-bottom: 24px;
   text-align: center;
