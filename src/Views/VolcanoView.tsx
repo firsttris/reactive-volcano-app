@@ -94,7 +94,7 @@ const AudioCard = styled("div")`
 
 const ImageBgTop = styled("div")`
   min-width: 800px;
-  min-height: 150px;
+  min-height: 120px;
   background-image: url('/background-1.png');
   background-position: center;
   background-size: 800px;
@@ -228,8 +228,10 @@ export const VolcanoView: Component = () => {
         <SettingItem>
         </SettingItem>
       </SettingsContainer>
+
       <ImageBgLine />
-      <ZenStudio>
+
+       <ZenStudio>
        <ZenStudioTitle>{t("zenstudio")}</ZenStudioTitle>
        <YTVideo>
          <iframe width="800" height="480" src="https://www.youtube.com/embed/2wYtJwDkKIk?si=oNif7cIBLopPzclP?autoplay=1&loop=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>      
@@ -240,12 +242,10 @@ export const VolcanoView: Component = () => {
        <AudioCard>
         <div style="align: center, min-width: 800px"><audio controls src="/sound.mp3" loop /></div>
        </AudioCard>
-      </ZenStudio>
-
-
-      <FishTank>
+       </ZenStudio>
+       <FishTank>
 	<iframe width="800" height="480" src="https://www.youtube.com/embed/1zcIUk66HX4?si=_CRmoZZ-756DNcyJ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-      </FishTank>
+       </FishTank>
       <ImageBgFooter />
     </>
   );
