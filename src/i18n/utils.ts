@@ -10,6 +10,7 @@ export const defaultLang = (() =>
 
 export const ui = {
   en: {
+    socialstudio: "Social Studio",
     zenstudio: "Zen Studio",
     settings: "Settings",
     darkMode: "Dark Mode",
@@ -89,6 +90,7 @@ export const ui = {
     confirmImportAll: "This will replace all existing workflows. Are you sure?",
   },
   de: {
+    socialstudio: "Social Studio",
     zenstudio: "Zen Studio",
     settings: "Einstellungen",
     darkMode: "Dunkelmodus",
