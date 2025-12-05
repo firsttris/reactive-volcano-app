@@ -4,6 +4,7 @@ CHANGELOG
 # S&B BLE Fork v1.5
 
 # S&B BLE Fork v1.5
+- added social studio card.
 - added irc chat. channel SBBLEFork. Feel free to chat.
 
 # S&B BLE Fork v1.4
