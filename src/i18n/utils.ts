@@ -10,8 +10,6 @@ export const defaultLang = (() =>
 
 export const ui = {
   en: {
-    socialstudio: "Social Studio",
-    zenstudio: "Zen Studio",
     settings: "Settings",
     darkMode: "Dark Mode",
     standbyLight: "Standby Light",
@@ -48,16 +46,16 @@ export const ui = {
     reset: "Reset",
     deviceNotConnected: "Device not connected",
     connectingToDevice: "Connecting to device...",
-    connectYourDevice: "Connect Storz & Bickle Device",
+    connectYourDevice: "Connect Your Device",
     appSupportsDevices:
-      "This app supports Volcano Hybrid, Veazy, and Venty devices. Click the button above to connect via Bluetooth.",
+      "This app supports Volcano Hybrid, Veazy, and Venty devices. Click the button below to connect via Bluetooth.",
     connectDevice: "Connect Device",
     connectNewDevice: "Connect New Device",
     connectingTo: "Connecting to",
     targetTemperature: "Target Temperature",
     ventyVeazyTemperatureControl: "Venty/Veazy Temperature Control",
     currentTemperature: "Current Temperature",
-    hybrid: "Volcano Hybrid",
+    hybrid: "HYBRID",
     deviceWillShutdownIn: "Device will Shutdown in",
     sec: "sec",
     step: "Step",
@@ -90,8 +88,6 @@ export const ui = {
     confirmImportAll: "This will replace all existing workflows. Are you sure?",
   },
   de: {
-    socialstudio: "Social Studio",
-    zenstudio: "Zen Studio",
     settings: "Einstellungen",
     darkMode: "Dunkelmodus",
     standbyLight: "Standby-Licht",

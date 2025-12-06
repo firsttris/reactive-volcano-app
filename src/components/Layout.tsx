@@ -6,7 +6,7 @@ const ResponsiveContainer = styled("div")`
   display: flex;
   flex-direction: column;
   margin: 25px;
-  max-width: 800px;
+  max-width: 600px;
   width: 100%;
   margin-left: auto;
   margin-right: auto;
@@ -19,7 +19,7 @@ const ResponsiveContainer = styled("div")`
 
 export const Layout = (props: RouteSectionProps) => {
   return (
-    <div style={{ display: "flex", "flex-direction": "column", "background-image": "url('/background.png')", "background-position": "center", "background-size": "cover", "background-repeat": "no-repeat"}}>
+    <div style={{ display: "flex", "flex-direction": "column" }}>
       <ConnectionBar />
       <ResponsiveContainer>
         <div style={{ "margin-left": "20px", "margin-right": "20px" }}>

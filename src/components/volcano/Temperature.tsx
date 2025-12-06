@@ -14,13 +14,13 @@ const TempDisplay = styled("div")`
 const TempLabel = styled("span")`
   display: block;
   font-size: 0.9rem;
-  color: #ffffff;
+  color: var(--secondary-text);
   margin-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
 `;
 
-const DigitalText1 = styled("div")<{ isTarget?: boolean }>`
+const DigitalText = styled("div")<{ isTarget?: boolean }>`
   margin-bottom: -10px;
   font-family: "CustomFont";
   font-size: 72px;
@@ -42,35 +42,11 @@ const DigitalText1 = styled("div")<{ isTarget?: boolean }>`
       : ""}
 `;
 
-const DigitalText2 = styled("div")<{ isTarget?: boolean }>`
-  margin-bottom: -10px;
-  font-family: "CustomFont";
-  font-size: 72px;
-  line-height: 1;
-  min-width: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${(props) => (props.isTarget ? "var(--text-color)" : "#f60")};
-  transition: all 0.3s ease;
-
-  ${(props) =>
-    props.isTarget
-      ? `
-        color: gold;      
-        text-shadow: 
-          0 0 10px rgba(255, 102, 0, 0.8),
-          0 0 20px rgba(255, 102, 0, 0.6);
-      `
-      : ""}
-`;
-
 const FlexContainer = styled("div")`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
-
 `;
 
 const TempControls = styled("div")`
@@ -108,23 +84,23 @@ export const Temperature = () => {
     <FlexContainer>
       <TempDisplay>
         <TempLabel>{t("currentTemperature")}</TempLabel>
-        <DigitalText1>
+        <DigitalText>
           <TemperatureDisplay
             value={getCurrentTemperature()}
             unit={isCelsius() ? "C" : "F"}
           />
-        </DigitalText1>
+        </DigitalText>
       </TempDisplay>
       <TempControls>
         <RoundButton onClick={decreaseTemperature}>
           <FaSolidMinus size="24px" />
         </RoundButton>
-        <DigitalText2 isTarget={true}>
+        <DigitalText isTarget={true}>
           <TemperatureDisplay
             value={getTargetTemperature()}
             unit={isCelsius() ? "C" : "F"}
           />
-        </DigitalText2>
+        </DigitalText>
         <RoundButton onClick={increaseTemperature}>
           <FaSolidPlus size="24px" />
         </RoundButton>

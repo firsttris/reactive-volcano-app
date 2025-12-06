@@ -49,7 +49,7 @@ const SwitchButton = styled("div")<SwitchButtonProps>`
 
 const Label = styled("div")`
   margin-left: 10px;
-  color: #ffffff;
+  color: var(--text-color);
   font-size: 1rem;
 `;
 

@@ -11,8 +11,7 @@ const Container = styled("div")`
 `;
 
 const Title = styled("h3")`
-  color: #f60;
-  font-weight: bold;
+  color: var(--accent-color);
   font-size: 1.2rem;
   margin-bottom: 8px;
   font-family: CustomFont;
@@ -21,7 +20,7 @@ const Title = styled("h3")`
 const TimeDisplay = styled("div")`
   font-family: "CustomFont";
   font-size: 1.5rem;
-  color: #ffffff;
+  color: var(--text-color);
   display: flex;
   align-items: center;
 `;

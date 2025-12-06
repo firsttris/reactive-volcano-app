@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "npx tsc && vite build --base=/reactive-volcano-app/",
+    "build": "tsc && vite build --base=/reactive-volcano-app/",
     "build:root": "tsc && vite build",
     "preview": "vite preview",
     "format": "prettier --write .",

@@ -9,7 +9,6 @@ import { buildRoute } from "../routes";
 import { useTranslations } from "../i18n/utils";
 
 const Centered = styled("div")`
-  height: 580px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -25,7 +24,7 @@ const ConnectButton = styled("button")`
   gap: 15px;
   padding: 30px;
   border: 3px solid var(--accent-color);
-  background-color: #000000;
+  background: transparent;
   border-radius: 20px;
   cursor: pointer;
   color: var(--accent-color);
@@ -42,14 +41,14 @@ const ConnectButton = styled("button")`
   }
 `;
 
-const Title = styled("h1")`
-  color: #ff6600;
+const Title = styled("h2")`
+  color: var(--text-color);
   margin-bottom: 10px;
   text-align: center;
 `;
 
-const Subtitle = styled("h3")`
-  color: #ff6600;
+const Subtitle = styled("p")`
+  color: var(--secondary-text);
   text-align: center;
   max-width: 400px;
   line-height: 1.5;
@@ -62,8 +61,7 @@ const LoadingContainer = styled("div")`
   margin-top: 40px;
 `;
 
-const LoadingSubtitle = styled("h3")`
-  color: #ff6600;
+const LoadingSubtitle = styled("p")`
   margin-top: 35px;
 `;
 
@@ -122,11 +120,11 @@ export const Connect = () => {
       <Show when={isNotConnected()}>
         <Centered>
           <Title>{t("connectYourDevice")}</Title>
+          <Subtitle>{t("appSupportsDevices")}</Subtitle>
           <ConnectButton onClick={connect}>
             <BsBluetooth size="64px" />
             {t("connectDevice")}
           </ConnectButton>
-          <Subtitle>{t("appSupportsDevices")}</Subtitle>
         </Centered>
       </Show>
 

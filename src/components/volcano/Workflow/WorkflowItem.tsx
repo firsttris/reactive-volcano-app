@@ -21,7 +21,8 @@ interface WorkflowItemProps {
 }
 
 const Card = styled("div")<{ isActive?: boolean }>`
-  background: var(--bg-color);
+  background: ${(props) =>
+    props.isActive ? "rgba(255, 102, 0, 0.1)" : "var(--bg-color)"};
   border: 2px solid
     ${(props) =>
       props.isActive ? "var(--accent-color)" : "var(--border-color)"};

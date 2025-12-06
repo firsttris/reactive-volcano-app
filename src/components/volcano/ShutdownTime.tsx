@@ -19,7 +19,6 @@ const StyledDiv = styled("div")<StyledDivProps>`
   font-size: 1rem;
   font-weight: 600;
   text-align: center;
-  min-width: 800px;
 `;
 
 export const ShutdownTime = () => {
