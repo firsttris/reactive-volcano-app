@@ -2,7 +2,7 @@
 
 # Introduction
 
-The Volcano, Venty, and Veazy, made by Storz & Bickel in Tuttlingen, Germany, are well-known high-quality vaporizers. These devices can be controlled using the Bluetooth Web API.
+The Volcano, Venty, Veazy, and Crafty, made by Storz & Bickel in Tuttlingen, Germany, are well-known high-quality vaporizers. These devices can be controlled using the Bluetooth Web API.
 
 This project showcases how to use cutting-edge technology to control these devices via the Web Bluetooth API.
 
@@ -24,7 +24,7 @@ The Motivation behind implementing a WebApp for Storz & Bickel devices:
 - Showcase how a reactive application is the better choice for bidirectional Bluetooth communication.
 
 # Device Support
-This app supports the Volcano, Venty, and Veazy devices from Storz & Bickel. Note that available features may vary depending on the device model.
+This app supports the Volcano, Venty, Veazy, and Crafty devices from Storz & Bickel. For Crafty, both new and old firmware versions are supported. Note that available features may vary depending on the device model.
 
 # Test my App
 
