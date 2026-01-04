@@ -1,0 +1,16 @@
+[Unit]
+Description=Volcano App Container
+Wants=network-online.target
+After=network-online.target nss-lookup.target
+
+[Container]
+Image=your-dockerhub-username/volcano-app:latest
+PublishPort=8080:80
+AutoUpdate=registry
+
+[Service]
+Restart=always
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target
