@@ -157,8 +157,12 @@ export const Settings: Component = () => {
     setAutoOffCountdown,
   } = settings;
   const { getBoostTemperature, setBoostTemp } = temperature;
-  const { getFirmwareVersion, getFirmwareBLEVersion, getStatusRegister2 } =
-    firmware;
+  const {
+    getFirmwareVersion,
+    getFirmwareBLEVersion,
+    getStatusRegister2,
+    isOldCrafty,
+  } = firmware;
   const { getSystemStatus, getAkkuStatus, getAkkuStatus2, factoryReset } =
     systemStatus;
   const { getUseHours, getUseMinutes } = usageTime;
@@ -202,28 +206,32 @@ export const Settings: Component = () => {
           />
         </SettingItem>
 
-        {/* Auto Shutdown Time */}
-        <SettingItem>
-          <SettingLabel>{t("autoMaticShutdownTime")}</SettingLabel>
-          <Slider
-            min={0}
-            max={600}
-            step={60}
-            value={getAutoOffCountdown()}
-            label={`${t("autoMaticShutdownTime")}: ${Math.floor(getAutoOffCountdown() / 60)} min`}
-            onInput={setAutoOffCountdown}
-          />
-        </SettingItem>
+        {/* Auto Shutdown Time - only on Crafty+ */}
+        {!isOldCrafty() && (
+          <>
+            <SettingItem>
+              <SettingLabel>{t("autoMaticShutdownTime")}</SettingLabel>
+              <Slider
+                min={0}
+                max={600}
+                step={60}
+                value={getAutoOffCountdown()}
+                label={`${t("autoMaticShutdownTime")}: ${Math.floor(getAutoOffCountdown() / 60)} min`}
+                onInput={setAutoOffCountdown}
+              />
+            </SettingItem>
 
-        {/* Current Auto-Off Time */}
-        <SettingItem>
-          <SettingLabel>Current Auto-Off Time</SettingLabel>
-          <InfoDisplay>
-            {Math.floor(getAutoOffCurrentValue() / 60)}:
-            {(getAutoOffCurrentValue() % 60).toString().padStart(2, "0")} min
-            remaining
-          </InfoDisplay>
-        </SettingItem>
+            {/* Current Auto-Off Time */}
+            <SettingItem>
+              <SettingLabel>Current Auto-Off Time</SettingLabel>
+              <InfoDisplay>
+                {Math.floor(getAutoOffCurrentValue() / 60)}:
+                {(getAutoOffCurrentValue() % 60).toString().padStart(2, "0")} min
+                remaining
+              </InfoDisplay>
+            </SettingItem>
+          </>
+        )}
 
         {/* Firmware Information */}
         <SettingItem>
@@ -233,53 +241,64 @@ export const Settings: Component = () => {
               <StatusLabel>Firmware Version</StatusLabel>
               <StatusValue>{getFirmwareVersion()}</StatusValue>
             </StatusItem>
-            <StatusItem>
-              <StatusLabel>BLE Firmware Version</StatusLabel>
-              <StatusValue>{getFirmwareBLEVersion()}</StatusValue>
-            </StatusItem>
+            {!isOldCrafty() && (
+              <StatusItem>
+                <StatusLabel>BLE Firmware Version</StatusLabel>
+                <StatusValue>{getFirmwareBLEVersion()}</StatusValue>
+              </StatusItem>
+            )}
             <StatusItem>
               <StatusLabel>Status Register 2</StatusLabel>
               <StatusValue>{getStatusRegister2()}</StatusValue>
             </StatusItem>
           </StatusContainer>
+          {isOldCrafty() && (
+            <InfoDisplay style="margin-top: 10px; font-size: 0.9rem; color: var(--secondary-text);">
+              ⚠️ Old Crafty detected. Some features are not available.
+            </InfoDisplay>
+          )}
         </SettingItem>
 
-        {/* System Status */}
-        <SettingItem>
-          <SettingLabel>System Status</SettingLabel>
-          <StatusContainer>
-            <StatusItem>
-              <StatusLabel>System Status</StatusLabel>
-              <StatusValue>{getSystemStatus()}</StatusValue>
-            </StatusItem>
-            <StatusItem>
-              <StatusLabel>Akku Status</StatusLabel>
-              <StatusValue>{getAkkuStatus()}</StatusValue>
-            </StatusItem>
-            <StatusItem>
-              <StatusLabel>Akku Status 2</StatusLabel>
-              <StatusValue>{getAkkuStatus2()}</StatusValue>
-            </StatusItem>
-          </StatusContainer>
-        </SettingItem>
+        {/* System Status - only on Crafty+ */}
+        {!isOldCrafty() && (
+          <SettingItem>
+            <SettingLabel>System Status</SettingLabel>
+            <StatusContainer>
+              <StatusItem>
+                <StatusLabel>System Status</StatusLabel>
+                <StatusValue>{getSystemStatus()}</StatusValue>
+              </StatusItem>
+              <StatusItem>
+                <StatusLabel>Akku Status</StatusLabel>
+                <StatusValue>{getAkkuStatus()}</StatusValue>
+              </StatusItem>
+              <StatusItem>
+                <StatusLabel>Akku Status 2</StatusLabel>
+                <StatusValue>{getAkkuStatus2()}</StatusValue>
+              </StatusItem>
+            </StatusContainer>
+          </SettingItem>
+        )}
 
         {/* Usage Time */}
         <SettingItem>
           <SettingLabel>Usage Time</SettingLabel>
           <InfoDisplay>
-            {getUseHours()} hours {getUseMinutes()} minutes
+            {getUseHours()} hours {!isOldCrafty() && `${getUseMinutes()} minutes`}
           </InfoDisplay>
         </SettingItem>
 
-        {/* Factory Reset */}
-        <SettingItem>
-          <SettingLabel>Factory Reset</SettingLabel>
-          <ResetButtonContainer>
-            <ResetButton onClick={() => setShowResetModal(true)}>
-              Factory Reset
-            </ResetButton>
-          </ResetButtonContainer>
-        </SettingItem>
+        {/* Factory Reset - only on Crafty+ */}
+        {!isOldCrafty() && (
+          <SettingItem>
+            <SettingLabel>Factory Reset</SettingLabel>
+            <ResetButtonContainer>
+              <ResetButton onClick={() => setShowResetModal(true)}>
+                Factory Reset
+              </ResetButton>
+            </ResetButtonContainer>
+          </SettingItem>
+        )}
 
         {/* Dark Mode */}
         <SettingItem>

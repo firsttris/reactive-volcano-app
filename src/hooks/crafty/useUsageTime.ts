@@ -7,11 +7,16 @@ import {
 } from "../../utils/characteristic";
 import { useBluetooth } from "../../provider/BluetoothProvider";
 
-export const useUsageTime = () => {
+interface UseUsageTimeProps {
+  isOldCrafty?: () => boolean;
+}
+
+export const useUsageTime = (props?: UseUsageTimeProps) => {
   const [getUseHours, setUseHours] = createSignal(0);
   const [getUseMinutes, setUseMinutes] = createSignal(0);
   const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
+  const isOldDevice = props?.isOldCrafty || (() => false);
 
   const handleUseHours = (value: DataView) => {
     const hours = convertBLEToUint16(value);
@@ -27,6 +32,7 @@ export const useUsageTime = () => {
     const service = getCraftyControlService();
     if (!service) return;
 
+    // Hours are available on all Crafty devices
     const useHoursCharacteristic = await createCharateristicWithEventListener(
       service,
       CraftyCharacteristicUUIDs.useHoursCharacteristic,
@@ -40,18 +46,25 @@ export const useUsageTime = () => {
       useHoursCharacteristic,
     }));
 
-    const useMinutesCharacteristic = await createCharateristicWithEventListener(
-      service,
-      CraftyCharacteristicUUIDs.useMinutesCharacteristic,
-      handleUseMinutes
-    );
-    if (!useMinutesCharacteristic) {
-      return Promise.reject("useMinutesCharacteristic not found");
+    // Minutes only available on Crafty+ (firmware >= 2.51)
+    if (!isOldDevice()) {
+      try {
+        const useMinutesCharacteristic = await createCharateristicWithEventListener(
+          service,
+          CraftyCharacteristicUUIDs.useMinutesCharacteristic,
+          handleUseMinutes
+        );
+        if (useMinutesCharacteristic) {
+          setCharacteristics((prev) => ({
+            ...prev,
+            useMinutesCharacteristic,
+          }));
+        }
+      } catch (error) {
+        console.warn("Usage minutes not available (old Crafty)", error);
+        // Old Crafty only provides hours, so minutes remain 0
+      }
     }
-    setCharacteristics((prev) => ({
-      ...prev,
-      useMinutesCharacteristic,
-    }));
   };
 
   createEffect(() => {

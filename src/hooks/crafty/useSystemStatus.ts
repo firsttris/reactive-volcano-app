@@ -11,13 +11,18 @@ import {
 import { useBluetooth } from "../../provider/BluetoothProvider";
 import { useWriteToCharacteristic } from "../volcano/useWriteToCharacteristic";
 
-export const useSystemStatus = () => {
+interface UseSystemStatusProps {
+  isOldCrafty?: () => boolean;
+}
+
+export const useSystemStatus = (props?: UseSystemStatusProps) => {
   const [getSystemStatus, setSystemStatus] = createSignal(0);
   const [getAkkuStatus, setAkkuStatus] = createSignal(0);
   const [getAkkuStatus2, setAkkuStatus2] = createSignal(0);
   const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
+  const isOldDevice = props?.isOldCrafty || (() => false);
 
   const handleSystemStatus = (value: DataView) => {
     const status = convertBLEToUint16(value);
@@ -38,58 +43,64 @@ export const useSystemStatus = () => {
     const service = getCraftyControlService();
     if (!service) return;
 
-    const systemStatusCharacteristic =
-      await createCharateristicWithEventListener(
+    // System status features only available on Crafty+ (firmware >= 2.51)
+    if (isOldDevice()) {
+      console.log("System status features not available on old Crafty");
+      return;
+    }
+
+    try {
+      const systemStatusCharacteristic =
+        await createCharateristicWithEventListener(
+          service,
+          CraftyCharacteristicUUIDs.systemStatusCharacteristic,
+          handleSystemStatus
+        );
+      if (systemStatusCharacteristic) {
+        setCharacteristics((prev) => ({
+          ...prev,
+          systemStatusCharacteristic,
+        }));
+      }
+
+      const akkuStatusCharacteristic = await createCharateristicWithEventListener(
         service,
-        CraftyCharacteristicUUIDs.systemStatusCharacteristic,
-        handleSystemStatus
+        CraftyCharacteristicUUIDs.akkuStatusCharacteristic,
+        handleAkkuStatus
       );
-    if (!systemStatusCharacteristic) {
-      return Promise.reject("systemStatusCharacteristic not found");
-    }
-    setCharacteristics((prev) => ({
-      ...prev,
-      systemStatusCharacteristic,
-    }));
+      if (akkuStatusCharacteristic) {
+        setCharacteristics((prev) => ({
+          ...prev,
+          akkuStatusCharacteristic,
+        }));
+      }
 
-    const akkuStatusCharacteristic = await createCharateristicWithEventListener(
-      service,
-      CraftyCharacteristicUUIDs.akkuStatusCharacteristic,
-      handleAkkuStatus
-    );
-    if (!akkuStatusCharacteristic) {
-      return Promise.reject("akkuStatusCharacteristic not found");
-    }
-    setCharacteristics((prev) => ({
-      ...prev,
-      akkuStatusCharacteristic,
-    }));
+      const akkuStatusCharacteristic2 =
+        await createCharateristicWithEventListener(
+          service,
+          CraftyCharacteristicUUIDs.akkuStatusCharacteristic2,
+          handleAkkuStatus2
+        );
+      if (akkuStatusCharacteristic2) {
+        setCharacteristics((prev) => ({
+          ...prev,
+          akkuStatusCharacteristic2,
+        }));
+      }
 
-    const akkuStatusCharacteristic2 =
-      await createCharateristicWithEventListener(
-        service,
-        CraftyCharacteristicUUIDs.akkuStatusCharacteristic2,
-        handleAkkuStatus2
+      // factoryResetCharacteristic is write-only
+      const factoryResetCharacteristic = await service.getCharacteristic(
+        CraftyCharacteristicUUIDs.factoryResetCharacteristic
       );
-    if (!akkuStatusCharacteristic2) {
-      return Promise.reject("akkuStatusCharacteristic2 not found");
+      if (factoryResetCharacteristic) {
+        setCharacteristics((prev) => ({
+          ...prev,
+          factoryResetCharacteristic,
+        }));
+      }
+    } catch (error) {
+      console.warn("System status features not fully available", error);
     }
-    setCharacteristics((prev) => ({
-      ...prev,
-      akkuStatusCharacteristic2,
-    }));
-
-    // factoryResetCharacteristic is write-only
-    const factoryResetCharacteristic = await service.getCharacteristic(
-      CraftyCharacteristicUUIDs.factoryResetCharacteristic
-    );
-    if (!factoryResetCharacteristic) {
-      return Promise.reject("factoryResetCharacteristic not found");
-    }
-    setCharacteristics((prev) => ({
-      ...prev,
-      factoryResetCharacteristic,
-    }));
   };
 
   const factoryReset = async () => {

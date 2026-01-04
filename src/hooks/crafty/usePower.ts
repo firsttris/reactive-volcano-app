@@ -11,11 +11,16 @@ import {
 import { useBluetooth } from "../../provider/BluetoothProvider";
 import { useWriteToCharacteristic } from "../volcano/useWriteToCharacteristic";
 
-export const usePower = () => {
+interface UsePowerProps {
+  isOldCrafty?: () => boolean;
+}
+
+export const usePower = (props?: UsePowerProps) => {
   const [getPowerChanged, setPowerChanged] = createSignal(0);
   const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
+  const isOldDevice = props?.isOldCrafty || (() => false);
 
   const handlePowerChanged = (value: DataView) => {
     const power = convertBLEToUint16(value);
@@ -26,6 +31,7 @@ export const usePower = () => {
     const service = getCraftyControlService();
     if (!service) return;
 
+    // Power characteristic is available on all Crafty devices
     const powerChanged = await createCharateristicWithEventListener(
       service,
       CraftyCharacteristicUUIDs.powerChanged,
@@ -39,28 +45,32 @@ export const usePower = () => {
       powerChanged,
     }));
 
-    // heaterOn and heaterOff are write-only, no listeners needed
-    const heaterOn = await service.getCharacteristic(
-      CraftyCharacteristicUUIDs.heaterOn
-    );
-    if (!heaterOn) {
-      return Promise.reject("heaterOnCharacteristic not found");
-    }
-    setCharacteristics((prev) => ({
-      ...prev,
-      heaterOn,
-    }));
+    // heaterOn and heaterOff only available on Crafty+ (firmware >= 2.51)
+    if (!isOldDevice()) {
+      try {
+        const heaterOn = await service.getCharacteristic(
+          CraftyCharacteristicUUIDs.heaterOn
+        );
+        if (heaterOn) {
+          setCharacteristics((prev) => ({
+            ...prev,
+            heaterOn,
+          }));
+        }
 
-    const heaterOff = await service.getCharacteristic(
-      CraftyCharacteristicUUIDs.heaterOff
-    );
-    if (!heaterOff) {
-      return Promise.reject("heaterOffCharacteristic not found");
+        const heaterOff = await service.getCharacteristic(
+          CraftyCharacteristicUUIDs.heaterOff
+        );
+        if (heaterOff) {
+          setCharacteristics((prev) => ({
+            ...prev,
+            heaterOff,
+          }));
+        }
+      } catch (error) {
+        console.warn("Heater on/off controls not available (old Crafty)", error);
+      }
     }
-    setCharacteristics((prev) => ({
-      ...prev,
-      heaterOff,
-    }));
   };
 
   const turnHeaterOn = async () => {

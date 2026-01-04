@@ -25,13 +25,17 @@ type CraftyDeviceProviderProps = {
 
 export const CraftyDeviceProvider = (props: CraftyDeviceProviderProps) => {
   console.log("Crafty Device Provider: Initializing Crafty device provider");
-  // Alle Bluetooth-Hooks werden hier zentral einmal instanziiert
-  const temperature = useTemperature();
-  const power = usePower();
-  const settings = useSettings();
-  const systemStatus = useSystemStatus();
+  
+  // Initialize firmware hook first to determine device capabilities
   const firmware = useFirmware();
-  const usageTime = useUsageTime();
+  const isOldCrafty = firmware.isOldCrafty;
+  
+  // Pass isOldCrafty to hooks that need conditional logic
+  const temperature = useTemperature();
+  const power = usePower({ isOldCrafty });
+  const settings = useSettings({ isOldCrafty });
+  const systemStatus = useSystemStatus({ isOldCrafty });
+  const usageTime = useUsageTime({ isOldCrafty });
   const projectRegister = useProjectRegister();
 
   return (

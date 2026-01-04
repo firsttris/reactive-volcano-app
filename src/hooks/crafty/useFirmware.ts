@@ -7,16 +7,53 @@ import {
 } from "../../utils/characteristic";
 import { useBluetooth } from "../../provider/BluetoothProvider";
 
+/**
+ * Parse firmware version string (e.g., "V2.48" or "V3.01")
+ * Returns { major, minor } or null if parsing fails
+ */
+const parseFirmwareVersion = (version: string): { major: number; minor: number } | null => {
+  // Expected format: "V2.48" or "V3.01"
+  const match = version.match(/V?(\d+)\.(\d+)/);
+  if (!match) return null;
+  
+  return {
+    major: parseInt(match[1], 10),
+    minor: parseInt(match[2], 10)
+  };
+};
+
+/**
+ * Check if firmware version indicates old Crafty (firmware <= 2.51)
+ * Old Crafty devices don't support many BLE characteristics
+ */
+const isOldCraftyFirmware = (version: string): boolean => {
+  const parsed = parseFirmwareVersion(version);
+  if (!parsed) return false;
+  
+  // Old Crafty: firmware <= 2.51
+  return parsed.major < 2 || (parsed.major === 2 && parsed.minor < 51);
+};
+
 export const useFirmware = () => {
   const [getFirmwareVersion, setFirmwareVersion] = createSignal("");
   const [getFirmwareBLEVersion, setFirmwareBLEVersion] = createSignal("");
   const [getStatusRegister2, setStatusRegister2] = createSignal(0);
+  const [isOldCrafty, setIsOldCrafty] = createSignal(false);
   const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
 
   const handleFirmwareVersion = (value: DataView) => {
-    const version = convertBLEToUint16(value);
-    setFirmwareVersion(version.toString());
+    const decoder = new TextDecoder("utf-8");
+    const versionString = decoder.decode(value);
+    setFirmwareVersion(versionString);
+    
+    // Check if this is an old Crafty device
+    const isOld = isOldCraftyFirmware(versionString);
+    setIsOldCrafty(isOld);
+    
+    if (isOld) {
+      console.log(`Old Crafty detected (firmware: ${versionString}). Some features will be unavailable.`);
+    }
   };
 
   const handleFirmwareBLEVersion = (value: DataView) => {
@@ -33,6 +70,7 @@ export const useFirmware = () => {
     const service = getCraftyControlService();
     if (!service) return;
 
+    // First get firmware version to determine device capabilities
     const firmwareVersion = await createCharateristicWithEventListener(
       service,
       CraftyCharacteristicUUIDs.firmwareVersion,
@@ -46,18 +84,24 @@ export const useFirmware = () => {
       firmwareVersion,
     }));
 
-    const firmwareBLEVersion = await createCharateristicWithEventListener(
-      service,
-      CraftyCharacteristicUUIDs.firmwareBLEVersion,
-      handleFirmwareBLEVersion
-    );
-    if (!firmwareBLEVersion) {
-      return Promise.reject("firmwareBLEVersionCharacteristic not found");
+    // BLE firmware version only available on Crafty+ (firmware >= 2.51)
+    if (!isOldCrafty()) {
+      try {
+        const firmwareBLEVersion = await createCharateristicWithEventListener(
+          service,
+          CraftyCharacteristicUUIDs.firmwareBLEVersion,
+          handleFirmwareBLEVersion
+        );
+        if (firmwareBLEVersion) {
+          setCharacteristics((prev) => ({
+            ...prev,
+            firmwareBLEVersion,
+          }));
+        }
+      } catch (error) {
+        console.warn("Firmware BLE version not available (old Crafty)", error);
+      }
     }
-    setCharacteristics((prev) => ({
-      ...prev,
-      firmwareBLEVersion,
-    }));
 
     const statusRegister2 = await createCharateristicWithEventListener(
       service,
@@ -95,6 +139,7 @@ export const useFirmware = () => {
     getFirmwareVersion,
     getFirmwareBLEVersion,
     getStatusRegister2,
+    isOldCrafty,
     handleCharacteristics,
   };
 };
