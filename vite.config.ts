@@ -1,9 +1,13 @@
 import { defineConfig } from "vite";
 import solid from "vite-plugin-solid";
 import { VitePWA } from "vite-plugin-pwa";
+import legacy from "@vitejs/plugin-legacy";
 
 export default defineConfig({
   plugins: [
+    legacy({
+      targets: ["iOS >= 10", "Safari >= 10"],
+    }),
     solid(),
     VitePWA({
       registerType: "autoUpdate",
