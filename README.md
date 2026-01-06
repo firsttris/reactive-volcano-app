@@ -1,6 +1,6 @@
 # Reactive Vaporizer App
 
-[Deutsch](README_de.md)
+[German Version](README_de.md)
 
 # Introduction
 
