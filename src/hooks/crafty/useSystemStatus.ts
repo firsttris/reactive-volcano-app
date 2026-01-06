@@ -19,6 +19,7 @@ export const useSystemStatus = (props?: UseSystemStatusProps) => {
   const [getSystemStatus, setSystemStatus] = createSignal(0);
   const [getAkkuStatus, setAkkuStatus] = createSignal(0);
   const [getAkkuStatus2, setAkkuStatus2] = createSignal(0);
+  const [isInitialized, setIsInitialized] = createSignal(false);
   const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
@@ -41,13 +42,16 @@ export const useSystemStatus = (props?: UseSystemStatusProps) => {
 
   const handleCharacteristics = async () => {
     const service = getCraftyControlService();
-    if (!service) return;
+    if (!service || isInitialized()) return;
 
     // System status features only available on Crafty+ (firmware >= 2.51)
     if (isOldDevice()) {
       console.log("System status features not available on old Crafty");
+      setIsInitialized(true);
       return;
     }
+
+    console.log(`useSystemStatus: Starting initialization (isOldCrafty: ${isOldDevice()})`);
 
     try {
       const systemStatusCharacteristic =
@@ -101,6 +105,9 @@ export const useSystemStatus = (props?: UseSystemStatusProps) => {
     } catch (error) {
       console.warn("System status features not fully available", error);
     }
+    
+    setIsInitialized(true);
+    console.log("useSystemStatus: Initialization complete");
   };
 
   const factoryReset = async () => {
@@ -112,7 +119,16 @@ export const useSystemStatus = (props?: UseSystemStatusProps) => {
   };
 
   createEffect(() => {
-    handleCharacteristics();
+    // Wait for firmware detection before initializing
+    // This ensures isOldCrafty is set correctly
+    const oldDevice = isOldDevice();
+    const service = getCraftyControlService();
+    
+    // Only proceed if service is available
+    if (service) {
+      console.log(`useSystemStatus: Initializing (isOldCrafty: ${oldDevice})`);
+      handleCharacteristics();
+    }
   });
 
   onCleanup(() => {

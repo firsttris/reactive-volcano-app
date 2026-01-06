@@ -14,6 +14,7 @@ interface UseUsageTimeProps {
 export const useUsageTime = (props?: UseUsageTimeProps) => {
   const [getUseHours, setUseHours] = createSignal(0);
   const [getUseMinutes, setUseMinutes] = createSignal(0);
+  const [isInitialized, setIsInitialized] = createSignal(false);
   const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
   const isOldDevice = props?.isOldCrafty || (() => false);
@@ -30,7 +31,9 @@ export const useUsageTime = (props?: UseUsageTimeProps) => {
 
   const handleCharacteristics = async () => {
     const service = getCraftyControlService();
-    if (!service) return;
+    if (!service || isInitialized()) return;
+
+    console.log(`useUsageTime: Starting initialization (isOldCrafty: ${isOldDevice()})`);
 
     // Hours are available on all Crafty devices
     const useHoursCharacteristic = await createCharateristicWithEventListener(
@@ -65,10 +68,22 @@ export const useUsageTime = (props?: UseUsageTimeProps) => {
         // Old Crafty only provides hours, so minutes remain 0
       }
     }
+    
+    setIsInitialized(true);
+    console.log("useUsageTime: Initialization complete");
   };
 
   createEffect(() => {
-    handleCharacteristics();
+    // Wait for firmware detection before initializing
+    // This ensures isOldCrafty is set correctly
+    const oldDevice = isOldDevice();
+    const service = getCraftyControlService();
+    
+    // Only proceed if service is available
+    if (service) {
+      console.log(`useUsageTime: Initializing (isOldCrafty: ${oldDevice})`);
+      handleCharacteristics();
+    }
   });
 
   onCleanup(() => {

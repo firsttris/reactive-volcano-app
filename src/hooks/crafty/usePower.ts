@@ -17,6 +17,7 @@ interface UsePowerProps {
 
 export const usePower = (props?: UsePowerProps) => {
   const [getPowerChanged, setPowerChanged] = createSignal(0);
+  const [isInitialized, setIsInitialized] = createSignal(false);
   const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
@@ -29,7 +30,9 @@ export const usePower = (props?: UsePowerProps) => {
 
   const handleCharacteristics = async () => {
     const service = getCraftyControlService();
-    if (!service) return;
+    if (!service || isInitialized()) return;
+
+    console.log(`usePower: Starting initialization (isOldCrafty: ${isOldDevice()})`);
 
     // Power characteristic is available on all Crafty devices
     const powerChanged = await createCharateristicWithEventListener(
@@ -71,6 +74,9 @@ export const usePower = (props?: UsePowerProps) => {
         console.warn("Heater on/off controls not available (old Crafty)", error);
       }
     }
+    
+    setIsInitialized(true);
+    console.log("usePower: Initialization complete");
   };
 
   const turnHeaterOn = async () => {
@@ -82,7 +88,16 @@ export const usePower = (props?: UsePowerProps) => {
   };
 
   createEffect(() => {
-    handleCharacteristics();
+    // Wait for firmware detection before initializing
+    // This ensures isOldCrafty is set correctly
+    const oldDevice = isOldDevice();
+    const service = getCraftyControlService();
+    
+    // Only proceed if service is available
+    if (service) {
+      console.log(`usePower: Initializing (isOldCrafty: ${oldDevice})`);
+      handleCharacteristics();
+    }
   });
 
   onCleanup(() => {

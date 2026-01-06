@@ -19,6 +19,7 @@ export const useSettings = (props?: UseSettingsProps) => {
   const [getLedBrightness, setLedBrightness] = createSignal(0);
   const [getAutoOffCountdown, setAutoOffCountdown] = createSignal(0);
   const [getAutoOffCurrentValue, setAutoOffCurrentValue] = createSignal(0);
+  const [isInitialized, setIsInitialized] = createSignal(false);
   const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
@@ -41,7 +42,9 @@ export const useSettings = (props?: UseSettingsProps) => {
 
   const handleCharacteristics = async () => {
     const service = getCraftyControlService();
-    if (!service) return;
+    if (!service || isInitialized()) return;
+
+    console.log(`useSettings: Starting initialization (isOldCrafty: ${isOldDevice()})`);
 
     // LED brightness is available on all Crafty devices
     const ledBrightness = await createCharateristicWithEventListener(
@@ -87,6 +90,9 @@ export const useSettings = (props?: UseSettingsProps) => {
         console.warn("Auto-off features not available (old Crafty)", error);
       }
     }
+    
+    setIsInitialized(true);
+    console.log("useSettings: Initialization complete");
   };
 
   const setLedBrightnessValue = async (value: number) => {
@@ -106,7 +112,16 @@ export const useSettings = (props?: UseSettingsProps) => {
   };
 
   createEffect(() => {
-    handleCharacteristics();
+    // Wait for firmware detection before initializing
+    // This ensures isOldCrafty is set correctly
+    const oldDevice = isOldDevice();
+    const service = getCraftyControlService();
+    
+    // Only proceed if service is available
+    if (service) {
+      console.log(`useSettings: Initializing (isOldCrafty: ${oldDevice})`);
+      handleCharacteristics();
+    }
   });
 
   onCleanup(() => {
