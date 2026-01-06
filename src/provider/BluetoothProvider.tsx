@@ -48,6 +48,14 @@ const createBluetoothMethods = () => {
   const [getCraftyStatusService, setCraftyStatusService] =
     createSignal<BluetoothRemoteGATTService>();
 
+  const isIOS = () => {
+    return (
+      navigator.userAgent.includes("iPhone") ||
+      navigator.userAgent.includes("iPad") ||
+      navigator.userAgent.includes("WebBLE/1")
+    );
+  };
+
   const [getCharacteristics, setCharacteristics] =
     createSignal<DeviceCharacteristics>({});
 
@@ -264,22 +272,32 @@ const createBluetoothMethods = () => {
   };
 
   const getDeviceFilters = () => {
-    const baseFilters = [
-      { namePrefix: "STORZ&BICKEL" },
-      { namePrefix: "Storz&Bickel" },
-      { namePrefix: "S&B" },
-      {
-        services: [
-          ServiceUUIDs.Crafty1,
-          ServiceUUIDs.Crafty2,
-          ServiceUUIDs.Crafty3,
-        ],
-      }, // Crafty services
-      { services: [ServiceUUIDs.DeviceState, ServiceUUIDs.DeviceControl] }, // Volcano services
-      { services: [ServiceUUIDs.Primary] }, // Veazy/Venty service
-    ];
+    if (isIOS()) {
+      // On iOS, only use namePrefix filters as services are not supported
+      return [
+        { namePrefix: "STORZ&BICKEL" },
+        { namePrefix: "Storz&Bickel" },
+        { namePrefix: "S&B" },
+      ];
+    } else {
+      // On Android/Desktop, use both namePrefix and services
+      const baseFilters = [
+        { namePrefix: "STORZ&BICKEL" },
+        { namePrefix: "Storz&Bickel" },
+        { namePrefix: "S&B" },
+        {
+          services: [
+            ServiceUUIDs.Crafty1,
+            ServiceUUIDs.Crafty2,
+            ServiceUUIDs.Crafty3,
+          ],
+        }, // Crafty services
+        { services: [ServiceUUIDs.DeviceState, ServiceUUIDs.DeviceControl] }, // Volcano services
+        { services: [ServiceUUIDs.Primary] }, // Veazy/Venty service
+      ];
 
-    return baseFilters;
+      return baseFilters;
+    }
   };
 
   const getOptionalServices = () => [
