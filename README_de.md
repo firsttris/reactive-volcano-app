@@ -40,6 +40,10 @@ Dieses Projekt basiert auf einer soliden Grundlage modernster Technologien, um e
 - **[Web Bluetooth API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API)**: Eine Schnittstelle, die die Möglichkeit bietet, sich mit Bluetooth Low Energy Peripheriegeräten zu verbinden und zu interagieren.
 - **[p-queue](https://github.com/sindresorhus/p-queue)**: Eine Promise-Queue mit Parallelitätskontrolle, verwendet zur Optimierung der Bluetooth-Kommunikation.
 
+# Browser-Unterstützung
+
+Die App unterstützt Chrome und den Bluefy BLE Browser in iOS.
+
 # Benutzeroberfläche Übersicht
 
 Die Benutzeroberfläche ist responsiv und für Desktop- und Mobilgeräte optimiert.
