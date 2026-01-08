@@ -6,6 +6,7 @@ import {
 import { CraftyCharacteristicUUIDs } from "../../utils/uuids";
 import {
   createCharateristicWithEventListener,
+  createCharateristic,
   detachEventListener,
 } from "../../utils/characteristic";
 import { useBluetooth } from "../../provider/BluetoothProvider";
@@ -48,7 +49,9 @@ export const useTemperature = () => {
     }
     console.log("Crafty Temperature: Setting up temperature characteristics");
 
-    const targetTemperature = await createCharateristicWithEventListener(
+    // writeTemp characteristic does NOT support notifications on old Crafty devices
+    // Use createCharateristic (read only) instead of createCharateristicWithEventListener
+    const targetTemperature = await createCharateristic(
       service,
       CraftyCharacteristicUUIDs.writeTemp,
       handleTargetTemperature
@@ -78,7 +81,9 @@ export const useTemperature = () => {
       currTemperatureChanged: currentTemperature,
     }));
 
-    const boostTemperature = await createCharateristicWithEventListener(
+    // writeBoostTemp characteristic does NOT support notifications on old Crafty devices
+    // Use createCharateristic (read only) instead of createCharateristicWithEventListener
+    const boostTemperature = await createCharateristic(
       service,
       CraftyCharacteristicUUIDs.writeBoostTemp,
       handleBoostTemperature
@@ -117,16 +122,11 @@ export const useTemperature = () => {
   });
 
   onCleanup(() => {
-    const { writeTemp, currTemperatureChanged, writeBoostTemp } =
-      getCharacteristics();
-    if (writeTemp) {
-      detachEventListener(writeTemp, handleTargetTemperature);
-    }
+    const { currTemperatureChanged } = getCharacteristics();
+    // Only cleanup currTemperatureChanged which uses notifications
+    // writeTemp and writeBoostTemp don't use notifications
     if (currTemperatureChanged) {
       detachEventListener(currTemperatureChanged, handleCurrentTemperature);
-    }
-    if (writeBoostTemp) {
-      detachEventListener(writeBoostTemp, handleBoostTemperature);
     }
   });
 
