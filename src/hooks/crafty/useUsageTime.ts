@@ -1,10 +1,7 @@
-import { createEffect, createSignal, onCleanup } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { convertBLEToUint16 } from "../../utils/bluetoothUtils";
 import { CraftyCharacteristicUUIDs } from "../../utils/uuids";
-import {
-  createCharateristicWithEventListener,
-  detachEventListener,
-} from "../../utils/characteristic";
+import { createCharateristic } from "../../utils/characteristic";
 import { useBluetooth } from "../../provider/BluetoothProvider";
 
 interface UseUsageTimeProps {
@@ -15,7 +12,7 @@ export const useUsageTime = (props?: UseUsageTimeProps) => {
   const [getUseHours, setUseHours] = createSignal(0);
   const [getUseMinutes, setUseMinutes] = createSignal(0);
   const [isInitialized, setIsInitialized] = createSignal(false);
-  const { getCraftyControlService, getCharacteristics, setCharacteristics } =
+  const { getCraftyStatusService, setCharacteristics } =
     useBluetooth();
   const isOldDevice = props?.isOldCrafty || (() => false);
 
@@ -30,13 +27,15 @@ export const useUsageTime = (props?: UseUsageTimeProps) => {
   };
 
   const handleCharacteristics = async () => {
-    const service = getCraftyControlService();
+    // useHours (0x23) and useMinutes (0x1e3) are in Crafty3 (Status service)
+    const service = getCraftyStatusService();
     if (!service || isInitialized()) return;
 
     console.log(`useUsageTime: Starting initialization (isOldCrafty: ${isOldDevice()})`);
 
     // Hours are available on all Crafty devices
-    const useHoursCharacteristic = await createCharateristicWithEventListener(
+    // NOTE: This characteristic does NOT support notifications - use createCharateristic (read-only)
+    const useHoursCharacteristic = await createCharateristic(
       service,
       CraftyCharacteristicUUIDs.useHoursCharacteristic,
       handleUseHours
@@ -50,9 +49,10 @@ export const useUsageTime = (props?: UseUsageTimeProps) => {
     }));
 
     // Minutes only available on Crafty+ (firmware >= 2.51)
+    // NOTE: This characteristic does NOT support notifications - use createCharateristic (read-only)
     if (!isOldDevice()) {
       try {
-        const useMinutesCharacteristic = await createCharateristicWithEventListener(
+        const useMinutesCharacteristic = await createCharateristic(
           service,
           CraftyCharacteristicUUIDs.useMinutesCharacteristic,
           handleUseMinutes
@@ -77,7 +77,7 @@ export const useUsageTime = (props?: UseUsageTimeProps) => {
     // Wait for firmware detection before initializing
     // This ensures isOldCrafty is set correctly
     const oldDevice = isOldDevice();
-    const service = getCraftyControlService();
+    const service = getCraftyStatusService();
     
     // Only proceed if service is available
     if (service) {
@@ -86,16 +86,7 @@ export const useUsageTime = (props?: UseUsageTimeProps) => {
     }
   });
 
-  onCleanup(() => {
-    const { useHoursCharacteristic, useMinutesCharacteristic } =
-      getCharacteristics();
-    if (useHoursCharacteristic) {
-      detachEventListener(useHoursCharacteristic, handleUseHours);
-    }
-    if (useMinutesCharacteristic) {
-      detachEventListener(useMinutesCharacteristic, handleUseMinutes);
-    }
-  });
+  // No onCleanup needed - useHours and useMinutes don't use notifications
 
   return {
     getUseHours,

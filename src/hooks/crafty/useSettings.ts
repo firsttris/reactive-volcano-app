@@ -6,6 +6,7 @@ import {
 import { CraftyCharacteristicUUIDs } from "../../utils/uuids";
 import {
   createCharateristicWithEventListener,
+  createCharateristic,
   detachEventListener,
 } from "../../utils/characteristic";
 import { useBluetooth } from "../../provider/BluetoothProvider";
@@ -47,7 +48,8 @@ export const useSettings = (props?: UseSettingsProps) => {
     console.log(`useSettings: Starting initialization (isOldCrafty: ${isOldDevice()})`);
 
     // LED brightness is available on all Crafty devices
-    const ledBrightness = await createCharateristicWithEventListener(
+    // NOTE: This characteristic does NOT support notifications - use createCharateristic (read-only)
+    const ledBrightness = await createCharateristic(
       service,
       CraftyCharacteristicUUIDs.ledBrightness,
       handleLedBrightness
@@ -63,7 +65,8 @@ export const useSettings = (props?: UseSettingsProps) => {
     // Auto-off features only available on Crafty+ (firmware >= 2.51)
     if (!isOldDevice()) {
       try {
-        const autoOffCountdown = await createCharateristicWithEventListener(
+        // autoOffCountdown does NOT support notifications - use createCharateristic (read-only)
+        const autoOffCountdown = await createCharateristic(
           service,
           CraftyCharacteristicUUIDs.autoOffCountdown,
           handleAutoOffCountdown
@@ -75,6 +78,7 @@ export const useSettings = (props?: UseSettingsProps) => {
           }));
         }
 
+        // autoOffCurrentValue DOES support notifications
         const autoOffCurrentValue = await createCharateristicWithEventListener(
           service,
           CraftyCharacteristicUUIDs.autoOffCurrentValue,
@@ -125,14 +129,9 @@ export const useSettings = (props?: UseSettingsProps) => {
   });
 
   onCleanup(() => {
-    const { ledBrightness, autoOffCountdown, autoOffCurrentValue } =
-      getCharacteristics();
-    if (ledBrightness) {
-      detachEventListener(ledBrightness, handleLedBrightness);
-    }
-    if (autoOffCountdown) {
-      detachEventListener(autoOffCountdown, handleAutoOffCountdown);
-    }
+    const { autoOffCurrentValue } = getCharacteristics();
+    // Only autoOffCurrentValue uses notifications
+    // ledBrightness and autoOffCountdown are read-only (no notifications)
     if (autoOffCurrentValue) {
       detachEventListener(autoOffCurrentValue, handleAutoOffCurrentValue);
     }

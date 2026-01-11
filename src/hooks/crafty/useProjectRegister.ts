@@ -18,7 +18,7 @@ interface UseProjectRegisterProps {
 export const useProjectRegister = (props?: UseProjectRegisterProps) => {
   const [getProjectRegister, setProjectRegister] = createSignal(0);
   const [isInitialized, setIsInitialized] = createSignal(false);
-  const { getCraftyControlService, getCharacteristics, setCharacteristics } =
+  const { getCraftyStatusService, getCharacteristics, setCharacteristics } =
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
   const isOldDevice = props?.isOldCrafty || (() => false);
@@ -29,7 +29,8 @@ export const useProjectRegister = (props?: UseProjectRegisterProps) => {
   };
 
   const handleCharacteristics = async () => {
-    const service = getCraftyControlService();
+    // handleProjectRegister (0x93) and sicherheitscode (0x1b3) are in Crafty3 (Status service)
+    const service = getCraftyStatusService();
     if (!service || isInitialized()) return;
 
     console.log(`useProjectRegister: Starting initialization (isOldCrafty: ${isOldDevice()})`);
@@ -102,7 +103,7 @@ export const useProjectRegister = (props?: UseProjectRegisterProps) => {
     // Wait for firmware detection before initializing
     // This ensures isOldCrafty is set correctly
     const oldDevice = isOldDevice();
-    const service = getCraftyControlService();
+    const service = getCraftyStatusService();
     
     // Only proceed if service is available
     if (service) {
