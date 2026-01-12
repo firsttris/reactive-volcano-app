@@ -86,6 +86,7 @@ export const WorkflowForm: Component = () => {
 
   const handleSubmit = (event: Event) => {
     event.preventDefault();
+    if (!workflowListId || !workflowStepId) return;
     editWorkflowStepInList(workflowListId, workflowStepId, {
       id: workflowStepId,
       temperature: temperature(),
@@ -133,7 +134,7 @@ export const WorkflowForm: Component = () => {
           <ButtonGroup>
             <StyledButton
               type="button"
-              onClick={() => navigate(buildRoute.workflowList(workflowListId))}
+              onClick={() => workflowListId && navigate(buildRoute.workflowList(workflowListId))}
             >
               <FiX size={20} />
               {t("cancel")}

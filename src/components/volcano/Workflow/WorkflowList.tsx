@@ -195,7 +195,7 @@ export const WorkflowList = () => {
                     <StepActions>
                       <IconButton
                         onClick={() =>
-                          navigate(
+                          workflowListId && navigate(
                             buildRoute.workflowForm(
                               workflowListId,
                               workflowItem.id
@@ -207,7 +207,7 @@ export const WorkflowList = () => {
                       </IconButton>
                       <IconButton
                         onClick={() =>
-                          deleteWorkflowStepFromList(
+                          workflowListId && deleteWorkflowStepFromList(
                             workflowListId,
                             workflowItem.id
                           )
@@ -233,7 +233,9 @@ export const WorkflowList = () => {
           </StyledButton>
           <StyledButton
             onClick={() => {
-              updateWorkflowStepsInList(workflowListId, workflowSteps());
+              if (workflowListId) {
+                updateWorkflowStepsInList(workflowListId, workflowSteps());
+              }
               navigate(buildRoute.volcanoRoot());
             }}
           >
