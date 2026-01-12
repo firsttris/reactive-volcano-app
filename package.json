@@ -9,12 +9,16 @@
     "build:root": "tsc && vite build",
     "preview": "vite preview",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@fontsource/roboto": "^5.2.8",
-    "@solidjs/router": "^0.15.3",
-    "p-queue": "^9.0.0",
+    "@fontsource/roboto": "^5.2.9",
+    "@solidjs/router": "^0.15.4",
+    "p-queue": "^9.1.0",
     "solid-icons": "^1.1.0",
     "solid-js": "^1.9.10",
     "solid-styled-components": "^0.28.5",
@@ -23,16 +27,18 @@
   "devDependencies": {
     "@types/uuid": "^11.0.0",
     "@types/web-bluetooth": "^0.0.21",
-    "@typescript-eslint/eslint-plugin": "^8.46.3",
-    "@typescript-eslint/parser": "^8.46.3",
+    "@typescript-eslint/eslint-plugin": "^8.52.0",
+    "@typescript-eslint/parser": "^8.52.0",
     "@vitejs/plugin-legacy": "^7.2.1",
-    "eslint": "^9.39.1",
+    "@vitest/coverage-v8": "^4.0.16",
+    "eslint": "^9.39.2",
     "eslint-plugin-solid": "^0.14.5",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.4",
     "terser": "^5.44.1",
     "typescript": "^5.9.3",
-    "vite": "^7.3.0",
-    "vite-plugin-pwa": "^1.1.0",
-    "vite-plugin-solid": "^2.11.10"
+    "vite": "^7.3.1",
+    "vite-plugin-pwa": "^1.2.0",
+    "vite-plugin-solid": "^2.11.10",
+    "vitest": "^4.0.16"
   }
 }
