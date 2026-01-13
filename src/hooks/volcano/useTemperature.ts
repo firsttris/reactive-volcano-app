@@ -57,7 +57,11 @@ export const useTemperature = () => {
   };
 
   createEffect(() => {
-    console.log("CreateEffect in useTemperature");
+    const service = getVolcanoControlService(); // Track als reactive dependency
+    if (!service) {
+      console.log("No service yet, skipping characteristic setup");
+      return;
+    }
     handleCharacteristics();
   });
 

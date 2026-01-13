@@ -5,7 +5,7 @@ const DB_NAME = "VolcanoWorkflowDB";
 const DB_VERSION = 3; // Increased version to upgrade the database
 const STORE_NAME = "keyValueStore"; // Single store for all key-value pairs
 
-const openDB = (): Promise<IDBDatabase> => {
+export const openDB = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     request.onerror = () => reject(request.error);
@@ -27,7 +27,7 @@ const openDB = (): Promise<IDBDatabase> => {
   });
 };
 
-const loadFromDB = async <T>(key: string): Promise<T | null> => {
+export const loadFromDB = async <T>(key: string): Promise<T | null> => {
   const db = await openDB();
   const transaction = db.transaction([STORE_NAME], "readonly");
   const store = transaction.objectStore(STORE_NAME);
@@ -38,7 +38,7 @@ const loadFromDB = async <T>(key: string): Promise<T | null> => {
   });
 };
 
-const saveToDB = async <T>(key: string, value: T): Promise<void> => {
+export const saveToDB = async <T>(key: string, value: T): Promise<void> => {
   const db = await openDB();
   const transaction = db.transaction([STORE_NAME], "readwrite");
   const store = transaction.objectStore(STORE_NAME);
