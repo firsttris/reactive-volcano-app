@@ -17,6 +17,7 @@ interface UsePowerProps {
 
 export const usePower = (props?: UsePowerProps) => {
   const [getPowerChanged, setPowerChanged] = createSignal(0);
+  const [getBatteryPercent, setBatteryPercent] = createSignal(0);
   const [isInitialized, setIsInitialized] = createSignal(false);
   const { getCraftyControlService, getCharacteristics, setCharacteristics } =
     useBluetooth();
@@ -26,6 +27,10 @@ export const usePower = (props?: UsePowerProps) => {
   const handlePowerChanged = (value: DataView) => {
     const power = convertBLEToUint16(value);
     setPowerChanged(power);
+    // The powerChanged characteristic (0x41) contains battery percentage
+    // This is available on all Crafty devices (both old and new)
+    setBatteryPercent(power);
+    console.log("Crafty Power: Battery percentage updated to", power);
   };
 
   const handleCharacteristics = async () => {
@@ -109,6 +114,7 @@ export const usePower = (props?: UsePowerProps) => {
 
   return {
     getPowerChanged,
+    getBatteryPercent,
     turnHeaterOn,
     turnHeaterOff,
     handleCharacteristics,

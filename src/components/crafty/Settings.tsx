@@ -147,7 +147,7 @@ const ModalButton = styled(Button)<{ variant?: "danger" | "cancel" }>`
 `;
 
 export const Settings: Component = () => {
-  const { settings, temperature, firmware, systemStatus, usageTime } =
+  const { settings, temperature, firmware, systemStatus, usageTime, power } =
     useCraftyDeviceContext();
   const {
     getLedBrightness,
@@ -157,6 +157,7 @@ export const Settings: Component = () => {
     setAutoOffCountdown,
   } = settings;
   const { getBoostTemperature, setBoostTemp } = temperature;
+  const { getBatteryPercent } = power;
   const {
     getFirmwareVersion,
     getFirmwareBLEVersion,
@@ -184,11 +185,11 @@ export const Settings: Component = () => {
         <SettingItem>
           <SettingLabel>Boost Temperature</SettingLabel>
           <Slider
-            min={150}
-            max={250}
-            step={5}
+            min={0}
+            max={30}
+            step={1}
             value={getBoostTemperature()}
-            label={`Boost Temperature: ${getBoostTemperature()} °C`}
+            label={`Boost Temperature: ${getBoostTemperature()}`}
             onInput={setBoostTemp}
           />
         </SettingItem>
@@ -259,17 +260,28 @@ export const Settings: Component = () => {
           )}
         </SettingItem>
 
+        {/* Battery Status - available on all Crafty devices */}
+        <SettingItem>
+          <SettingLabel>Battery Status</SettingLabel>
+          <StatusContainer>
+            <StatusItem>
+              <StatusLabel>Battery Level</StatusLabel>
+              <StatusValue>{getBatteryPercent()} %</StatusValue>
+            </StatusItem>
+          </StatusContainer>
+        </SettingItem>
+
         {/* System Status - only on Crafty+ */}
         {!isOldCrafty() && (
           <SettingItem>
-            <SettingLabel>System Status</SettingLabel>
+            <SettingLabel>System Status (Crafty+ only)</SettingLabel>
             <StatusContainer>
               <StatusItem>
                 <StatusLabel>System Status</StatusLabel>
                 <StatusValue>{getSystemStatus()}</StatusValue>
               </StatusItem>
               <StatusItem>
-                <StatusLabel>Akku Status</StatusLabel>
+                <StatusLabel>Akku Status 1</StatusLabel>
                 <StatusValue>{getAkkuStatus()}</StatusValue>
               </StatusItem>
               <StatusItem>

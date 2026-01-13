@@ -145,8 +145,8 @@ export const useTemperature = () => {
   };
 
   const setBoostTemp = async (value: number) => {
-    // Clamp value to valid range
-    const clampedValue = Math.max(1, Math.min(99, value));
+    // Clamp value to valid range (0-30)
+    const clampedValue = Math.max(0, Math.min(30, value));
     console.log("Crafty Temperature: Setting boost temperature to", clampedValue);
     
     // Update local state immediately for responsive UI

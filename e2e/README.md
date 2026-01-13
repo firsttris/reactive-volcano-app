@@ -96,32 +96,6 @@ test('Mein Test', async ({ page, bluetoothDevice }) => {
 - `VENTY` - S&B Venty
 - `VEAZY` - S&B Veazy
 
-## 🧪 Testabdeckung
-
-Die Tests decken ab:
-
-### Allgemeine App-Funktionen (`app.spec.ts`)
-- ✅ Startseite laden
-- ✅ Dark Mode
-- ✅ Responsive Design (Mobile, Tablet, Desktop)
-- ✅ Navigation
-
-### Volcano-Tests (`volcano.spec.ts`)
-- ✅ Verbindung herstellen
-- ✅ Temperatur anzeigen und steuern
-- ✅ Heizung steuern
-- ✅ Verbindung trennen
-
-### Crafty-Tests (`crafty.spec.ts`)
-- ✅ Verbindung herstellen
-- ✅ Temperatur anzeigen
-- ✅ Heizung steuern
-
-### Venty/Veazy-Tests (`venty-veazy.spec.ts`)
-- ✅ Verbindung herstellen
-- ✅ Temperatur anzeigen
-- ✅ Boost-Steuerung
-
 ## 🔍 Debugging
 
 ### Browser DevTools öffnen

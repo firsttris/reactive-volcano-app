@@ -74,13 +74,22 @@ export const Temperature = () => {
     temperature;
 
   const t = useTranslations();
+  
+  const MIN_TEMP = 40;
+  const MAX_TEMP = 210;
 
   const increaseTemperature = () => {
-    setTemperature(getTargetTemperature() + 1);
+    const currentTemp = getTargetTemperature();
+    if (currentTemp < MAX_TEMP) {
+      setTemperature(currentTemp + 1);
+    }
   };
 
   const decreaseTemperature = () => {
-    setTemperature(getTargetTemperature() - 1);
+    const currentTemp = getTargetTemperature();
+    if (currentTemp > MIN_TEMP) {
+      setTemperature(currentTemp - 1);
+    }
   };
 
   return (
@@ -92,13 +101,19 @@ export const Temperature = () => {
         </DigitalText>
       </TempDisplay>
       <TempControls>
-        <RoundButton onClick={decreaseTemperature}>
+        <RoundButton 
+          onClick={decreaseTemperature}
+          disabled={getTargetTemperature() <= MIN_TEMP}
+        >
           <FaSolidMinus size="24px" />
         </RoundButton>
         <DigitalText isTarget={true}>
           <TemperatureDisplay value={getTargetTemperature()} unit="C" />
         </DigitalText>
-        <RoundButton onClick={increaseTemperature}>
+        <RoundButton 
+          onClick={increaseTemperature}
+          disabled={getTargetTemperature() >= MAX_TEMP}
+        >
           <FaSolidPlus size="24px" />
         </RoundButton>
       </TempControls>
