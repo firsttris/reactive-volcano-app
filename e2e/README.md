@@ -23,33 +23,6 @@ Die Tests verwenden einen **Bluetooth-Mock**, da echte Bluetooth-Geräte in CI-U
 - Custom Fixtures für einfache Bluetooth-Mock-Integration
 - Wiederverwendbare Test-Utilities
 
-## 🚀 Tests ausführen
-
-### Alle Tests ausführen
-```bash
-npm run test:e2e
-```
-
-### Tests mit UI (interaktiv)
-```bash
-npm run test:e2e:ui
-```
-
-### Tests im Headed-Modus (Browser sichtbar)
-```bash
-npm run test:e2e:headed
-```
-
-### Tests debuggen
-```bash
-npm run test:e2e:debug
-```
-
-### Test-Report anzeigen
-```bash
-npm run test:e2e:report
-```
-
 ## 📁 Struktur
 
 ```
