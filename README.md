@@ -44,10 +44,6 @@ This app supports the following Storz & Bickel devices:
 - 🌍 **Localization** (German & English)
 - 💾 **PWA** (Progressive Web App)
 
-### Non-implemented Features
-- Workflows
-- Analytics
-
 ## 🎮 Test my App
 
 Access & Test the WebApp here: **[Reactive Vaporizer App](https://firsttris.github.io/reactive-volcano-app/)**
