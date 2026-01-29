@@ -52,6 +52,15 @@ This app supports the following Storz & Bickel devices:
 
 Access & Test the WebApp here: **[Reactive Vaporizer App](https://firsttris.github.io/reactive-volcano-app/)**
 
+## 🐧 Prerequisites
+
+Make sure the **Web Bluetooth API** is activated in your browser.
+
+1. Open Chrome and navigate to `chrome://flags/#enable-web-bluetooth`.
+2. Enable the flag as shown in the image below.
+
+![Enabling Web Bluetooth API in Chrome](/docs/web-bluetooth-api.png)
+
 ## 🖼️ User Interface Overview
 
 <details>
@@ -87,6 +96,10 @@ The user interface is responsive and designed to work well on both desktop and m
 
 ## 📲 Adding the PWA to Your Home Screen
 
+<details>
+<summary><b>Click to see PWA installation steps</b></summary>
+<br>
+
 Progressive Web Apps can be installed on your device like native apps.
 
 ### On Android:
@@ -99,7 +112,15 @@ Progressive Web Apps can be installed on your device like native apps.
 2. Tap the Share button (the box with an arrow pointing upwards).
 3. Scroll down and tap "Add to Home Screen".
 
+</details>
+
+
+
 ## 🛠️ Development and Build
+
+<details>
+<summary><b>Click to see Development and Build steps</b></summary>
+<br>
 
 To develop and build this project, follow these steps:
 
@@ -124,16 +145,13 @@ To develop and build this project, follow these steps:
    npm run build
    ```
 
-### 🐧 Prerequisites for Linux
-
-In Linux there is no official support for Web Bluetooth API in Chrome. However, you can still enable it:
-
-1. Open Chrome and navigate to `chrome://flags/#enable-web-bluetooth`.
-2. Enable the flag as shown in the image below.
-
-![Enabling Web Bluetooth API in Chrome](/docs/web-bluetooth-api.png)
+</details>
 
 ### 🐛 Remote Debugging on Android
+
+<details>
+<summary><b>Click to see Remote Debugging steps</b></summary>
+<br>
 
 1. **Enable USB Debugging** on your Android device.
 2. **Connect Your Device** via USB.
@@ -144,6 +162,8 @@ In Linux there is no official support for Web Bluetooth API in Chrome. However, 
 6. **Enable Remote Debugging**: On your PC, go to `chrome://inspect/#devices`.
    ![inspect](docs/inspect.png)
 7. **Debug**: Click "inspect" to open the DevTools.
+
+</details>
 
 ## ⚠️ Connection Issues and Pitfalls
 

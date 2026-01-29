@@ -50,6 +50,15 @@ Diese App unterstützt die folgenden Storz & Bickel Geräte:
 
 Greifen Sie auf meine WebApp zu und testen Sie sie hier: **[Reactive Vaporizer App](https://firsttris.github.io/reactive-volcano-app/)**
 
+## 🐧 Voraussetzungen
+
+Stellen Sie sicher, dass die **Web Bluetooth API** in Ihrem Browser aktiviert ist.
+
+1. Öffnen Sie Chrome und navigieren Sie zu `chrome://flags/#enable-web-bluetooth`.
+2. Aktivieren Sie das Flag wie im Bild unten gezeigt.
+
+![Aktivierung der Web Bluetooth API in Chrome](/docs/web-bluetooth-api.png)
+
 ## 🖼️ Benutzeroberfläche Übersicht
 
 <details>
@@ -85,6 +94,10 @@ Die Benutzeroberfläche ist responsiv und für Desktop- und Mobilgeräte optimie
 
 ## 📲 Hinzufügen der PWA zu Ihrem Startbildschirm
 
+<details>
+<summary><b>Klicken, um Schritte zum Hinzufügen der PWA anzuzeigen</b></summary>
+<br>
+
 Progressive Web Apps können wie native Apps auf Ihrem Gerät installiert werden.
 
 ### Auf Android:
@@ -97,7 +110,15 @@ Progressive Web Apps können wie native Apps auf Ihrem Gerät installiert werden
 2. Tippen Sie auf die Teilen-Schaltfläche (das Feld mit einem nach oben zeigenden Pfeil).
 3. Scrollen Sie nach unten und tippen Sie auf "Zum Startbildschirm hinzufügen".
 
+</details>
+
+
+
 ## 🛠️ Entwicklung und Build
+
+<details>
+<summary><b>Klicken, um Schritte für Entwicklung und Build anzuzeigen</b></summary>
+<br>
 
 Um dieses Projekt zu entwickeln und zu bauen, folgen Sie diesen Schritten:
 
@@ -122,16 +143,13 @@ Um dieses Projekt zu entwickeln und zu bauen, folgen Sie diesen Schritten:
    npm run build
    ```
 
-### 🐧 Voraussetzungen für Linux
-
-Unter Linux gibt es keine offizielle Unterstützung für die Web Bluetooth API in Chrome. Sie können sie jedoch trotzdem aktivieren:
-
-1. Öffnen Sie Chrome und navigieren Sie zu `chrome://flags/#enable-web-bluetooth`.
-2. Aktivieren Sie das Flag wie im Bild unten gezeigt.
-
-![Aktivierung der Web Bluetooth API in Chrome](/docs/web-bluetooth-api.png)
+</details>
 
 ### 🐛 Remote-Debugging auf Android
+
+<details>
+<summary><b>Klicken, um Schritte für Remote-Debugging anzuzeigen</b></summary>
+<br>
 
 1. **USB-Debugging aktivieren** auf Ihrem Android-Gerät.
 2. **Gerät verbinden** über USB.
@@ -142,6 +160,8 @@ Unter Linux gibt es keine offizielle Unterstützung für die Web Bluetooth API i
 6. **Remote-Debugging aktivieren**: Gehen Sie auf Ihrem PC zu `chrome://inspect/#devices`.
    ![inspect](docs/inspect.png)
 7. **Debuggen**: Klicken Sie auf "inspect", um die DevTools zu öffnen.
+
+</details>
 
 ## ⚠️ Verbindungsprobleme und Fallstricke
 
