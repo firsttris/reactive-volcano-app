@@ -2,8 +2,15 @@
 
 # Reactive Vaporizer App
 
+<img src="./docs/ui-1.png" alt="User Interface" height="500" />
+
 [![Build](https://github.com/firsttris/reactive-volcano-app/actions/workflows/build.yml/badge.svg)](https://github.com/firsttris/reactive-volcano-app/actions/workflows/build.yml)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+
+[![SolidJS](https://img.shields.io/badge/SolidJS-2c4f7c?style=for-the-badge&logo=solid&logoColor=c8c8c8)](https://www.solidjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Styled Components](https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white)](https://styled-components.com/)
 
 **Control your Storz & Bickel devices with cutting-edge Web Bluetooth technology.**
 
@@ -11,18 +18,6 @@
 
 </div>
 
----
-
-<div align="center">
-
-[![SolidJS](https://img.shields.io/badge/SolidJS-2c4f7c?style=for-the-badge&logo=solid&logoColor=c8c8c8)](https://www.solidjs.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Styled Components](https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white)](https://styled-components.com/)
-
-</div>
-
----
 
 ## 📖 Introduction
 
@@ -59,18 +54,36 @@ Access & Test the WebApp here: **[Reactive Vaporizer App](https://firsttris.gith
 
 ## 🖼️ User Interface Overview
 
+<details>
+<summary><b>Click to view User Interface screenshots</b></summary>
+<br>
+
 The user interface is responsive and designed to work well on both desktop and mobile devices.
 
 ### Click on the Bluetooth icon to initiate Bluetooth discovery
+<div align="center">
+
 ![Bluetooth Discovery](/docs/bluetooth-connect.png)
 
+</div>
+
 ### Effortlessly control your Storz & Bickel device
+<div align="center">
+
 ![User Interface](/docs/ui-1.png)
 ![User Interface](/docs/ui-2.png)
 
+</div>
+
 ### Veazy Venty
+<div align="center">
+
 ![User Interface](/docs/veazy1.png)
 ![User Interface](/docs/veazy2.png)
+
+</div>
+
+</details>
 
 ## 📲 Adding the PWA to Your Home Screen
 

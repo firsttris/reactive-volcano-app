@@ -2,25 +2,20 @@
 
 # Reactive Vaporizer App
 
+<img src="./docs/ui-1.png" alt="User Interface" height="500" />
+
 [![Build](https://github.com/firsttris/reactive-volcano-app/actions/workflows/build.yml/badge.svg)](https://github.com/firsttris/reactive-volcano-app/actions/workflows/build.yml)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-
-**Steuern Sie Ihre Storz & Bickel Geräte mit modernster Web Bluetooth Technologie.**
-
-</div>
-
----
-
-<div align="center">
 
 [![SolidJS](https://img.shields.io/badge/SolidJS-2c4f7c?style=for-the-badge&logo=solid&logoColor=c8c8c8)](https://www.solidjs.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Styled Components](https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white)](https://styled-components.com/)
 
+**Steuern Sie Ihre Storz & Bickel Geräte mit modernster Web Bluetooth Technologie.**
+
 </div>
 
----
 
 ## 📖 Einführung
 
@@ -57,18 +52,36 @@ Greifen Sie auf meine WebApp zu und testen Sie sie hier: **[Reactive Vaporizer A
 
 ## 🖼️ Benutzeroberfläche Übersicht
 
+<details>
+<summary><b>Klicken Sie hier, um Screenshots der Benutzeroberfläche anzuzeigen</b></summary>
+<br>
+
 Die Benutzeroberfläche ist responsiv und für Desktop- und Mobilgeräte optimiert.
 
 ### Klicken Sie auf das Bluetooth-Symbol, um die Bluetooth-Suche zu starten
+<div align="center">
+
 ![Bluetooth Discovery](/docs/bluetooth-connect.png)
 
+</div>
+
 ### Steuern Sie mühelos Ihr Storz & Bickel Gerät
+<div align="center">
+
 ![User Interface](/docs/ui-1.png)
 ![User Interface](/docs/ui-2.png)
 
+</div>
+
 ### Veazy Venty
+<div align="center">
+
 ![User Interface](/docs/veazy1.png)
 ![User Interface](/docs/veazy2.png)
+
+</div>
+
+</details>
 
 ## 📲 Hinzufügen der PWA zu Ihrem Startbildschirm
 
