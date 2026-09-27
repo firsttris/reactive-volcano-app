@@ -1,6 +1,6 @@
 import { ActiveRoundButton } from "../Button";
 import { SiFireship } from "solid-icons/si";
-import { useCraftyDeviceContext } from "../../provider/CraftyDeviceProvider";
+import { useCrafty } from "../../provider/CraftyProvider";
 import { styled } from "solid-styled-components";
 import { Show } from "solid-js";
 
@@ -31,30 +31,13 @@ const WarningText = styled("div")`
 `;
 
 export const HeaterControl = () => {
-  const { power, firmware, projectRegister } = useCraftyDeviceContext();
-  const { turnHeaterOn, turnHeaterOff } = power;
-  const { isHeaterActive } = projectRegister;
-  const { isOldCrafty } = firmware;
-
-  const toggleHeater = () => {
-    // Heater on/off controls only available on Crafty+ (firmware >= 2.51)
-    if (isOldCrafty()) {
-      console.warn("Heater controls not available on old Crafty");
-      return;
-    }
-
-    if (isHeaterActive()) {
-      turnHeaterOff();
-    } else {
-      turnHeaterOn();
-    }
-  };
+  const { actions, derived, isOldFirmware } = useCrafty();
 
   return (
     <Container>
       <TextContainer>Crafty</TextContainer>
       <Show
-        when={!isOldCrafty()}
+        when={!isOldFirmware}
         fallback={
           <WarningText>
             ⚠️ Heater controls not available on old Crafty (firmware &lt;=
@@ -64,7 +47,10 @@ export const HeaterControl = () => {
           </WarningText>
         }
       >
-        <ActiveRoundButton isActive={isHeaterActive()} onClick={toggleHeater}>
+        <ActiveRoundButton
+          isActive={derived.isHeaterActive()}
+          onClick={actions.toggleHeater}
+        >
           <SiFireship size="30px" />
         </ActiveRoundButton>
       </Show>

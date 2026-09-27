@@ -7,44 +7,6 @@ export enum States {
   VIBRATION = 0x400,
 }
 
-// Crafty project register (0x93) bits (from crafty.js)
-export enum CraftyProjectRegisterBits {
-  CRAFTY_ACTIVE = 1 << 4,
-  BOOST_MODE_ENABLED = 1 << 5,
-  SUPERBOOST_MODE_ENABLED = 1 << 6,
-}
-
-// Codes that must be written to the Crafty "sicherheitscode" characteristic
-// before protected settings can be changed (from crafty.js)
-export enum CraftySecurityCodes {
-  AUTO_OFF_COUNTDOWN = 815,
-  FACTORY_RESET = 1000,
-}
-
-// Veazy/Venty Write Masks (from qvap.js)
-export enum VentyVeazyWriteMasks {
-  SET_TEMPERATURE = 1 << 1,
-  SET_BOOST = 1 << 2,
-  SET_SUPERBOOST = 1 << 3,
-  HEATER = 1 << 5,
-  SETTINGS = 1 << 7,
-}
-
-// Veazy/Venty Settings Bits (from qvap.js)
-export enum VentyVeazySettingsBits {
-  UNIT = 1 << 0,
-  SETPOINT_REACHED = 1 << 1,
-  FACTORY_RESET = 1 << 2,
-  ECOMODE_CHARGE = 1 << 3,
-  BUTTON_CHANGED_FILLING_CHAMBER = 1 << 4,
-  ECOMODE_VOLTAGE = 1 << 5,
-  BOOST_VISUALIZATION = 1 << 6,
-}
-
-export enum VentyVeazySettings2Bits {
-  BLE_PERMANENT = 1 << 0,
-}
-
 // Volcano Services
 export enum VolcanoServiceUUIDs {
   Bootloader = "00000001-1989-0108-1234-123456789abc",
@@ -142,17 +104,6 @@ const CharateristicUUIDs = {
   ...VentyVeazyCharacteristicUUIDs,
   ...CraftyCharacteristicUUIDs,
 };
-
-// Device-specific characteristic types
-export type VolcanoCharacteristics = Record<
-  keyof typeof VolcanoCharacteristicUUIDs,
-  BluetoothRemoteGATTCharacteristic | undefined
->;
-
-export type CraftyCharacteristics = Record<
-  keyof typeof CraftyCharacteristicUUIDs,
-  BluetoothRemoteGATTCharacteristic | undefined
->;
 
 export type CharateristicUUIDsKeys = keyof typeof CharateristicUUIDs;
 

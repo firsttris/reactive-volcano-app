@@ -7,7 +7,7 @@ import { Settings } from "../components/crafty/Settings";
 import { useBluetooth } from "../provider/BluetoothProvider";
 import { ConnectionState } from "../utils/uuids";
 import { buildRoute } from "../routes";
-import { CraftyDeviceProvider } from "../provider/CraftyDeviceProvider";
+import { CraftyProvider } from "../provider/CraftyProvider";
 
 const MainCard = styled("div")`
   background: var(--secondary-bg);
@@ -18,12 +18,27 @@ const MainCard = styled("div")`
   max-width: 600px;
 `;
 
-const CraftyViewContent: Component = () => {
-  console.log("Crafty View: Rendering Crafty view");
+const CraftyViewContent: Component = () => (
+  <>
+    {/* Main Controls */}
+    <MainCard>
+      <div style={{ "margin-bottom": "24px" }}>
+        <Temperature />
+      </div>
+      <HeaterControl />
+    </MainCard>
+
+    {/* Settings */}
+    <Settings />
+  </>
+);
+
+export const CraftyView: Component = () => {
   const navigate = useNavigate();
   const { connectionState } = useBluetooth();
 
-  // Redirect to connect page if not connected
+  // Redirect to connect page if not connected (the provider renders nothing
+  // without a connected device, so this must live outside of it)
   createEffect(() => {
     const state = connectionState();
     if (
@@ -35,25 +50,8 @@ const CraftyViewContent: Component = () => {
   });
 
   return (
-    <>
-      {/* Main Controls */}
-      <MainCard>
-        <div style={{ "margin-bottom": "24px" }}>
-          <Temperature />
-        </div>
-        <HeaterControl />
-      </MainCard>
-
-      {/* Settings */}
-      <Settings />
-    </>
-  );
-};
-
-export const CraftyView: Component = () => {
-  return (
-    <CraftyDeviceProvider>
+    <CraftyProvider>
       <CraftyViewContent />
-    </CraftyDeviceProvider>
+    </CraftyProvider>
   );
 };

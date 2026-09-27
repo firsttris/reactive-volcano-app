@@ -12,6 +12,7 @@ import {
   type VentyVeazyDriver,
 } from "../devices/ventyVeazy/driver";
 import type { VentyVeazyModel } from "../devices/ventyVeazy/protocol";
+import { connectCrafty, type CraftyDriver } from "../devices/crafty/driver";
 
 type DeviceCharacteristics = Record<
   string,
@@ -45,13 +46,7 @@ const createBluetoothMethods = () => {
   const [ventyVeazyDriver, setVentyVeazyDriver] =
     createSignal<VentyVeazyDriver>();
 
-  //Crafty services
-  const [getCraftyDeviceInfoService, setCraftyDeviceInfoService] =
-    createSignal<BluetoothRemoteGATTService>();
-  const [getCraftyControlService, setCraftyControlService] =
-    createSignal<BluetoothRemoteGATTService>();
-  const [getCraftyStatusService, setCraftyStatusService] =
-    createSignal<BluetoothRemoteGATTService>();
+  const [craftyDriver, setCraftyDriver] = createSignal<CraftyDriver>();
 
   const isIOS = () => {
     return (
@@ -90,9 +85,7 @@ const createBluetoothMethods = () => {
     setConnectionState(ConnectionState.NOT_CONNECTED);
     setVolcanoStateService(undefined);
     setVolcanoControlService(undefined);
-    setCraftyDeviceInfoService(undefined);
-    setCraftyControlService(undefined);
-    setCraftyStatusService(undefined);
+    setCraftyDriver(undefined);
     setVentyVeazyDriver(undefined);
     setCharacteristics({});
     setDeviceInfo({ type: DeviceType.UNKNOWN, name: "" });
@@ -100,19 +93,19 @@ const createBluetoothMethods = () => {
     setDevice(undefined);
   };
 
-  const disposeVentyVeazyDriver = async () => {
-    const driver = ventyVeazyDriver();
-    if (driver) await driver.dispose();
+  const disposeDrivers = async () => {
+    await ventyVeazyDriver()?.dispose();
+    await craftyDriver()?.dispose();
   };
 
   const handleDisconnect = (event: Event) => {
     console.log("🔌 Device disconnected unexpectedly:", event);
-    disposeVentyVeazyDriver();
+    disposeDrivers();
     resetState();
   };
 
   const disconnect = async () => {
-    await disposeVentyVeazyDriver();
+    await disposeDrivers();
 
     // Remove event listener before disconnecting
     const currentDevice = device();
@@ -166,24 +159,9 @@ const createBluetoothMethods = () => {
   };
 
   const connectToCrafty = async (server: BluetoothRemoteGATTServer) => {
-    console.log("Crafty: Connecting to Crafty device...");
-    const craftyService1 = await getPrimaryService(
-      server,
-      ServiceUUIDs.Crafty1
-    );
-    const craftyService2 = await getPrimaryService(
-      server,
-      ServiceUUIDs.Crafty2
-    );
-    const craftyService3 = await getPrimaryService(
-      server,
-      ServiceUUIDs.Crafty3
-    );
-    // Crafty1: control, Crafty2: device info, Crafty3: status registers, usage time, etc.
-    setCraftyControlService(craftyService1);
-    setCraftyDeviceInfoService(craftyService2);
-    setCraftyStatusService(craftyService3);
-    console.log("Crafty: Crafty services connected successfully");
+    const driver = await connectCrafty(server, bluetoothQueue);
+    // The CraftyProvider subscribes to the driver and then starts it
+    setCraftyDriver(driver);
   };
 
   const connectToVolcano = async (server: BluetoothRemoteGATTServer) => {
@@ -231,7 +209,6 @@ const createBluetoothMethods = () => {
         actualDeviceType === DeviceType.VEAZY ? "VEAZY" : "VENTY"
       );
     } else if (actualDeviceType === DeviceType.CRAFTY) {
-      console.log("Crafty: Detected Crafty device, connecting...");
       await connectToCrafty(server);
     } else {
       await connectToVolcano(server);
@@ -315,9 +292,7 @@ const createBluetoothMethods = () => {
     getVolcanoStateService,
     getVolcanoControlService,
     ventyVeazyDriver,
-    getCraftyControlService,
-    getCraftyDeviceInfoService,
-    getCraftyStatusService,
+    craftyDriver,
     getCharacteristics,
     setCharacteristics,
   };

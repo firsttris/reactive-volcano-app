@@ -106,27 +106,91 @@ export async function mockBluetooth(page: Page, deviceType: DeviceType = 'VOLCAN
       CRAFTY: {
         name: 'STORZ&BICKEL',
         services: {
-          '00000001-4c45-4b43-4942-265a524f5453': { // Crafty Service 1
+          '00000001-4c45-4b43-4942-265a524f5453': { // Crafty Service 1 (control)
             characteristics: {
-              '00000008-4c45-4b43-4942-265a524f5453': { // Serial Number
-                properties: { read: true, notify: false, write: false, writeWithoutResponse: false },
-                value: new TextEncoder().encode('12345678'),
+              '00000021-4c45-4b43-4942-265a524f5453': { // Target Temperature (185°C)
+                properties: { read: true, notify: false, write: true, writeWithoutResponse: false },
+                value: new Uint8Array([0x3A, 0x07]),
               },
-            },
-          },
-          '00000002-4c45-4b43-4942-265a524f5453': { // Crafty Service 2
-            characteristics: {
-              '00000210-4c45-4b43-4942-265a524f5453': { // Target Temperature
-                properties: { read: true, notify: true, write: true, writeWithoutResponse: false },
-                value: new Uint8Array([0xB4]), // 180°C
-              },
-            },
-          },
-          '00000003-4c45-4b43-4942-265a524f5453': { // Crafty Service 3
-            characteristics: {
-              '00000310-4c45-4b43-4942-265a524f5453': { // Status
+              '00000011-4c45-4b43-4942-265a524f5453': { // Current Temperature (180°C)
                 properties: { read: true, notify: true, write: false, writeWithoutResponse: false },
-                value: new Uint8Array([0x00]),
+                value: new Uint8Array([0x08, 0x07]),
+              },
+              '00000031-4c45-4b43-4942-265a524f5453': { // Boost Temperature (10°C)
+                properties: { read: true, notify: false, write: true, writeWithoutResponse: false },
+                value: new Uint8Array([0x64, 0x00]),
+              },
+              '00000041-4c45-4b43-4942-265a524f5453': { // Battery (80%)
+                properties: { read: true, notify: true, write: false, writeWithoutResponse: false },
+                value: new Uint8Array([0x50, 0x00]),
+              },
+              '00000051-4c45-4b43-4942-265a524f5453': { // LED Brightness
+                properties: { read: true, notify: false, write: true, writeWithoutResponse: false },
+                value: new Uint8Array([0x46, 0x00]),
+              },
+              '00000061-4c45-4b43-4942-265a524f5453': { // Auto-Off Countdown (120 s)
+                properties: { read: true, notify: false, write: true, writeWithoutResponse: false },
+                value: new Uint8Array([0x78, 0x00]),
+              },
+              '00000071-4c45-4b43-4942-265a524f5453': { // Auto-Off Remaining
+                properties: { read: true, notify: true, write: false, writeWithoutResponse: false },
+                value: new Uint8Array([0x5A, 0x00]),
+              },
+              '00000081-4c45-4b43-4942-265a524f5453': { // Heater On
+                properties: { read: false, notify: false, write: true, writeWithoutResponse: false },
+              },
+              '00000091-4c45-4b43-4942-265a524f5453': { // Heater Off
+                properties: { read: false, notify: false, write: true, writeWithoutResponse: false },
+              },
+            },
+          },
+          '00000002-4c45-4b43-4942-265a524f5453': { // Crafty Service 2 (device info)
+            characteristics: {
+              '00000032-4c45-4b43-4942-265a524f5453': { // Firmware Version
+                properties: { read: true, notify: false, write: false, writeWithoutResponse: false },
+                value: new TextEncoder().encode('V03.01'),
+              },
+              '00000072-4c45-4b43-4942-265a524f5453': { // BLE Firmware Version
+                properties: { read: true, notify: false, write: false, writeWithoutResponse: false },
+                value: new Uint8Array([1, 2, 3]),
+              },
+            },
+          },
+          '00000003-4c45-4b43-4942-265a524f5453': { // Crafty Service 3 (status)
+            characteristics: {
+              '00000023-4c45-4b43-4942-265a524f5453': { // Use Hours
+                properties: { read: true, notify: false, write: false, writeWithoutResponse: false },
+                value: new Uint8Array([0x0C, 0x00]),
+              },
+              '000001e3-4c45-4b43-4942-265a524f5453': { // Use Minutes
+                properties: { read: true, notify: false, write: false, writeWithoutResponse: false },
+                value: new Uint8Array([0x22, 0x00]),
+              },
+              '00000093-4c45-4b43-4942-265a524f5453': { // Project Register
+                properties: { read: true, notify: true, write: false, writeWithoutResponse: false },
+                value: new Uint8Array([0x00, 0x00]),
+              },
+              '000001c3-4c45-4b43-4942-265a524f5453': { // Status Register 2
+                properties: { read: true, notify: true, write: true, writeWithoutResponse: false },
+                value: new Uint8Array([0x00, 0x00]),
+              },
+              '000001b3-4c45-4b43-4942-265a524f5453': { // Security Code
+                properties: { read: false, notify: false, write: true, writeWithoutResponse: false },
+              },
+              '00000083-4c45-4b43-4942-265a524f5453': { // System Status
+                properties: { read: true, notify: false, write: false, writeWithoutResponse: false },
+                value: new Uint8Array([0x00, 0x00]),
+              },
+              '00000063-4c45-4b43-4942-265a524f5453': { // Akku Status
+                properties: { read: true, notify: false, write: false, writeWithoutResponse: false },
+                value: new Uint8Array([0x00, 0x00]),
+              },
+              '00000073-4c45-4b43-4942-265a524f5453': { // Akku Status 2
+                properties: { read: true, notify: false, write: false, writeWithoutResponse: false },
+                value: new Uint8Array([0x00, 0x00]),
+              },
+              '000001d3-4c45-4b43-4942-265a524f5453': { // Factory Reset
+                properties: { read: false, notify: false, write: true, writeWithoutResponse: false },
               },
             },
           },

@@ -1,6 +1,6 @@
 import { onCleanup } from "solid-js";
 import { createStore } from "solid-js/store";
-import { createDebouncedWriter } from "./debouncedWriter";
+import { createDebouncedWriter } from "../shared/debouncedWriter";
 import type { VentyVeazyDriver } from "./driver";
 import {
   Command,

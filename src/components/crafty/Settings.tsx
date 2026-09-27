@@ -3,7 +3,8 @@ import { styled } from "solid-styled-components";
 import { Slider } from "../Slider";
 import { Button } from "../Button";
 import { DarkModeSwitch } from "../DarkModeSwitch";
-import { useCraftyDeviceContext } from "../../provider/CraftyDeviceProvider";
+import { useCrafty } from "../../provider/CraftyProvider";
+import { Limits } from "../../devices/crafty/protocol";
 import { useTranslations } from "../../i18n/utils";
 
 const SettingsContainer = styled("div")`
@@ -147,32 +148,13 @@ const ModalButton = styled(Button)<{ variant?: "danger" | "cancel" }>`
 `;
 
 export const Settings: Component = () => {
-  const { settings, temperature, firmware, systemStatus, usageTime, power } =
-    useCraftyDeviceContext();
-  const {
-    getLedBrightness,
-    getAutoOffCountdown,
-    getAutoOffCurrentValue,
-    setLedBrightness,
-    setAutoOffCountdown,
-  } = settings;
-  const { getBoostTemperature, setBoostTemp } = temperature;
-  const { getBatteryPercent } = power;
-  const {
-    getFirmwareVersion,
-    getFirmwareBLEVersion,
-    getStatusRegister2,
-    isOldCrafty,
-  } = firmware;
-  const { getSystemStatus, getAkkuStatus, getAkkuStatus2, factoryReset } =
-    systemStatus;
-  const { getUseHours, getUseMinutes } = usageTime;
+  const { state, actions, firmwareVersion, isOldFirmware } = useCrafty();
 
   const t = useTranslations();
   const [showResetModal, setShowResetModal] = createSignal(false);
 
   const handleFactoryReset = () => {
-    factoryReset();
+    actions.factoryReset();
     setShowResetModal(false);
   };
 
@@ -185,12 +167,12 @@ export const Settings: Component = () => {
         <SettingItem>
           <SettingLabel>Boost Temperature</SettingLabel>
           <Slider
-            min={0}
-            max={30}
+            min={Limits.MIN_BOOST}
+            max={Limits.MAX_BOOST}
             step={1}
-            value={getBoostTemperature()}
-            label={`Boost Temperature: ${getBoostTemperature()}`}
-            onInput={setBoostTemp}
+            value={state.boostTemp}
+            label={`Boost Temperature: ${state.boostTemp}`}
+            onInput={actions.setBoostTemp}
           />
         </SettingItem>
 
@@ -198,27 +180,27 @@ export const Settings: Component = () => {
         <SettingItem>
           <SettingLabel>{t("deviceBrightness")}</SettingLabel>
           <Slider
-            min={0}
-            max={100}
+            min={Limits.MIN_BRIGHTNESS}
+            max={Limits.MAX_BRIGHTNESS}
             step={10}
-            value={getLedBrightness()}
-            label={`${t("deviceBrightness")}: ${getLedBrightness()} %`}
-            onInput={setLedBrightness}
+            value={state.ledBrightness}
+            label={`${t("deviceBrightness")}: ${state.ledBrightness} %`}
+            onInput={actions.setLedBrightness}
           />
         </SettingItem>
 
         {/* Auto Shutdown Time - only on Crafty+ */}
-        {!isOldCrafty() && (
+        {!isOldFirmware && (
           <>
             <SettingItem>
               <SettingLabel>{t("autoMaticShutdownTime")}</SettingLabel>
               <Slider
-                min={30}
-                max={300}
+                min={Limits.MIN_AUTO_OFF}
+                max={Limits.MAX_AUTO_OFF}
                 step={30}
-                value={getAutoOffCountdown()}
-                label={`${t("autoMaticShutdownTime")}: ${getAutoOffCountdown()} s`}
-                onInput={setAutoOffCountdown}
+                value={state.autoOffCountdown ?? Limits.MIN_AUTO_OFF}
+                label={`${t("autoMaticShutdownTime")}: ${state.autoOffCountdown ?? "-"} s`}
+                onInput={actions.setAutoOffCountdown}
               />
             </SettingItem>
 
@@ -226,8 +208,10 @@ export const Settings: Component = () => {
             <SettingItem>
               <SettingLabel>Current Auto-Off Time</SettingLabel>
               <InfoDisplay>
-                {Math.floor(getAutoOffCurrentValue() / 60)}:
-                {(getAutoOffCurrentValue() % 60).toString().padStart(2, "0")}{" "}
+                {Math.floor((state.autoOffRemaining ?? 0) / 60)}:
+                {((state.autoOffRemaining ?? 0) % 60)
+                  .toString()
+                  .padStart(2, "0")}{" "}
                 min remaining
               </InfoDisplay>
             </SettingItem>
@@ -240,20 +224,20 @@ export const Settings: Component = () => {
           <StatusContainer>
             <StatusItem>
               <StatusLabel>Firmware Version</StatusLabel>
-              <StatusValue>{getFirmwareVersion()}</StatusValue>
+              <StatusValue>{firmwareVersion}</StatusValue>
             </StatusItem>
-            {!isOldCrafty() && (
+            {!isOldFirmware && (
               <StatusItem>
                 <StatusLabel>BLE Firmware Version</StatusLabel>
-                <StatusValue>{getFirmwareBLEVersion()}</StatusValue>
+                <StatusValue>{state.bleFirmwareVersion ?? "-"}</StatusValue>
               </StatusItem>
             )}
             <StatusItem>
               <StatusLabel>Status Register 2</StatusLabel>
-              <StatusValue>{getStatusRegister2()}</StatusValue>
+              <StatusValue>{state.statusRegister2}</StatusValue>
             </StatusItem>
           </StatusContainer>
-          {isOldCrafty() && (
+          {isOldFirmware && (
             <InfoDisplay style="margin-top: 10px; font-size: 0.9rem; color: var(--secondary-text);">
               ⚠️ Old Crafty detected. Some features are not available.
             </InfoDisplay>
@@ -266,27 +250,27 @@ export const Settings: Component = () => {
           <StatusContainer>
             <StatusItem>
               <StatusLabel>Battery Level</StatusLabel>
-              <StatusValue>{getBatteryPercent()} %</StatusValue>
+              <StatusValue>{state.batteryLevel} %</StatusValue>
             </StatusItem>
           </StatusContainer>
         </SettingItem>
 
         {/* System Status - only on Crafty+ */}
-        {!isOldCrafty() && (
+        {!isOldFirmware && (
           <SettingItem>
             <SettingLabel>System Status (Crafty+ only)</SettingLabel>
             <StatusContainer>
               <StatusItem>
                 <StatusLabel>System Status</StatusLabel>
-                <StatusValue>{getSystemStatus()}</StatusValue>
+                <StatusValue>{state.systemStatus ?? "-"}</StatusValue>
               </StatusItem>
               <StatusItem>
                 <StatusLabel>Akku Status 1</StatusLabel>
-                <StatusValue>{getAkkuStatus()}</StatusValue>
+                <StatusValue>{state.akkuStatus ?? "-"}</StatusValue>
               </StatusItem>
               <StatusItem>
                 <StatusLabel>Akku Status 2</StatusLabel>
-                <StatusValue>{getAkkuStatus2()}</StatusValue>
+                <StatusValue>{state.akkuStatus2 ?? "-"}</StatusValue>
               </StatusItem>
             </StatusContainer>
           </SettingItem>
@@ -296,13 +280,13 @@ export const Settings: Component = () => {
         <SettingItem>
           <SettingLabel>Usage Time</SettingLabel>
           <InfoDisplay>
-            {getUseHours()} hours{" "}
-            {!isOldCrafty() && `${getUseMinutes()} minutes`}
+            {state.useHours} hours{" "}
+            {!isOldFirmware && `${state.useMinutes ?? 0} minutes`}
           </InfoDisplay>
         </SettingItem>
 
         {/* Factory Reset - only on Crafty+ */}
-        {!isOldCrafty() && (
+        {!isOldFirmware && (
           <SettingItem>
             <SettingLabel>Factory Reset</SettingLabel>
             <ResetButtonContainer>

@@ -1,4 +1,5 @@
-import { useCraftyDeviceContext } from "../../provider/CraftyDeviceProvider";
+import { useCrafty } from "../../provider/CraftyProvider";
+import { Limits } from "../../devices/crafty/protocol";
 import { styled } from "solid-styled-components";
 import { FaSolidMinus } from "solid-icons/fa";
 import { FaSolidPlus } from "solid-icons/fa";
@@ -69,50 +70,34 @@ const TempControls = styled("div")`
 `;
 
 export const Temperature = () => {
-  const { temperature } = useCraftyDeviceContext();
-  const { getTargetTemperature, getCurrentTemperature, setTemperature } =
-    temperature;
+  const { state, actions } = useCrafty();
 
   const t = useTranslations();
-  
-  const MIN_TEMP = 40;
-  const MAX_TEMP = 210;
 
-  const increaseTemperature = () => {
-    const currentTemp = getTargetTemperature();
-    if (currentTemp < MAX_TEMP) {
-      setTemperature(currentTemp + 1);
-    }
-  };
-
-  const decreaseTemperature = () => {
-    const currentTemp = getTargetTemperature();
-    if (currentTemp > MIN_TEMP) {
-      setTemperature(currentTemp - 1);
-    }
-  };
+  const increaseTemperature = () => actions.setTargetTemp(state.targetTemp + 1);
+  const decreaseTemperature = () => actions.setTargetTemp(state.targetTemp - 1);
 
   return (
     <FlexContainer>
       <TempDisplay>
         <TempLabel>{t("currentTemperature")}</TempLabel>
         <DigitalText>
-          <TemperatureDisplay value={getCurrentTemperature()} unit="C" />
+          <TemperatureDisplay value={state.currentTemp} unit="C" />
         </DigitalText>
       </TempDisplay>
       <TempControls>
-        <RoundButton 
+        <RoundButton
           onClick={decreaseTemperature}
-          disabled={getTargetTemperature() <= MIN_TEMP}
+          disabled={state.targetTemp <= Limits.MIN_TEMP}
         >
           <FaSolidMinus size="24px" />
         </RoundButton>
         <DigitalText isTarget={true}>
-          <TemperatureDisplay value={getTargetTemperature()} unit="C" />
+          <TemperatureDisplay value={state.targetTemp} unit="C" />
         </DigitalText>
-        <RoundButton 
+        <RoundButton
           onClick={increaseTemperature}
-          disabled={getTargetTemperature() >= MAX_TEMP}
+          disabled={state.targetTemp >= Limits.MAX_TEMP}
         >
           <FaSolidPlus size="24px" />
         </RoundButton>
