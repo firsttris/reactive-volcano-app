@@ -6,9 +6,9 @@ import { Settings } from "../components/veazy-venty/Settings";
 import { useBluetooth } from "../provider/BluetoothProvider";
 import { ConnectionState } from "../utils/uuids";
 import {
-  DeviceStatusProvider,
-  useDeviceStatusContext,
-} from "../provider/DeviceStatusProvider";
+  VentyVeazyProvider,
+  useVentyVeazy,
+} from "../provider/VentyVeazyProvider";
 import { useTranslations } from "../i18n/utils";
 
 const BatteryContainer = styled("div")`
@@ -30,7 +30,9 @@ const BatteryBar = styled("div")<{ charging?: boolean }>`
   background: var(--secondary-bg);
   border-radius: 10px;
   overflow: hidden;
-  border: 1px solid ${(props) => (props.charging ? "var(--accent-color)" : "var(--border-color)")};
+  border: 1px solid
+    ${(props) =>
+      props.charging ? "var(--accent-color)" : "var(--border-color)"};
   box-shadow: ${(props) =>
     props.charging ? "0 0 8px rgba(255, 102, 0, 0.6)" : "none"};
   position: relative;
@@ -89,21 +91,8 @@ const BatteryFill = styled("div")<{ level: number; charging?: boolean }>`
 `;
 
 const VentyVeazyViewContent: Component = () => {
-  const navigate = useNavigate();
-  const { connectionState } = useBluetooth();
-  const { status } = useDeviceStatusContext();
+  const { state } = useVentyVeazy();
   const t = useTranslations();
-
-  // Redirect to connect page if not connected
-  createEffect(() => {
-    const state = connectionState();
-    if (
-      state === ConnectionState.NOT_CONNECTED ||
-      state === ConnectionState.CONNECTION_FAILED
-    ) {
-      navigate("/");
-    }
-  });
 
   return (
     <>
@@ -116,13 +105,13 @@ const VentyVeazyViewContent: Component = () => {
         {/* Battery Level Display */}
         <BatteryContainer>
           <BatteryLabel>
-            {t("battery")}: {status()?.batteryLevel ?? 0}%{" "}
-            {status()?.isCharging ? "⚡ " + t("charging") : ""}
+            {t("battery")}: {state.status?.batteryLevel ?? 0}%{" "}
+            {state.status?.isCharging ? "⚡ " + t("charging") : ""}
           </BatteryLabel>
-          <BatteryBar charging={status()?.isCharging ?? false}>
+          <BatteryBar charging={state.status?.isCharging ?? false}>
             <BatteryFill
-              level={status()?.batteryLevel ?? 0}
-              charging={status()?.isCharging ?? false}
+              level={state.status?.batteryLevel ?? 0}
+              charging={state.status?.isCharging ?? false}
             />
           </BatteryBar>
         </BatteryContainer>
@@ -135,9 +124,24 @@ const VentyVeazyViewContent: Component = () => {
 };
 
 export const VentyVeazyView: Component = () => {
+  const navigate = useNavigate();
+  const { connectionState } = useBluetooth();
+
+  // Redirect to connect page if not connected (the provider renders nothing
+  // without a connected device, so this must live outside of it)
+  createEffect(() => {
+    const state = connectionState();
+    if (
+      state === ConnectionState.NOT_CONNECTED ||
+      state === ConnectionState.CONNECTION_FAILED
+    ) {
+      navigate("/");
+    }
+  });
+
   return (
-    <DeviceStatusProvider>
+    <VentyVeazyProvider>
       <VentyVeazyViewContent />
-    </DeviceStatusProvider>
+    </VentyVeazyProvider>
   );
 };

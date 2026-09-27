@@ -7,6 +7,11 @@ import {
   VentyVeazyCharacteristicUUIDs,
 } from "../utils/uuids";
 import { bluetoothQueue } from "../utils/bluetoothQueue";
+import {
+  connectVentyVeazy,
+  type VentyVeazyDriver,
+} from "../devices/ventyVeazy/driver";
+import type { VentyVeazyModel } from "../devices/ventyVeazy/protocol";
 
 type DeviceCharacteristics = Record<
   string,
@@ -37,8 +42,8 @@ const createBluetoothMethods = () => {
   const [getVolcanoControlService, setVolcanoControlService] =
     createSignal<BluetoothRemoteGATTService>();
 
-  const [getVentyVeazyService, setVentyVeazyService] =
-    createSignal<BluetoothRemoteGATTService>();
+  const [ventyVeazyDriver, setVentyVeazyDriver] =
+    createSignal<VentyVeazyDriver>();
 
   //Crafty services
   const [getCraftyDeviceInfoService, setCraftyDeviceInfoService] =
@@ -81,32 +86,33 @@ const createBluetoothMethods = () => {
     return DeviceType.CRAFTY;
   };
 
-  const handleDisconnect = (event: Event) => {
-    console.log("🔌 Device disconnected unexpectedly:", event);
-    // Clean up state after disconnect
+  const resetState = () => {
     setConnectionState(ConnectionState.NOT_CONNECTED);
     setVolcanoStateService(undefined);
     setVolcanoControlService(undefined);
-    setVentyVeazyService(undefined);
     setCraftyDeviceInfoService(undefined);
     setCraftyControlService(undefined);
     setCraftyStatusService(undefined);
+    setVentyVeazyDriver(undefined);
     setCharacteristics({});
     setDeviceInfo({ type: DeviceType.UNKNOWN, name: "" });
     setServer(undefined);
     setDevice(undefined);
   };
 
+  const disposeVentyVeazyDriver = async () => {
+    const driver = ventyVeazyDriver();
+    if (driver) await driver.dispose();
+  };
+
+  const handleDisconnect = (event: Event) => {
+    console.log("🔌 Device disconnected unexpectedly:", event);
+    disposeVentyVeazyDriver();
+    resetState();
+  };
+
   const disconnect = async () => {
-    const characteristics = getCharacteristics();
-    if (characteristics.control) {
-      try {
-        console.log("🛑 Stopping notifications on control characteristic");
-        await characteristics.control.stopNotifications();
-      } catch (error) {
-        console.error("Error stopping notifications:", error);
-      }
-    }
+    await disposeVentyVeazyDriver();
 
     // Remove event listener before disconnecting
     const currentDevice = device();
@@ -130,74 +136,22 @@ const createBluetoothMethods = () => {
       }
     }
 
-    // Reset all state
-    setConnectionState(ConnectionState.NOT_CONNECTED);
-
-    setVolcanoStateService(undefined);
-    setVolcanoControlService(undefined);
-    // Venty/Veazy
-    setVentyVeazyService(undefined);
-    //Crafty
-    setCraftyDeviceInfoService(undefined);
-    setCraftyControlService(undefined);
-    setCraftyStatusService(undefined);
-    setCharacteristics({});
-    setDeviceInfo({ type: DeviceType.UNKNOWN, name: "" });
-    setServer(undefined);
-    setDevice(undefined);
+    resetState();
   };
 
-  const connectToVeazyVenty = async (server: BluetoothRemoteGATTServer) => {
-    try {
-      const primaryService = await bluetoothQueue.add(() =>
-        server.getPrimaryService(ServiceUUIDs.Primary)
-      );
-      if (!primaryService) throw new Error("Veazy/Venty service not found");
-      setVentyVeazyService(primaryService); // Device-specific service
-
-      // Initialize Veazy/Venty characteristics
-      try {
-        const controlCharacteristic = await bluetoothQueue.add(() =>
-          primaryService.getCharacteristic(
-            VentyVeazyCharacteristicUUIDs.control
-          )
-        );
-        if (!controlCharacteristic) {
-          throw new Error("Veazy/Venty control characteristic not found");
-        }
-
-        // First: Activate notifications
-        await bluetoothQueue.add(() =>
-          controlCharacteristic.startNotifications()
-        );
-
-        // Publish the characteristic before sending the init commands so the
-        // hooks have attached their listeners and receive the responses.
-        setCharacteristics({ control: controlCharacteristic });
-
-        // Then: Send initialization commands
-        await bluetoothQueue.add(async () => {
-          for (const cmd of [0x02, 0x1d, 0x01, 0x04]) {
-            const buffer = new ArrayBuffer(20);
-            new DataView(buffer).setUint8(0, cmd);
-            await controlCharacteristic.writeValue(buffer);
-          }
-
-          console.log(
-            "Veazy/Venty initialization commands sent (0x02, 0x1D, 0x01, 0x04)"
-          );
-        });
-      } catch (charError) {
-        console.error(
-          "Failed to get Veazy/Venty control characteristic:",
-          charError
-        );
-        // Don't throw here, as the characteristic might not be available on all devices
-      }
-    } catch (error) {
-      console.error("Failed to connect to Veazy/Venty service:", error);
-      throw error;
-    }
+  const connectToVeazyVenty = async (
+    server: BluetoothRemoteGATTServer,
+    model: VentyVeazyModel
+  ) => {
+    const service = await getPrimaryService(server, ServiceUUIDs.Primary);
+    const driver = await connectVentyVeazy(
+      service,
+      VentyVeazyCharacteristicUUIDs.control,
+      model,
+      bluetoothQueue
+    );
+    // The VentyVeazyProvider subscribes to the driver and then starts it
+    setVentyVeazyDriver(driver);
   };
 
   const getPrimaryService = async (
@@ -272,7 +226,10 @@ const createBluetoothMethods = () => {
       actualDeviceType === DeviceType.VEAZY ||
       actualDeviceType === DeviceType.VENTY
     ) {
-      await connectToVeazyVenty(server);
+      await connectToVeazyVenty(
+        server,
+        actualDeviceType === DeviceType.VEAZY ? "VEAZY" : "VENTY"
+      );
     } else if (actualDeviceType === DeviceType.CRAFTY) {
       console.log("Crafty: Detected Crafty device, connecting...");
       await connectToCrafty(server);
@@ -357,7 +314,7 @@ const createBluetoothMethods = () => {
     deviceInfo,
     getVolcanoStateService,
     getVolcanoControlService,
-    getVentyVeazyService,
+    ventyVeazyDriver,
     getCraftyControlService,
     getCraftyDeviceInfoService,
     getCraftyStatusService,

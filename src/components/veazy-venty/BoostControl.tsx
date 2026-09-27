@@ -6,7 +6,8 @@ import { TemperatureDisplay } from "../TemperatureDisplay";
 const BoostCard = styled("div")<{ active?: boolean }>`
   background: ${(props) =>
     props.active ? "rgba(255, 102, 0, 0.1)" : "var(--bg-color)"};
-  border: 2px solid ${(props) => (props.active ? "var(--accent-color)" : "var(--border-color)")};
+  border: 2px solid
+    ${(props) => (props.active ? "var(--accent-color)" : "var(--border-color)")};
   border-radius: 12px;
   padding: 20px;
   text-align: center;

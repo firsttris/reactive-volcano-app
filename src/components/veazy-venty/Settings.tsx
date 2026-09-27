@@ -4,10 +4,7 @@ import { Switch } from "../Switch";
 import { Slider } from "../Slider";
 import { Button } from "../Button";
 import { DarkModeSwitch } from "../DarkModeSwitch";
-import { useBluetooth } from "../../provider/BluetoothProvider";
-import { useDeviceStatusContext } from "../../provider/DeviceStatusProvider";
-import { useBrightnessVibration } from "../../hooks/venty-veazy/useBrightnessVibration";
-import { useSettings } from "../../hooks/venty-veazy/useSettings";
+import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
 import { useTranslations } from "../../i18n/utils";
 
 const SettingsContainer = styled("div")`
@@ -114,46 +111,22 @@ const ModalButton = styled(Button)<{ variant?: "danger" | "cancel" }>`
 `;
 
 export const Settings: Component = () => {
-  const { deviceInfo } = useBluetooth();
-  const {
-    status,
-    setIsCelsius,
-    setChargeCurrentOptimization,
-    setChargeVoltageLimit,
-    setPermanentBluetooth,
-  } = useDeviceStatusContext();
-  const {
-    data: brightnessData,
-    setBrightness,
-    setVibration,
-    setBoostTimeout,
-  } = useBrightnessVibration();
+  const { state, actions, model } = useVentyVeazy();
 
   const t = useTranslations();
-  const { factoryReset, setBoostVisualization } = useSettings();
 
   const [showResetModal, setShowResetModal] = createSignal(false);
   const [localBrightness, setLocalBrightness] = createSignal(5);
 
-  const isVeazy = () => deviceInfo().type === "VEAZY";
+  const isVeazy = () => model === "VEAZY";
 
   const handleBrightnessChange = (value: number) => {
     setLocalBrightness(value);
-    setBrightness(value);
-  };
-
-  const handleVibrationToggle = (enabled: boolean) => {
-    // Vibration: 0 = disabled, 1 = enabled
-    setVibration(enabled ? 1 : 0);
-  };
-
-  const handleBoostTimeoutToggle = (enabled: boolean) => {
-    // BoostTimeout: 0 = disabled, 1 = enabled
-    setBoostTimeout(enabled ? 1 : 0);
+    actions.setBrightness(value);
   };
 
   const handleFactoryReset = () => {
-    factoryReset();
+    actions.factoryReset();
     setShowResetModal(false);
   };
 
@@ -165,7 +138,7 @@ export const Settings: Component = () => {
       <SettingItem>
         <SettingLabel>{t("ledBrightness")}</SettingLabel>
         <Slider
-          value={brightnessData()?.brightness ?? localBrightness()}
+          value={state.brightnessVibration?.brightness ?? localBrightness()}
           onInput={handleBrightnessChange}
           min={1}
           max={9}
@@ -173,7 +146,7 @@ export const Settings: Component = () => {
           label={
             <span>
               {t("brightness")}:{" "}
-              {brightnessData()?.brightness ?? localBrightness()}
+              {state.brightnessVibration?.brightness ?? localBrightness()}
             </span>
           }
         />
@@ -183,8 +156,8 @@ export const Settings: Component = () => {
       <SettingItem>
         <SettingLabel>{t("vibration")}</SettingLabel>
         <Switch
-          isOn={brightnessData()?.vibration === 1}
-          onToggle={handleVibrationToggle}
+          isOn={state.brightnessVibration?.vibration ?? false}
+          onToggle={actions.setVibration}
           label={t("enableVibration")}
         />
       </SettingItem>
@@ -194,8 +167,8 @@ export const Settings: Component = () => {
         <SettingItem>
           <SettingLabel>{t("permanentBluetooth")}</SettingLabel>
           <Switch
-            isOn={status()?.permanentBluetooth ?? false}
-            onToggle={(enabled) => setPermanentBluetooth(enabled)}
+            isOn={state.status?.permanentBluetooth ?? false}
+            onToggle={actions.setPermanentBluetooth}
             label={t("keepBluetoothAlwaysOn")}
           />
         </SettingItem>
@@ -205,8 +178,8 @@ export const Settings: Component = () => {
       <SettingItem>
         <SettingLabel>{t("chargeCurrentOptimization")}</SettingLabel>
         <Switch
-          isOn={status()?.chargeCurrentOptimization ?? false}
-          onToggle={(enabled) => setChargeCurrentOptimization(enabled)}
+          isOn={state.status?.chargeCurrentOptimization ?? false}
+          onToggle={actions.setChargeCurrentOptimization}
           label={t("optimizeChargingCurrent")}
         />
       </SettingItem>
@@ -215,8 +188,8 @@ export const Settings: Component = () => {
       <SettingItem>
         <SettingLabel>{t("chargeVoltageLimit")}</SettingLabel>
         <Switch
-          isOn={status()?.chargeVoltageLimit ?? false}
-          onToggle={(enabled) => setChargeVoltageLimit(enabled)}
+          isOn={state.status?.chargeVoltageLimit ?? false}
+          onToggle={actions.setChargeVoltageLimit}
           label={t("limitChargingVoltage")}
         />
       </SettingItem>
@@ -225,8 +198,8 @@ export const Settings: Component = () => {
       <SettingItem>
         <SettingLabel>{t("boostSuperboostVisualization")}</SettingLabel>
         <Switch
-          isOn={status()?.boostVisualization ?? false}
-          onToggle={(enabled) => setBoostVisualization(enabled)}
+          isOn={state.status?.boostVisualization ?? false}
+          onToggle={actions.setBoostVisualization}
           label={t("enableBoostLedVisualization")}
         />
       </SettingItem>
@@ -236,8 +209,8 @@ export const Settings: Component = () => {
       <SettingItem>
         <SettingLabel>{t("permanentBoost")}</SettingLabel>
         <Switch
-          isOn={brightnessData()?.boostTimeout === 1}
-          onToggle={handleBoostTimeoutToggle}
+          isOn={state.brightnessVibration?.boostTimeoutDisabled ?? false}
+          onToggle={actions.setBoostTimeoutDisabled}
           label={t("deactivateBoostTimeout")}
         />
       </SettingItem>
@@ -246,9 +219,9 @@ export const Settings: Component = () => {
       <SettingItem>
         <SettingLabel>{t("temperatureUnit")}</SettingLabel>
         <Switch
-          isOn={status()?.isCelsius ?? true}
-          onToggle={(enabled) => setIsCelsius(enabled)}
-          label={status()?.isCelsius ? t("celsius") : t("fahrenheit")}
+          isOn={state.status?.isCelsius ?? true}
+          onToggle={actions.setIsCelsius}
+          label={state.status?.isCelsius ? t("celsius") : t("fahrenheit")}
         />
       </SettingItem>
 
