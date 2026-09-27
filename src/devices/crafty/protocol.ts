@@ -1,5 +1,5 @@
 /**
- * Crafty / Crafty+ BLE protocol (derived from crafty.js of the S&B web app).
+ * Crafty / Crafty+ BLE protocol (derived from crafty.js).
  *
  * Unlike the Venty/Veazy, every value has its own characteristic. Values are
  * little-endian uint16, temperatures in 1/10 °C.

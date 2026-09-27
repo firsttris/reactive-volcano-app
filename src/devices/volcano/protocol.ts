@@ -1,5 +1,5 @@
 /**
- * Volcano Hybrid BLE protocol (derived from volcano.js of the S&B web app).
+ * Volcano Hybrid BLE protocol (derived from volcano.js).
  *
  * Every value has its own characteristic. Temperatures are in 1/10 °C.
  * The three project registers are changed with a 32-bit write: the lower

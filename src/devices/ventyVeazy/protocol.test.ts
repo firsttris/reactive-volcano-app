@@ -186,7 +186,7 @@ describe("Venty/Veazy protocol", () => {
     expect(parseResponse(frame({ 0: 0x29 }), "VENTY")).toBe(null);
   });
 
-  // Expected byte layouts are taken from qvap.js of the S&B web app
+  // Expected byte layouts are taken from qvap.js
   describe("encoders", () => {
     it("encodes plain requests as 20-byte frames", () => {
       expect(bytes(encodeRequest(Command.STATUS))).toEqual(

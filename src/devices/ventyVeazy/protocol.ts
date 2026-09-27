@@ -1,5 +1,5 @@
 /**
- * Venty / Veazy BLE protocol (derived from qvap.js of the S&B web app).
+ * Venty / Veazy BLE protocol (derived from qvap.js).
  *
  * All communication runs over a single characteristic: the app writes a
  * command frame whose first byte is the command id, and the device answers
