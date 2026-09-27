@@ -3,16 +3,22 @@ import {
   convertBLEToUint16,
   convertToUInt16BLE,
 } from "../../utils/bluetoothUtils";
-import { CraftyCharacteristicUUIDs } from "../../utils/uuids";
 import {
+  CraftyCharacteristicUUIDs,
+  CraftyProjectRegisterBits,
+} from "../../utils/uuids";
+import {
+  createCharateristic,
   createCharateristicWithEventListener,
   detachEventListener,
+  getCharacteristic,
 } from "../../utils/characteristic";
 import { useBluetooth } from "../../provider/BluetoothProvider";
 import { useWriteToCharacteristic } from "../volcano/useWriteToCharacteristic";
 
 interface UseProjectRegisterProps {
   isOldCrafty?: () => boolean;
+  isFirmwareLoaded?: () => boolean;
 }
 
 export const useProjectRegister = (props?: UseProjectRegisterProps) => {
@@ -22,6 +28,7 @@ export const useProjectRegister = (props?: UseProjectRegisterProps) => {
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
   const isOldDevice = props?.isOldCrafty || (() => false);
+  const isFirmwareLoaded = props?.isFirmwareLoaded || (() => true);
 
   const handleProjectRegister = (value: DataView) => {
     const register = convertBLEToUint16(value);
@@ -33,7 +40,9 @@ export const useProjectRegister = (props?: UseProjectRegisterProps) => {
     const service = getCraftyStatusService();
     if (!service || isInitialized()) return;
 
-    console.log(`useProjectRegister: Starting initialization (isOldCrafty: ${isOldDevice()})`);
+    console.log(
+      `useProjectRegister: Starting initialization (isOldCrafty: ${isOldDevice()})`
+    );
 
     // Project register is available on all Crafty devices
     // On old Crafty, we only read the value without notifications
@@ -41,12 +50,12 @@ export const useProjectRegister = (props?: UseProjectRegisterProps) => {
     if (isOldDevice()) {
       // Old Crafty: only read, no notifications
       try {
-        const projectRegisterChar = await service.getCharacteristic(
-          CraftyCharacteristicUUIDs.handleProjectRegister
+        const projectRegisterChar = await createCharateristic(
+          service,
+          CraftyCharacteristicUUIDs.handleProjectRegister,
+          handleProjectRegister
         );
         if (projectRegisterChar) {
-          const value = await projectRegisterChar.readValue();
-          handleProjectRegister(value);
           setCharacteristics((prev) => ({
             ...prev,
             projectRegister: projectRegisterChar,
@@ -73,7 +82,8 @@ export const useProjectRegister = (props?: UseProjectRegisterProps) => {
 
       // sicherheitscode is write-only and only available on Crafty+
       try {
-        const sicherheitscode = await service.getCharacteristic(
+        const sicherheitscode = await getCharacteristic(
+          service,
           CraftyCharacteristicUUIDs.sicherheitscode
         );
         if (sicherheitscode) {
@@ -86,7 +96,7 @@ export const useProjectRegister = (props?: UseProjectRegisterProps) => {
         console.warn("Sicherheitscode characteristic not available", error);
       }
     }
-    
+
     setIsInitialized(true);
     console.log("useProjectRegister: Initialization complete");
   };
@@ -104,10 +114,12 @@ export const useProjectRegister = (props?: UseProjectRegisterProps) => {
     // This ensures isOldCrafty is set correctly
     const oldDevice = isOldDevice();
     const service = getCraftyStatusService();
-    
-    // Only proceed if service is available
-    if (service) {
-      console.log(`useProjectRegister: Initializing (isOldCrafty: ${oldDevice})`);
+
+    // Only proceed if service is available and the firmware version is known
+    if (service && isFirmwareLoaded()) {
+      console.log(
+        `useProjectRegister: Initializing (isOldCrafty: ${oldDevice})`
+      );
       handleCharacteristics();
     }
   });
@@ -119,8 +131,12 @@ export const useProjectRegister = (props?: UseProjectRegisterProps) => {
     }
   });
 
+  const isHeaterActive = () =>
+    (getProjectRegister() & CraftyProjectRegisterBits.CRAFTY_ACTIVE) !== 0;
+
   return {
     getProjectRegister,
+    isHeaterActive,
     setSicherheitscode,
     handleCharacteristics,
   };

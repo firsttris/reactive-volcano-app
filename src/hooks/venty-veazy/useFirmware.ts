@@ -3,31 +3,25 @@ import { useBluetooth } from "../../provider/BluetoothProvider";
 import { bluetoothQueue } from "../../utils/bluetoothQueue";
 
 export interface FirmwareData {
-  firmwareVersion: string | null; // Byte 1-4 (z.B. 1.2.3.4)
-  bootloaderVersion: string | null; // Byte 5-8 (z.B. 1.0.0.0)
+  applicationFlags: number; // Byte 1: bit 0 = application running (not bootloader)
+  firmwareVersion: string | null; // Byte 2-7: ASCII
+  bootloaderVersion: string | null; // Byte 11-16: ASCII
 }
 
 export function useFirmware(pollInterval = 60000) {
   const { getCharacteristics } = useBluetooth();
   const [data, setData] = createSignal<FirmwareData | null>(null);
 
-  const parseFirmware = (value: DataView): FirmwareData => {
-    // Byte 1-4: Firmware-Version
-    const firmwareVersion = [
-      value.getUint8(1),
-      value.getUint8(2),
-      value.getUint8(3),
-      value.getUint8(4),
-    ].join(".");
-    // Byte 5-8: Bootloader-Version
-    const bootloaderVersion = [
-      value.getUint8(5),
-      value.getUint8(6),
-      value.getUint8(7),
-      value.getUint8(8),
-    ].join(".");
-    return { firmwareVersion, bootloaderVersion };
-  };
+  const decodeAscii = (value: DataView, start: number, length: number) =>
+    new TextDecoder("utf-8").decode(
+      new Uint8Array(value.buffer, value.byteOffset + start, length)
+    );
+
+  const parseFirmware = (value: DataView): FirmwareData => ({
+    applicationFlags: value.getUint8(1),
+    firmwareVersion: decodeAscii(value, 2, 6),
+    bootloaderVersion: decodeAscii(value, 11, 6),
+  });
 
   const requestFirmware = async () => {
     const buffer = new ArrayBuffer(20);
@@ -41,7 +35,7 @@ export function useFirmware(pollInterval = 60000) {
 
   const handleFirmware = (event: Event) => {
     const value = (event.target as BluetoothRemoteGATTCharacteristic).value;
-    if (value && value.getUint8(0) === 0x02) {
+    if (value && value.getUint8(0) === 0x02 && value.byteLength >= 19) {
       setData(parseFirmware(value));
     }
   };

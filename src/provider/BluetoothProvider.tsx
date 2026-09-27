@@ -149,52 +149,44 @@ const createBluetoothMethods = () => {
 
   const connectToVeazyVenty = async (server: BluetoothRemoteGATTServer) => {
     try {
-      const primaryService = await server.getPrimaryService(
-        ServiceUUIDs.Primary
+      const primaryService = await bluetoothQueue.add(() =>
+        server.getPrimaryService(ServiceUUIDs.Primary)
       );
+      if (!primaryService) throw new Error("Veazy/Venty service not found");
       setVentyVeazyService(primaryService); // Device-specific service
 
       // Initialize Veazy/Venty characteristics
       try {
-        const controlCharacteristic = await primaryService.getCharacteristic(
-          VentyVeazyCharacteristicUUIDs.control
+        const controlCharacteristic = await bluetoothQueue.add(() =>
+          primaryService.getCharacteristic(
+            VentyVeazyCharacteristicUUIDs.control
+          )
         );
+        if (!controlCharacteristic) {
+          throw new Error("Veazy/Venty control characteristic not found");
+        }
 
         // First: Activate notifications
-        await controlCharacteristic.startNotifications();
+        await bluetoothQueue.add(() =>
+          controlCharacteristic.startNotifications()
+        );
+
+        // Publish the characteristic before sending the init commands so the
+        // hooks have attached their listeners and receive the responses.
+        setCharacteristics({ control: controlCharacteristic });
 
         // Then: Send initialization commands
         await bluetoothQueue.add(async () => {
-          // CMD 0x02 - Reset/Initialize
-          const resetBuffer = new ArrayBuffer(20);
-          const resetView = new DataView(resetBuffer);
-          resetView.setUint8(0, 0x02);
-          await controlCharacteristic.writeValue(resetBuffer);
-
-          // CMD 0x1D - Status request
-          const statusBuffer = new ArrayBuffer(20);
-          const statusView = new DataView(statusBuffer);
-          statusView.setUint8(0, 0x1d);
-          await controlCharacteristic.writeValue(statusBuffer);
-
-          // CMD 0x01 - Basic data request
-          const basicBuffer = new ArrayBuffer(20);
-          const basicView = new DataView(basicBuffer);
-          basicView.setUint8(0, 0x01);
-          await controlCharacteristic.writeValue(basicBuffer);
-
-          // CMD 0x04 - Extended data request
-          const extendedBuffer = new ArrayBuffer(20);
-          const extendedView = new DataView(extendedBuffer);
-          extendedView.setUint8(0, 0x04);
-          await controlCharacteristic.writeValue(extendedBuffer);
+          for (const cmd of [0x02, 0x1d, 0x01, 0x04]) {
+            const buffer = new ArrayBuffer(20);
+            new DataView(buffer).setUint8(0, cmd);
+            await controlCharacteristic.writeValue(buffer);
+          }
 
           console.log(
             "Veazy/Venty initialization commands sent (0x02, 0x1D, 0x01, 0x04)"
           );
         });
-
-        setCharacteristics({ control: controlCharacteristic });
       } catch (charError) {
         console.error(
           "Failed to get Veazy/Venty control characteristic:",
@@ -208,30 +200,48 @@ const createBluetoothMethods = () => {
     }
   };
 
+  const getPrimaryService = async (
+    server: BluetoothRemoteGATTServer,
+    uuid: string
+  ) => {
+    const service = await bluetoothQueue.add(() =>
+      server.getPrimaryService(uuid)
+    );
+    if (!service) throw new Error(`Service ${uuid} not found`);
+    return service;
+  };
+
   const connectToCrafty = async (server: BluetoothRemoteGATTServer) => {
     console.log("Crafty: Connecting to Crafty device...");
-    const craftyService1 = await server.getPrimaryService(ServiceUUIDs.Crafty1);
-    console.log("Crafty: Got Crafty1 service", craftyService1);
+    const craftyService1 = await getPrimaryService(
+      server,
+      ServiceUUIDs.Crafty1
+    );
+    const craftyService2 = await getPrimaryService(
+      server,
+      ServiceUUIDs.Crafty2
+    );
+    const craftyService3 = await getPrimaryService(
+      server,
+      ServiceUUIDs.Crafty3
+    );
+    // Crafty1: control, Crafty2: device info, Crafty3: status registers, usage time, etc.
     setCraftyControlService(craftyService1);
-    const craftyService2 = await server.getPrimaryService(ServiceUUIDs.Crafty2);
-    console.log("Crafty: Got Crafty2 service", craftyService2);
-    // Assuming Crafty2 is control service, adjust as needed
     setCraftyDeviceInfoService(craftyService2);
-    const craftyService3 = await server.getPrimaryService(ServiceUUIDs.Crafty3);
-    console.log("Crafty: Got Crafty3 service", craftyService3);
-    // Crafty3 is used for additional characteristics like status registers, usage time, etc.
     setCraftyStatusService(craftyService3);
     console.log("Crafty: Crafty services connected successfully");
   };
 
   const connectToVolcano = async (server: BluetoothRemoteGATTServer) => {
-    const stateService = await server.getPrimaryService(
+    const stateService = await getPrimaryService(
+      server,
       ServiceUUIDs.DeviceState
     );
-    setVolcanoStateService(stateService); // Device-specific state service
-    const controlService = await server.getPrimaryService(
+    const controlService = await getPrimaryService(
+      server,
       ServiceUUIDs.DeviceControl
     );
+    setVolcanoStateService(stateService); // Device-specific state service
     setVolcanoControlService(controlService); // Device-specific control service
   };
 
@@ -322,7 +332,7 @@ const createBluetoothMethods = () => {
     } catch (error) {
       console.error("Connection failed:", error);
       setConnectionState(ConnectionState.CONNECTION_FAILED);
-      
+
       // Clean up device reference on connection failure
       const currentDevice = device();
       if (currentDevice) {
@@ -332,8 +342,11 @@ const createBluetoothMethods = () => {
         );
         setDevice(undefined);
       }
-      
-      if (error instanceof Error) alert(error.message);
+
+      // Closing the device chooser is not an error worth an alert
+      const userCancelled =
+        error instanceof DOMException && error.name === "NotFoundError";
+      if (error instanceof Error && !userCancelled) alert(error.message);
     }
   };
 
@@ -366,7 +379,7 @@ export const BluetoothProvider = (props: BluetoothProviderProps) => {
 export const useBluetooth = () => {
   const context = useContext(BluetoothContext);
   if (context === undefined) {
-    throw new Error("useStore must be used within a StoreProvider");
+    throw new Error("useBluetooth must be used within a BluetoothProvider");
   }
   return context;
 };

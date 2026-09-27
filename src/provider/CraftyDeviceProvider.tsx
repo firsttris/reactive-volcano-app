@@ -25,20 +25,20 @@ type CraftyDeviceProviderProps = {
 
 export const CraftyDeviceProvider = (props: CraftyDeviceProviderProps) => {
   console.log("Crafty Device Provider: Initializing Crafty device provider");
-  
+
   // Initialize firmware hook FIRST to determine device capabilities
   // This must complete before other hooks can initialize
   const firmware = useFirmware();
-  const isOldCrafty = firmware.isOldCrafty;
-  
-  // Initialize other hooks - these will be called via createEffect
+  const { isOldCrafty, isFirmwareLoaded } = firmware;
+
+  // The other hooks only initialize once the firmware version is known,
   // so they respect the isOldCrafty signal state
   const temperature = useTemperature();
-  const power = usePower({ isOldCrafty });
-  const settings = useSettings({ isOldCrafty });
-  const systemStatus = useSystemStatus({ isOldCrafty });
-  const usageTime = useUsageTime({ isOldCrafty });
-  const projectRegister = useProjectRegister({ isOldCrafty });
+  const power = usePower({ isOldCrafty, isFirmwareLoaded });
+  const settings = useSettings({ isOldCrafty, isFirmwareLoaded });
+  const systemStatus = useSystemStatus({ isOldCrafty, isFirmwareLoaded });
+  const usageTime = useUsageTime({ isOldCrafty, isFirmwareLoaded });
+  const projectRegister = useProjectRegister({ isOldCrafty, isFirmwareLoaded });
 
   return (
     <CraftyDeviceContext.Provider

@@ -6,15 +6,16 @@ import { useBluetooth } from "../../provider/BluetoothProvider";
 
 interface UseUsageTimeProps {
   isOldCrafty?: () => boolean;
+  isFirmwareLoaded?: () => boolean;
 }
 
 export const useUsageTime = (props?: UseUsageTimeProps) => {
   const [getUseHours, setUseHours] = createSignal(0);
   const [getUseMinutes, setUseMinutes] = createSignal(0);
   const [isInitialized, setIsInitialized] = createSignal(false);
-  const { getCraftyStatusService, setCharacteristics } =
-    useBluetooth();
+  const { getCraftyStatusService, setCharacteristics } = useBluetooth();
   const isOldDevice = props?.isOldCrafty || (() => false);
+  const isFirmwareLoaded = props?.isFirmwareLoaded || (() => true);
 
   const handleUseHours = (value: DataView) => {
     const hours = convertBLEToUint16(value);
@@ -31,7 +32,9 @@ export const useUsageTime = (props?: UseUsageTimeProps) => {
     const service = getCraftyStatusService();
     if (!service || isInitialized()) return;
 
-    console.log(`useUsageTime: Starting initialization (isOldCrafty: ${isOldDevice()})`);
+    console.log(
+      `useUsageTime: Starting initialization (isOldCrafty: ${isOldDevice()})`
+    );
 
     // Hours are available on all Crafty devices
     // NOTE: This characteristic does NOT support notifications - use createCharateristic (read-only)
@@ -68,7 +71,7 @@ export const useUsageTime = (props?: UseUsageTimeProps) => {
         // Old Crafty only provides hours, so minutes remain 0
       }
     }
-    
+
     setIsInitialized(true);
     console.log("useUsageTime: Initialization complete");
   };
@@ -78,9 +81,9 @@ export const useUsageTime = (props?: UseUsageTimeProps) => {
     // This ensures isOldCrafty is set correctly
     const oldDevice = isOldDevice();
     const service = getCraftyStatusService();
-    
-    // Only proceed if service is available
-    if (service) {
+
+    // Only proceed if service is available and the firmware version is known
+    if (service && isFirmwareLoaded()) {
       console.log(`useUsageTime: Initializing (isOldCrafty: ${oldDevice})`);
       handleCharacteristics();
     }

@@ -74,7 +74,7 @@ export const Temperature = () => {
 
   const adjustTemperature = async (change: number) => {
     const currentTemp = status()?.targetTemp ?? 0;
-    const newTemp = Math.max(40, Math.min(230, currentTemp + change));
+    const newTemp = Math.max(40, Math.min(210, currentTemp + change));
 
     try {
       await setTargetTemp(newTemp);

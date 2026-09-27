@@ -48,12 +48,14 @@ export const useTemperature = () => {
   };
 
   const setTemperature = async (value: number) => {
+    // Valid Volcano range (40-230°C)
+    const clampedValue = Math.max(40, Math.min(230, value));
     await writeValueToCharacteristic(
       "targetTemperature",
-      value * 10,
+      clampedValue * 10,
       convertToUInt32BLE
     );
-    setTargetTemperature(value);
+    setTargetTemperature(clampedValue);
   };
 
   createEffect(() => {

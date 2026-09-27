@@ -1,6 +1,7 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
 import {
   convertBLEToUint16,
+  convertFahrenheitToCelsius,
   convertToUInt16BLE,
 } from "../../utils/bluetoothUtils";
 import { CraftyCharacteristicUUIDs } from "../../utils/uuids";
@@ -13,6 +14,17 @@ import { useBluetooth } from "../../provider/BluetoothProvider";
 import { useWriteToCharacteristic } from "../volcano/useWriteToCharacteristic";
 import { bluetoothQueue } from "../../utils/bluetoothQueue";
 
+const MIN_TEMP = 40;
+const MAX_TEMP = 210;
+
+// A Crafty in Fahrenheit mode reports the target temperature in °F
+const parseTargetTemperature = (value: DataView) => {
+  const temperature = Math.round(convertBLEToUint16(value) / 10.0);
+  return temperature > MAX_TEMP
+    ? convertFahrenheitToCelsius(temperature)
+    : temperature;
+};
+
 export const useTemperature = () => {
   const [getTargetTemperature, setTargetTemperature] = createSignal(0);
   const [getCurrentTemperature, setCurrentTemperature] = createSignal(0);
@@ -22,23 +34,31 @@ export const useTemperature = () => {
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
 
   const handleTargetTemperature = (value: DataView) => {
-    const convertedValue = convertBLEToUint16(value);
-    const targetTemperature = Math.round(convertedValue / 10.0);
-    console.log("Crafty Temperature: Target temperature updated to", targetTemperature);
+    const targetTemperature = parseTargetTemperature(value);
+    console.log(
+      "Crafty Temperature: Target temperature updated to",
+      targetTemperature
+    );
     setTargetTemperature(targetTemperature);
   };
 
   const handleCurrentTemperature = (value: DataView) => {
     const convertedValue = convertBLEToUint16(value);
     const currentTemperature = Math.round(convertedValue / 10.0);
-    console.log("Crafty Temperature: Current temperature updated to", currentTemperature);
+    console.log(
+      "Crafty Temperature: Current temperature updated to",
+      currentTemperature
+    );
     setCurrentTemperature(currentTemperature);
   };
 
   const handleBoostTemperature = (value: DataView) => {
     const convertedValue = convertBLEToUint16(value);
     const boostTemperature = Math.round(convertedValue / 10.0);
-    console.log("Crafty Temperature: Boost temperature updated to", boostTemperature);
+    console.log(
+      "Crafty Temperature: Boost temperature updated to",
+      boostTemperature
+    );
     setBoostTemperature(boostTemperature);
   };
 
@@ -73,10 +93,14 @@ export const useTemperature = () => {
       handleCurrentTemperature
     );
     if (!currentTemperature) {
-      console.error("Crafty Temperature: currTemperatureChangedCharacteristic not found");
+      console.error(
+        "Crafty Temperature: currTemperatureChangedCharacteristic not found"
+      );
       return Promise.reject("currTemperatureChangedCharacteristic not found");
     }
-    console.log("Crafty Temperature: Current temperature characteristic set up");
+    console.log(
+      "Crafty Temperature: Current temperature characteristic set up"
+    );
     setCharacteristics((prev) => ({
       ...prev,
       currTemperatureChanged: currentTemperature,
@@ -90,7 +114,9 @@ export const useTemperature = () => {
       handleBoostTemperature
     );
     if (!boostTemperature) {
-      console.error("Crafty Temperature: writeBoostTempCharacteristic not found");
+      console.error(
+        "Crafty Temperature: writeBoostTempCharacteristic not found"
+      );
       return Promise.reject("writeBoostTempCharacteristic not found");
     }
     console.log("Crafty Temperature: Boost temperature characteristic set up");
@@ -102,27 +128,35 @@ export const useTemperature = () => {
 
   const setTemperature = async (value: number) => {
     // Clamp value to valid range (40-210°C)
-    const clampedValue = Math.max(40, Math.min(210, value));
-    console.log("Crafty Temperature: Setting target temperature to", clampedValue);
-    
+    const clampedValue = Math.max(MIN_TEMP, Math.min(MAX_TEMP, value));
+    console.log(
+      "Crafty Temperature: Setting target temperature to",
+      clampedValue
+    );
+
     // Update local state immediately for responsive UI
     setTargetTemperature(clampedValue);
-    
+
     try {
       await writeValueToCharacteristic(
         "writeTemp",
         clampedValue * 10,
         convertToUInt16BLE
       );
-      
+
       // Re-read the value from device to confirm
       const characteristics = getCharacteristics();
       const writeTemp = characteristics.writeTemp;
       if (writeTemp) {
-        const confirmedValue = await bluetoothQueue.add(() => writeTemp.readValue());
+        const confirmedValue = await bluetoothQueue.add(() =>
+          writeTemp.readValue()
+        );
         if (confirmedValue) {
-          const confirmedTemp = Math.round(convertBLEToUint16(confirmedValue) / 10.0);
-          console.log("Crafty Temperature: Confirmed target temperature", confirmedTemp);
+          const confirmedTemp = parseTargetTemperature(confirmedValue);
+          console.log(
+            "Crafty Temperature: Confirmed target temperature",
+            confirmedTemp
+          );
           setTargetTemperature(confirmedTemp);
         }
       }
@@ -133,9 +167,11 @@ export const useTemperature = () => {
       const writeTemp = characteristics.writeTemp;
       if (writeTemp) {
         try {
-          const currentValue = await bluetoothQueue.add(() => writeTemp.readValue());
+          const currentValue = await bluetoothQueue.add(() =>
+            writeTemp.readValue()
+          );
           if (currentValue) {
-            setTargetTemperature(Math.round(convertBLEToUint16(currentValue) / 10.0));
+            setTargetTemperature(parseTargetTemperature(currentValue));
           }
         } catch {
           // Ignore read error during recovery
@@ -145,33 +181,49 @@ export const useTemperature = () => {
   };
 
   const setBoostTemp = async (value: number) => {
-    // Clamp value to valid range (0-30)
-    const clampedValue = Math.max(0, Math.min(30, value));
-    console.log("Crafty Temperature: Setting boost temperature to", clampedValue);
-    
+    // Clamp value to valid range (0-30); target + boost must not exceed 210°C
+    const clampedValue = Math.max(
+      0,
+      Math.min(30, MAX_TEMP - getTargetTemperature(), value)
+    );
+    console.log(
+      "Crafty Temperature: Setting boost temperature to",
+      clampedValue
+    );
+
     // Update local state immediately for responsive UI
     setBoostTemperature(clampedValue);
-    
+
     try {
       await writeValueToCharacteristic(
         "writeBoostTemp",
         clampedValue * 10,
         convertToUInt16BLE
       );
-      
+
       // Re-read the value from device to confirm
       const characteristics = getCharacteristics();
       const writeBoostTemp = characteristics.writeBoostTemp;
       if (writeBoostTemp) {
-        const confirmedValue = await bluetoothQueue.add(() => writeBoostTemp.readValue());
+        const confirmedValue = await bluetoothQueue.add(() =>
+          writeBoostTemp.readValue()
+        );
         if (confirmedValue) {
-          const confirmedTemp = Math.round(convertBLEToUint16(confirmedValue) / 10.0);
-          console.log("Crafty Temperature: Confirmed boost temperature", confirmedTemp);
+          const confirmedTemp = Math.round(
+            convertBLEToUint16(confirmedValue) / 10.0
+          );
+          console.log(
+            "Crafty Temperature: Confirmed boost temperature",
+            confirmedTemp
+          );
           setBoostTemperature(confirmedTemp);
         }
       }
     } catch (error) {
-      console.error("Crafty Temperature: Failed to set boost temperature", error);
+      console.error(
+        "Crafty Temperature: Failed to set boost temperature",
+        error
+      );
     }
   };
 

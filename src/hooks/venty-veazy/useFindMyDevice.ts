@@ -21,8 +21,8 @@ export function useFindMyDevice() {
   const handleResponse = (event: Event) => {
     const value = (event.target as BluetoothRemoteGATTCharacteristic).value;
     if (!value) return;
-    // CMD 0x29: Device notification when entering advertising mode
-    if (value.getUint8(0) === 0x29) {
+    // CMD 0x1D (29 decimal): Advertising info, sent when entering find-my mode
+    if (value.getUint8(0) === 0x1d) {
       // Check Byte 1 Bit 4 (0x10) to confirm active
       if (value.byteLength > 1 && value.getUint8(1) & 0x10) {
         setFindMyDeviceActive(true);

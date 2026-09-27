@@ -2,14 +2,22 @@ import { createEffect, createSignal } from "solid-js";
 import {
   convertBLEToUint16,
   convertToUInt8BLE,
+  convertToUInt16BLE,
 } from "../../utils/bluetoothUtils";
-import { CraftyCharacteristicUUIDs } from "../../utils/uuids";
-import { createCharateristic } from "../../utils/characteristic";
+import {
+  CraftyCharacteristicUUIDs,
+  CraftySecurityCodes,
+} from "../../utils/uuids";
+import {
+  createCharateristic,
+  getCharacteristic,
+} from "../../utils/characteristic";
 import { useBluetooth } from "../../provider/BluetoothProvider";
 import { useWriteToCharacteristic } from "../volcano/useWriteToCharacteristic";
 
 interface UseSystemStatusProps {
   isOldCrafty?: () => boolean;
+  isFirmwareLoaded?: () => boolean;
 }
 
 export const useSystemStatus = (props?: UseSystemStatusProps) => {
@@ -17,10 +25,10 @@ export const useSystemStatus = (props?: UseSystemStatusProps) => {
   const [getAkkuStatus, setAkkuStatus] = createSignal(0);
   const [getAkkuStatus2, setAkkuStatus2] = createSignal(0);
   const [isInitialized, setIsInitialized] = createSignal(false);
-  const { getCraftyStatusService, setCharacteristics } =
-    useBluetooth();
+  const { getCraftyStatusService, setCharacteristics } = useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
   const isOldDevice = props?.isOldCrafty || (() => false);
+  const isFirmwareLoaded = props?.isFirmwareLoaded || (() => true);
 
   const handleSystemStatus = (value: DataView) => {
     const status = convertBLEToUint16(value);
@@ -49,7 +57,9 @@ export const useSystemStatus = (props?: UseSystemStatusProps) => {
       return;
     }
 
-    console.log(`useSystemStatus: Starting initialization (isOldCrafty: ${isOldDevice()})`);
+    console.log(
+      `useSystemStatus: Starting initialization (isOldCrafty: ${isOldDevice()})`
+    );
 
     try {
       // NOTE: These characteristics do NOT support notifications - use createCharateristic (read-only)
@@ -90,7 +100,8 @@ export const useSystemStatus = (props?: UseSystemStatusProps) => {
       }
 
       // factoryResetCharacteristic is write-only
-      const factoryResetCharacteristic = await service.getCharacteristic(
+      const factoryResetCharacteristic = await getCharacteristic(
+        service,
         CraftyCharacteristicUUIDs.factoryResetCharacteristic
       );
       if (factoryResetCharacteristic) {
@@ -102,12 +113,18 @@ export const useSystemStatus = (props?: UseSystemStatusProps) => {
     } catch (error) {
       console.warn("System status features not fully available", error);
     }
-    
+
     setIsInitialized(true);
     console.log("useSystemStatus: Initialization complete");
   };
 
   const factoryReset = async () => {
+    // The device only accepts the reset after the security code was written
+    await writeValueToCharacteristic(
+      "sicherheitscode",
+      CraftySecurityCodes.FACTORY_RESET,
+      convertToUInt16BLE
+    );
     await writeValueToCharacteristic(
       "factoryResetCharacteristic",
       0,
@@ -120,9 +137,9 @@ export const useSystemStatus = (props?: UseSystemStatusProps) => {
     // This ensures isOldCrafty is set correctly
     const oldDevice = isOldDevice();
     const service = getCraftyStatusService();
-    
-    // Only proceed if service is available
-    if (service) {
+
+    // Only proceed if service is available and the firmware version is known
+    if (service && isFirmwareLoaded()) {
       console.log(`useSystemStatus: Initializing (isOldCrafty: ${oldDevice})`);
       handleCharacteristics();
     }

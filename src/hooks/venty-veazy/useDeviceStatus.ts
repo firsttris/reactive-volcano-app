@@ -13,16 +13,38 @@ export interface DeviceStatus {
   isCharging: boolean;
   isCelsius: boolean;
   setpointReached: boolean;
-  vibration: boolean;
   chargeCurrentOptimization: boolean;
   chargeVoltageLimit: boolean;
   permanentBluetooth: boolean;
   boostVisualization: boolean;
 }
 
+const MIN_TEMP = 40;
+const MAX_TEMP = 210;
+const MIN_BOOST = 1;
+const MAX_BOOST = 99;
+
+// Temperature writes are delayed until the user stops clicking (like the
+// legacy app), and polled values are ignored shortly after a write so the
+// display does not jump back to the old value.
+const WRITE_DEBOUNCE_MS = 500;
+const IGNORE_POLL_AFTER_WRITE_MS = 1500;
+
+type PendingField = "targetTemp" | "boostTemp" | "superBoostTemp";
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, value));
+
 export function useDeviceStatus(pollInterval = 500) {
   const { getCharacteristics, deviceInfo } = useBluetooth();
   const [status, setStatus] = createSignal<DeviceStatus | null>(null);
+
+  const writeTimers: Partial<Record<PendingField, number>> = {};
+  const ignorePollUntil: Record<PendingField, number> = {
+    targetTemp: 0,
+    boostTemp: 0,
+    superBoostTemp: 0,
+  };
 
   const convertToFahrenheit = (celsius: number): number => {
     return Math.round(celsius * 1.8 + 32);
@@ -96,7 +118,7 @@ export function useDeviceStatus(pollInterval = 500) {
     //   bit 3 (0x08): Charge Current Optimization
     //   bit 4 (0x10): Button Changed (read-only)
     //   bit 5 (0x20): Charge Voltage Limit
-    //   bit 6 (0x40): Vibration & Boost Visualization
+    //   bit 6 (0x40): Boost Visualization (vibration is in CMD 0x06, byte 5)
     const settings = value.getUint8(14);
     // Byte 11: Heater mode (0=off, 1=normal, 2=boost, 3=superboost)
     const heaterModeValue = value.getUint8(11);
@@ -133,15 +155,13 @@ export function useDeviceStatus(pollInterval = 500) {
       isCelsius: !(settings & 0x01),
       // Byte 14, bit 1: Setpoint Reached (target temperature reached)
       setpointReached: !!(settings & 0x02),
-      // Byte 14, bit 6: Vibration (same as Boost Visualization)
-      vibration: !!(settings & 0x40),
       // Byte 14, bit 3: Charge Current Optimization
       chargeCurrentOptimization: !!(settings & 0x08),
       // Byte 14, bit 5: Charge Voltage Limit
       chargeVoltageLimit: !!(settings & 0x20),
       // Byte 16, bit 0: Permanent Bluetooth enabled
       permanentBluetooth,
-      // Byte 14, bit 6: Boost Visualization (für VEAZY invertiert, same as vibration)
+      // Byte 14, bit 6: Boost Visualization (für VEAZY invertiert)
       boostVisualization,
     };
   };
@@ -159,9 +179,19 @@ export function useDeviceStatus(pollInterval = 500) {
 
   const handleStatus = (event: Event) => {
     const value = (event.target as BluetoothRemoteGATTCharacteristic).value;
-    if (value && value.getUint8(0) === 1) {
-      setStatus(parseDeviceStatus(value));
+    if (!value || value.getUint8(0) !== 1 || value.byteLength < 15) return;
+
+    const parsed = parseDeviceStatus(value);
+    const prev = status();
+    if (prev) {
+      const now = Date.now();
+      for (const field of Object.keys(ignorePollUntil) as PendingField[]) {
+        if (now < ignorePollUntil[field]) {
+          parsed[field] = prev[field];
+        }
+      }
     }
+    setStatus(parsed);
   };
 
   async function writeDeviceStatus(
@@ -180,33 +210,60 @@ export function useDeviceStatus(pollInterval = 500) {
     if (control) await bluetoothQueue.add(() => control.writeValue(buffer));
   }
 
+  // Updates the UI immediately and writes to the device once the value
+  // has not changed for WRITE_DEBOUNCE_MS
+  const scheduleTemperatureWrite = (
+    field: PendingField,
+    val: number,
+    write: () => Promise<void>
+  ) => {
+    setStatus((prev) => (prev ? { ...prev, [field]: val } : prev));
+    ignorePollUntil[field] = Number.POSITIVE_INFINITY;
+    clearTimeout(writeTimers[field]);
+    writeTimers[field] = window.setTimeout(async () => {
+      delete writeTimers[field];
+      try {
+        await write();
+      } catch (error) {
+        console.error(`Failed to write ${field}:`, error);
+      } finally {
+        if (!writeTimers[field]) {
+          ignorePollUntil[field] = Date.now() + IGNORE_POLL_AFTER_WRITE_MS;
+        }
+      }
+    }, WRITE_DEBOUNCE_MS);
+  };
+
   const setTargetTemp = async (val: number | null) => {
     // Byte 4+5: Target temperature (uint16 LE, /10)
-    setStatus((prev) => (prev ? { ...prev, targetTemp: val } : prev));
-    if (val !== null) {
-      const tempValue = val * 10;
+    if (val === null) return;
+    const temp = clamp(val, MIN_TEMP, MAX_TEMP);
+    scheduleTemperatureWrite("targetTemp", temp, () => {
+      const tempValue = temp * 10;
       // Byte 4: low byte, Byte 5: high byte
-      await writeDeviceStatus(1, 2, {
+      return writeDeviceStatus(1, 2, {
         4: tempValue & 0xff, // Byte 4: Temperatur (low)
         5: (tempValue >> 8) & 0xff, // Byte 5: Temperatur (high)
       });
-    }
+    });
   };
 
   const setBoostTemp = async (val: number | null) => {
     // Byte 6: Boost temperature
-    setStatus((prev) => (prev ? { ...prev, boostTemp: val } : prev));
-    if (val !== null) {
-      await writeDeviceStatus(1, 4, { 6: val }); // Byte 6: Boost-Temp
-    }
+    if (val === null) return;
+    const temp = clamp(val, MIN_BOOST, MAX_BOOST);
+    scheduleTemperatureWrite("boostTemp", temp, () =>
+      writeDeviceStatus(1, 4, { 6: temp })
+    );
   };
 
   const setSuperBoostTemp = async (val: number | null) => {
     // Byte 7: Super Boost temperature
-    setStatus((prev) => (prev ? { ...prev, superBoostTemp: val } : prev));
-    if (val !== null) {
-      await writeDeviceStatus(1, 8, { 7: val }); // Byte 7: Superboost-Temp
-    }
+    if (val === null) return;
+    const temp = clamp(val, MIN_BOOST, MAX_BOOST);
+    scheduleTemperatureWrite("superBoostTemp", temp, () =>
+      writeDeviceStatus(1, 8, { 7: temp })
+    );
   };
 
   const setHeaterMode = async (val: number | null) => {
@@ -222,17 +279,6 @@ export function useDeviceStatus(pollInterval = 500) {
     // Byte 15: BIT_SETTINGS_UNIT
     setStatus((prev) => (prev ? { ...prev, isCelsius: val } : prev));
     await writeDeviceStatus(1, 128, { 14: val ? 0 : 1, 15: 1 });
-  };
-
-  const setAutoShutdownTimer = async (val: number | null) => {
-    // Byte 9+10: Auto-Shutdown-Timer (Sekunden)
-    setStatus((prev) => (prev ? { ...prev, autoShutdownTimer: val } : prev));
-    if (val !== null) {
-      await writeDeviceStatus(1, 16, {
-        9: val & 0xff, // Byte 9: Timer (low)
-        10: (val >> 8) & 0xff, // Byte 10: Timer (high)
-      });
-    }
   };
 
   const setChargeCurrentOptimization = async (val: boolean) => {
@@ -268,6 +314,7 @@ export function useDeviceStatus(pollInterval = 500) {
     onCleanup(() => {
       clearInterval(interval);
       control.removeEventListener("characteristicvaluechanged", handleStatus);
+      for (const timer of Object.values(writeTimers)) clearTimeout(timer);
     });
   });
 
@@ -276,7 +323,6 @@ export function useDeviceStatus(pollInterval = 500) {
     setTargetTemp,
     setBoostTemp,
     setSuperBoostTemp,
-    setAutoShutdownTimer,
     setHeaterMode,
     setIsCelsius,
     setChargeCurrentOptimization,

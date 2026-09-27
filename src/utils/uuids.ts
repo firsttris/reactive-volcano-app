@@ -7,6 +7,20 @@ export enum States {
   VIBRATION = 0x400,
 }
 
+// Crafty project register (0x93) bits (from crafty.js)
+export enum CraftyProjectRegisterBits {
+  CRAFTY_ACTIVE = 1 << 4,
+  BOOST_MODE_ENABLED = 1 << 5,
+  SUPERBOOST_MODE_ENABLED = 1 << 6,
+}
+
+// Codes that must be written to the Crafty "sicherheitscode" characteristic
+// before protected settings can be changed (from crafty.js)
+export enum CraftySecurityCodes {
+  AUTO_OFF_COUNTDOWN = 815,
+  FACTORY_RESET = 1000,
+}
+
 // Veazy/Venty Write Masks (from qvap.js)
 export enum VentyVeazyWriteMasks {
   SET_TEMPERATURE = 1 << 1,

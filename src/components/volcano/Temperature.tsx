@@ -5,6 +5,7 @@ import { FaSolidPlus } from "solid-icons/fa";
 import { RoundButton } from "../Button";
 import { TemperatureDisplay } from "../TemperatureDisplay";
 import { useTranslations } from "../../i18n/utils";
+import { convertCelsiusToFahrenheit } from "../../utils/bluetoothUtils";
 
 const TempDisplay = styled("div")`
   text-align: center;
@@ -70,6 +71,10 @@ export const Temperature = () => {
     temperature;
   const { isCelsius } = deviceSetting;
 
+  // The Volcano always reports °C, so convert for display in Fahrenheit mode
+  const toDisplayUnit = (celsius: number) =>
+    isCelsius() ? celsius : convertCelsiusToFahrenheit(celsius);
+
   const t = useTranslations();
 
   const increaseTemperature = () => {
@@ -86,7 +91,7 @@ export const Temperature = () => {
         <TempLabel>{t("currentTemperature")}</TempLabel>
         <DigitalText>
           <TemperatureDisplay
-            value={getCurrentTemperature()}
+            value={toDisplayUnit(getCurrentTemperature())}
             unit={isCelsius() ? "C" : "F"}
           />
         </DigitalText>
@@ -97,7 +102,7 @@ export const Temperature = () => {
         </RoundButton>
         <DigitalText isTarget={true}>
           <TemperatureDisplay
-            value={getTargetTemperature()}
+            value={toDisplayUnit(getTargetTemperature())}
             unit={isCelsius() ? "C" : "F"}
           />
         </DigitalText>

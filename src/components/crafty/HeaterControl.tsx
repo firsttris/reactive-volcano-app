@@ -31,8 +31,9 @@ const WarningText = styled("div")`
 `;
 
 export const HeaterControl = () => {
-  const { power, firmware } = useCraftyDeviceContext();
-  const { getPowerChanged, turnHeaterOn, turnHeaterOff } = power;
+  const { power, firmware, projectRegister } = useCraftyDeviceContext();
+  const { turnHeaterOn, turnHeaterOff } = power;
+  const { isHeaterActive } = projectRegister;
   const { isOldCrafty } = firmware;
 
   const toggleHeater = () => {
@@ -41,8 +42,8 @@ export const HeaterControl = () => {
       console.warn("Heater controls not available on old Crafty");
       return;
     }
-    
-    if (getPowerChanged() > 0) {
+
+    if (isHeaterActive()) {
       turnHeaterOff();
     } else {
       turnHeaterOn();
@@ -52,16 +53,18 @@ export const HeaterControl = () => {
   return (
     <Container>
       <TextContainer>Crafty</TextContainer>
-      <Show when={!isOldCrafty()} fallback={
-        <WarningText>
-          ⚠️ Heater controls not available on old Crafty (firmware &lt;= 2.51).<br/>
-          Battery status is shown below.
-        </WarningText>
-      }>
-        <ActiveRoundButton
-          isActive={getPowerChanged() > 0}
-          onClick={toggleHeater}
-        >
+      <Show
+        when={!isOldCrafty()}
+        fallback={
+          <WarningText>
+            ⚠️ Heater controls not available on old Crafty (firmware &lt;=
+            2.51).
+            <br />
+            Battery status is shown below.
+          </WarningText>
+        }
+      >
+        <ActiveRoundButton isActive={isHeaterActive()} onClick={toggleHeater}>
           <SiFireship size="30px" />
         </ActiveRoundButton>
       </Show>

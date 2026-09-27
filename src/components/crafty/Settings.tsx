@@ -213,11 +213,11 @@ export const Settings: Component = () => {
             <SettingItem>
               <SettingLabel>{t("autoMaticShutdownTime")}</SettingLabel>
               <Slider
-                min={0}
-                max={600}
-                step={60}
+                min={30}
+                max={300}
+                step={30}
                 value={getAutoOffCountdown()}
-                label={`${t("autoMaticShutdownTime")}: ${Math.floor(getAutoOffCountdown() / 60)} min`}
+                label={`${t("autoMaticShutdownTime")}: ${getAutoOffCountdown()} s`}
                 onInput={setAutoOffCountdown}
               />
             </SettingItem>
@@ -227,8 +227,8 @@ export const Settings: Component = () => {
               <SettingLabel>Current Auto-Off Time</SettingLabel>
               <InfoDisplay>
                 {Math.floor(getAutoOffCurrentValue() / 60)}:
-                {(getAutoOffCurrentValue() % 60).toString().padStart(2, "0")} min
-                remaining
+                {(getAutoOffCurrentValue() % 60).toString().padStart(2, "0")}{" "}
+                min remaining
               </InfoDisplay>
             </SettingItem>
           </>
@@ -296,7 +296,8 @@ export const Settings: Component = () => {
         <SettingItem>
           <SettingLabel>Usage Time</SettingLabel>
           <InfoDisplay>
-            {getUseHours()} hours {!isOldCrafty() && `${getUseMinutes()} minutes`}
+            {getUseHours()} hours{" "}
+            {!isOldCrafty() && `${getUseMinutes()} minutes`}
           </InfoDisplay>
         </SettingItem>
 

@@ -3,7 +3,10 @@ import {
   convertBLEToUint16,
   convertToUInt16BLE,
 } from "../../utils/bluetoothUtils";
-import { CraftyCharacteristicUUIDs } from "../../utils/uuids";
+import {
+  CraftyCharacteristicUUIDs,
+  CraftySecurityCodes,
+} from "../../utils/uuids";
 import {
   createCharateristicWithEventListener,
   createCharateristic,
@@ -14,6 +17,7 @@ import { useWriteToCharacteristic } from "../volcano/useWriteToCharacteristic";
 
 interface UseSettingsProps {
   isOldCrafty?: () => boolean;
+  isFirmwareLoaded?: () => boolean;
 }
 
 export const useSettings = (props?: UseSettingsProps) => {
@@ -25,6 +29,7 @@ export const useSettings = (props?: UseSettingsProps) => {
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
   const isOldDevice = props?.isOldCrafty || (() => false);
+  const isFirmwareLoaded = props?.isFirmwareLoaded || (() => true);
 
   const handleLedBrightness = (value: DataView) => {
     const brightness = convertBLEToUint16(value);
@@ -45,7 +50,9 @@ export const useSettings = (props?: UseSettingsProps) => {
     const service = getCraftyControlService();
     if (!service || isInitialized()) return;
 
-    console.log(`useSettings: Starting initialization (isOldCrafty: ${isOldDevice()})`);
+    console.log(
+      `useSettings: Starting initialization (isOldCrafty: ${isOldDevice()})`
+    );
 
     // LED brightness is available on all Crafty devices
     // NOTE: This characteristic does NOT support notifications - use createCharateristic (read-only)
@@ -94,7 +101,7 @@ export const useSettings = (props?: UseSettingsProps) => {
         console.warn("Auto-off features not available (old Crafty)", error);
       }
     }
-    
+
     setIsInitialized(true);
     console.log("useSettings: Initialization complete");
   };
@@ -108,6 +115,13 @@ export const useSettings = (props?: UseSettingsProps) => {
   };
 
   const setAutoOffCountdownValue = async (value: number) => {
+    setAutoOffCountdown(value);
+    // The device only accepts the new value after the security code was written
+    await writeValueToCharacteristic(
+      "sicherheitscode",
+      CraftySecurityCodes.AUTO_OFF_COUNTDOWN,
+      convertToUInt16BLE
+    );
     await writeValueToCharacteristic(
       "autoOffCountdown",
       value,
@@ -120,9 +134,9 @@ export const useSettings = (props?: UseSettingsProps) => {
     // This ensures isOldCrafty is set correctly
     const oldDevice = isOldDevice();
     const service = getCraftyControlService();
-    
-    // Only proceed if service is available
-    if (service) {
+
+    // Only proceed if service is available and the firmware version is known
+    if (service && isFirmwareLoaded()) {
       console.log(`useSettings: Initializing (isOldCrafty: ${oldDevice})`);
       handleCharacteristics();
     }

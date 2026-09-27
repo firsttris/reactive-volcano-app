@@ -1,18 +1,20 @@
 import { createEffect, createSignal, onCleanup } from "solid-js";
 import {
   convertBLEToUint16,
-  convertToUInt8BLE,
+  convertToUInt16BLE,
 } from "../../utils/bluetoothUtils";
 import { CraftyCharacteristicUUIDs } from "../../utils/uuids";
 import {
   createCharateristicWithEventListener,
   detachEventListener,
+  getCharacteristic,
 } from "../../utils/characteristic";
 import { useBluetooth } from "../../provider/BluetoothProvider";
 import { useWriteToCharacteristic } from "../volcano/useWriteToCharacteristic";
 
 interface UsePowerProps {
   isOldCrafty?: () => boolean;
+  isFirmwareLoaded?: () => boolean;
 }
 
 export const usePower = (props?: UsePowerProps) => {
@@ -23,6 +25,7 @@ export const usePower = (props?: UsePowerProps) => {
     useBluetooth();
   const { writeValueToCharacteristic } = useWriteToCharacteristic();
   const isOldDevice = props?.isOldCrafty || (() => false);
+  const isFirmwareLoaded = props?.isFirmwareLoaded || (() => true);
 
   const handlePowerChanged = (value: DataView) => {
     const power = convertBLEToUint16(value);
@@ -37,7 +40,9 @@ export const usePower = (props?: UsePowerProps) => {
     const service = getCraftyControlService();
     if (!service || isInitialized()) return;
 
-    console.log(`usePower: Starting initialization (isOldCrafty: ${isOldDevice()})`);
+    console.log(
+      `usePower: Starting initialization (isOldCrafty: ${isOldDevice()})`
+    );
 
     // Power characteristic is available on all Crafty devices
     const powerChanged = await createCharateristicWithEventListener(
@@ -56,7 +61,8 @@ export const usePower = (props?: UsePowerProps) => {
     // heaterOn and heaterOff only available on Crafty+ (firmware >= 2.51)
     if (!isOldDevice()) {
       try {
-        const heaterOn = await service.getCharacteristic(
+        const heaterOn = await getCharacteristic(
+          service,
           CraftyCharacteristicUUIDs.heaterOn
         );
         if (heaterOn) {
@@ -66,7 +72,8 @@ export const usePower = (props?: UsePowerProps) => {
           }));
         }
 
-        const heaterOff = await service.getCharacteristic(
+        const heaterOff = await getCharacteristic(
+          service,
           CraftyCharacteristicUUIDs.heaterOff
         );
         if (heaterOff) {
@@ -76,20 +83,24 @@ export const usePower = (props?: UsePowerProps) => {
           }));
         }
       } catch (error) {
-        console.warn("Heater on/off controls not available (old Crafty)", error);
+        console.warn(
+          "Heater on/off controls not available (old Crafty)",
+          error
+        );
       }
     }
-    
+
     setIsInitialized(true);
     console.log("usePower: Initialization complete");
   };
 
+  // The original app writes a 2-byte zero value to heaterOn/heaterOff
   const turnHeaterOn = async () => {
-    await writeValueToCharacteristic("heaterOn", 1, convertToUInt8BLE);
+    await writeValueToCharacteristic("heaterOn", 0, convertToUInt16BLE);
   };
 
   const turnHeaterOff = async () => {
-    await writeValueToCharacteristic("heaterOff", 1, convertToUInt8BLE);
+    await writeValueToCharacteristic("heaterOff", 0, convertToUInt16BLE);
   };
 
   createEffect(() => {
@@ -97,9 +108,9 @@ export const usePower = (props?: UsePowerProps) => {
     // This ensures isOldCrafty is set correctly
     const oldDevice = isOldDevice();
     const service = getCraftyControlService();
-    
-    // Only proceed if service is available
-    if (service) {
+
+    // Only proceed if service is available and the firmware version is known
+    if (service && isFirmwareLoaded()) {
       console.log(`usePower: Initializing (isOldCrafty: ${oldDevice})`);
       handleCharacteristics();
     }
