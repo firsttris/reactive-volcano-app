@@ -1,5 +1,5 @@
 import { Accessor, createSignal, onCleanup } from "solid-js";
-import { useVolcanoDeviceContext } from "../../provider/VolcanoDeviceProvider";
+import { useVolcano } from "../../provider/VolcanoProvider";
 import { WorkflowStep } from "../../utils/workflowData";
 
 // Like the legacy app, the pump always runs for at least this long
@@ -18,17 +18,16 @@ export const useWorkflowScheduler = (
   const [isRunning, setIsRunning] = createSignal(false);
   const [isPaused, setIsPaused] = createSignal(false);
 
-  const { temperature, deviceStatus } = useVolcanoDeviceContext();
-  const { getCurrentTemperature, getTargetTemperature, setTargetTemperature } =
-    temperature;
-  const {
-    isPumpActive,
-    isHeatingActive,
-    setPumpOn,
-    setPumpOff,
-    setHeatOn,
-    setHeatOff,
-  } = deviceStatus;
+  const { state, actions, derived } = useVolcano();
+  const getCurrentTemperature = () => state.currentTemp;
+  const getTargetTemperature = () => state.targetTemp;
+  const setTargetTemperature = actions.applyTargetTemp;
+  const isPumpActive = derived.isPumpActive;
+  const isHeatingActive = derived.isHeating;
+  const setPumpOn = () => actions.setPump(true);
+  const setPumpOff = () => actions.setPump(false);
+  const setHeatOn = () => actions.setHeater(true);
+  const setHeatOff = () => actions.setHeater(false);
 
   // Each run gets its own id; stopping or pausing invalidates the running one
   let runId = 0;

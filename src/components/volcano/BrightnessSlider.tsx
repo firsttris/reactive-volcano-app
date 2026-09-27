@@ -1,23 +1,20 @@
 import { Slider } from "../Slider";
-import { useVolcanoDeviceContext } from "../../provider/VolcanoDeviceProvider";
+import { useVolcano } from "../../provider/VolcanoProvider";
 import { useTranslations } from "../../i18n/utils";
 
 export const BrightnessSlider = () => {
   const t = useTranslations();
 
-  const { brightness } = useVolcanoDeviceContext();
-  const { getBrightness, setTargetBrightness } = brightness;
+  const { state, actions } = useVolcano();
 
   return (
     <Slider
-      value={getBrightness()}
-      label={`${t("deviceBrightness")}: ${getBrightness()} %`}
+      value={state.brightness}
+      label={`${t("deviceBrightness")}: ${state.brightness} %`}
       min={0}
       step={10}
       max={100}
-      onInput={(value) => {
-        setTargetBrightness(value);
-      }}
+      onInput={actions.setBrightness}
     />
   );
 };

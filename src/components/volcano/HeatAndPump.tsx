@@ -1,7 +1,7 @@
 import { ActiveRoundButton } from "../Button";
 import { FaSolidWind } from "solid-icons/fa";
 import { SiFireship } from "solid-icons/si";
-import { useVolcanoDeviceContext } from "../../provider/VolcanoDeviceProvider";
+import { useVolcano } from "../../provider/VolcanoProvider";
 import { styled } from "solid-styled-components";
 import { useTranslations } from "../../i18n/utils";
 
@@ -32,43 +32,25 @@ const TextContainer = styled("div")`
 `;
 
 export const HeatAndPump = () => {
-  const { deviceStatus } = useVolcanoDeviceContext();
+  const { actions, derived } = useVolcano();
   const t = useTranslations();
-  const {
-    isPumpActive: getIsPumpActive,
-    isHeatingActive: getIsHeatActive,
-    setHeatOn,
-    setHeatOff,
-    setPumpOn,
-    setPumpOff,
-  } = deviceStatus;
 
-  const toggleHeat = () => {
-    if (getIsHeatActive()) {
-      setHeatOff();
-    } else {
-      setHeatOn();
-    }
-  };
-
-  const togglePump = () => {
-    if (getIsPumpActive()) {
-      setPumpOff();
-    } else {
-      setPumpOn();
-    }
-  };
+  const toggleHeat = () => actions.setHeater(!derived.isHeating());
+  const togglePump = () => actions.setPump(!derived.isPumpActive());
 
   return (
     <Container>
       <div>
-        <ActiveRoundButton isActive={getIsHeatActive()} onClick={toggleHeat}>
+        <ActiveRoundButton isActive={derived.isHeating()} onClick={toggleHeat}>
           <SiFireship size="30px" />
         </ActiveRoundButton>
       </div>
       <TextContainer>{t("hybrid")}</TextContainer>
       <div>
-        <ActiveRoundButton isActive={getIsPumpActive()} onClick={togglePump}>
+        <ActiveRoundButton
+          isActive={derived.isPumpActive()}
+          onClick={togglePump}
+        >
           <FaSolidWind size="30px" style={{ transform: "rotate(270deg)" }} />
         </ActiveRoundButton>
       </div>

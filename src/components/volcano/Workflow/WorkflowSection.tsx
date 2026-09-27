@@ -1,7 +1,7 @@
 import { For } from "solid-js";
 import { WorkflowItem } from "./WorkflowItem";
 import { styled } from "solid-styled-components";
-import { useVolcanoDeviceContext } from "../../../provider/VolcanoDeviceProvider";
+import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { Button } from "../../Button";
 import { FiPlus, FiDownload, FiUpload } from "solid-icons/fi";
 import { useTranslations } from "../../../i18n/utils";
@@ -80,7 +80,7 @@ const AddWorkflowButton = styled(Button)`
 `;
 
 export const WorkFlowSection = () => {
-  const { workflow } = useVolcanoDeviceContext();
+  const workflow = useWorkflowContext();
   const t = useTranslations();
   const {
     workflowList,

@@ -11,7 +11,7 @@ import {
 import { styled } from "solid-styled-components";
 import { useNavigate } from "@solidjs/router";
 import { Workflow } from "../../../utils/workflowData";
-import { useVolcanoDeviceContext } from "../../../provider/VolcanoDeviceProvider";
+import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { useWorkflowScheduler } from "../../../hooks/volcano/useWorkflowScheduler";
 import { buildRoute } from "../../../routes";
 import { useTranslations } from "../../../i18n/utils";
@@ -176,7 +176,7 @@ const ProgressFill = styled("div")<{ progress: number }>`
 `;
 
 export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
-  const { workflow } = useVolcanoDeviceContext();
+  const workflow = useWorkflowContext();
   const {
     setSelectedWorkflowId,
     deleteWorkflowFromList,

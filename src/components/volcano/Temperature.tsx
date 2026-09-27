@@ -1,4 +1,4 @@
-import { useVolcanoDeviceContext } from "../../provider/VolcanoDeviceProvider";
+import { useVolcano } from "../../provider/VolcanoProvider";
 import { styled } from "solid-styled-components";
 import { FaSolidMinus } from "solid-icons/fa";
 import { FaSolidPlus } from "solid-icons/fa";
@@ -66,10 +66,8 @@ const TempControls = styled("div")`
 `;
 
 export const Temperature = () => {
-  const { temperature, deviceSetting } = useVolcanoDeviceContext();
-  const { getTargetTemperature, getCurrentTemperature, setTargetTemperature } =
-    temperature;
-  const { isCelsius } = deviceSetting;
+  const { state, actions, derived } = useVolcano();
+  const isCelsius = derived.isCelsius;
 
   // The Volcano always reports °C, so convert for display in Fahrenheit mode
   const toDisplayUnit = (celsius: number) =>
@@ -78,11 +76,11 @@ export const Temperature = () => {
   const t = useTranslations();
 
   const increaseTemperature = () => {
-    setTargetTemperature(getTargetTemperature() + 1);
+    actions.setTargetTemp(state.targetTemp + 1);
   };
 
   const decreaseTemperature = () => {
-    setTargetTemperature(getTargetTemperature() - 1);
+    actions.setTargetTemp(state.targetTemp - 1);
   };
 
   return (
@@ -91,7 +89,7 @@ export const Temperature = () => {
         <TempLabel>{t("currentTemperature")}</TempLabel>
         <DigitalText>
           <TemperatureDisplay
-            value={toDisplayUnit(getCurrentTemperature())}
+            value={toDisplayUnit(state.currentTemp)}
             unit={isCelsius() ? "C" : "F"}
           />
         </DigitalText>
@@ -102,7 +100,7 @@ export const Temperature = () => {
         </RoundButton>
         <DigitalText isTarget={true}>
           <TemperatureDisplay
-            value={toDisplayUnit(getTargetTemperature())}
+            value={toDisplayUnit(state.targetTemp)}
             unit={isCelsius() ? "C" : "F"}
           />
         </DigitalText>

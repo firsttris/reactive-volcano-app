@@ -1,4 +1,4 @@
-import { useVolcanoDeviceContext } from "../../provider/VolcanoDeviceProvider";
+import { useVolcano } from "../../provider/VolcanoProvider";
 import { FaSolidLightbulb } from "solid-icons/fa";
 import { Switch } from "../Switch";
 import { useTranslations } from "../../i18n/utils";
@@ -6,23 +6,13 @@ import { useTranslations } from "../../i18n/utils";
 export const StandbyDisplaySwitch = () => {
   const t = useTranslations();
 
-  const { deviceSetting } = useVolcanoDeviceContext();
-  const { isDisplayOnCooling, setDisplayOnCoolingOn, setDisplayOnCoolingOff } =
-    deviceSetting;
-
-  const toggleSwitch = (isOn: boolean) => {
-    if (isOn) {
-      setDisplayOnCoolingOn();
-    } else {
-      setDisplayOnCoolingOff();
-    }
-  };
+  const { actions, derived } = useVolcano();
 
   return (
     <Switch
       label={t("standbyLight")}
-      onToggle={toggleSwitch}
-      isOn={isDisplayOnCooling()}
+      onToggle={actions.setDisplayOnCooling}
+      isOn={derived.isDisplayOnCooling()}
       icon={<FaSolidLightbulb size="18px" />}
     />
   );

@@ -71,26 +71,66 @@ export async function mockBluetooth(page: Page, deviceType: DeviceType = 'VOLCAN
         services: {
           '10100000-5354-4f52-5a26-4249434b454c': { // Volcano State Service
             characteristics: {
-              '1010000c-5354-4f52-5a26-4249434b454c': { // Activity/Heater State
+              '10100008-5354-4f52-5a26-4249434b454c': { // Serial Number
+                properties: { read: true, notify: false, write: false, writeWithoutResponse: false },
+                value: new TextEncoder().encode('12345678'),
+              },
+              '10100003-5354-4f52-5a26-4249434b454c': { // Firmware Version
+                properties: { read: true, notify: false, write: false, writeWithoutResponse: false },
+                value: new TextEncoder().encode('V01.0.53'),
+              },
+              '10100004-5354-4f52-5a26-4249434b454c': { // BLE Firmware Version
+                properties: { read: true, notify: false, write: false, writeWithoutResponse: false },
+                value: new TextEncoder().encode('V01.0.03'),
+              },
+              '1010000c-5354-4f52-5a26-4249434b454c': { // Project Register 1 (heater/pump state, OFF)
                 properties: { read: true, notify: true, write: false, writeWithoutResponse: false },
-                value: new Uint8Array([0x00]), // OFF
+                value: new Uint8Array([0x00, 0x00]),
+              },
+              '1010000d-5354-4f52-5a26-4249434b454c': { // Project Register 2 (unit/display)
+                properties: { read: true, notify: true, write: true, writeWithoutResponse: false },
+                value: new Uint8Array([0x00, 0x00]),
+              },
+              '1010000e-5354-4f52-5a26-4249434b454c': { // Project Register 3 (vibration)
+                properties: { read: true, notify: false, write: true, writeWithoutResponse: false },
+                value: new Uint8Array([0x00, 0x00]),
               },
             },
           },
-          '10110000-5354-4f52-5a26-4249434b454c': { // Volcano Control Service  
+          '10110000-5354-4f52-5a26-4249434b454c': { // Volcano Control Service
             characteristics: {
-              '10110001-5354-4f52-5a26-4249434b454c': { // Current Temperature
+              '10110001-5354-4f52-5a26-4249434b454c': { // Current Temperature (200°C)
                 properties: { read: true, notify: true, write: false, writeWithoutResponse: false },
-                value: new Uint8Array([0xD0, 0x07]), // 200°C = 2000 in 0.1°C units (Little Endian: 0x07D0)
+                value: new Uint8Array([0xD0, 0x07]),
               },
-              '10110003-5354-4f52-5a26-4249434b454c': { // Target Temperature
+              '10110003-5354-4f52-5a26-4249434b454c': { // Target Temperature (230°C)
+                properties: { read: true, notify: true, write: true, writeWithoutResponse: false },
+                value: new Uint8Array([0xFC, 0x08]),
+              },
+              '1011000c-5354-4f52-5a26-4249434b454c': { // Auto-Off Remaining (s)
                 properties: { read: true, notify: true, write: false, writeWithoutResponse: false },
-                value: new Uint8Array([0xFC, 0x08]), // 230°C = 2300 in 0.1°C units (Little Endian: 0x08FC)
+                value: new Uint8Array([0x2C, 0x01]),
               },
-              '1011000f-5354-4f52-5a26-4249434b454c': { // Heater Control (ON)
+              '1011000d-5354-4f52-5a26-4249434b454c': { // Shutoff Time (s)
+                properties: { read: true, notify: false, write: true, writeWithoutResponse: false },
+                value: new Uint8Array([0x58, 0x02]),
+              },
+              '10110005-5354-4f52-5a26-4249434b454c': { // LED Brightness
+                properties: { read: true, notify: false, write: true, writeWithoutResponse: false },
+                value: new Uint8Array([0x46, 0x00]),
+              },
+              '10110015-5354-4f52-5a26-4249434b454c': { // Heating Hours
+                properties: { read: true, notify: true, write: false, writeWithoutResponse: false },
+                value: new Uint8Array([0x0C, 0x00]),
+              },
+              '10110016-5354-4f52-5a26-4249434b454c': { // Heating Minutes
+                properties: { read: true, notify: true, write: false, writeWithoutResponse: false },
+                value: new Uint8Array([0x22, 0x00]),
+              },
+              '1011000f-5354-4f52-5a26-4249434b454c': { // Heater ON
                 properties: { read: false, notify: false, write: true, writeWithoutResponse: false },
               },
-              '10110010-5354-4f52-5a26-4249434b454c': { // Heater Control (OFF)
+              '10110010-5354-4f52-5a26-4249434b454c': { // Heater OFF
                 properties: { read: false, notify: false, write: true, writeWithoutResponse: false },
               },
               '10110013-5354-4f52-5a26-4249434b454c': { // Pump ON

@@ -7,7 +7,6 @@ import { useTranslations } from "../i18n/utils";
 import { VsLoading } from "solid-icons/vs";
 import { Show } from "solid-js";
 import { useBluetooth } from "../provider/BluetoothProvider";
-import { useDeviceInformation } from "../hooks/volcano/useDeviceInformation";
 
 interface ConnectionBarContainerProps {
   isDarkMode: boolean;
@@ -137,22 +136,13 @@ export const ConnectionBar = () => {
   const { disconnect, connectionState, deviceInfo } = useBluetooth();
   const { isDarkMode } = useDarkMode();
   const t = useTranslations();
-  const { getSerialNumber: getVolcanoSerialNumber } = useDeviceInformation();
 
   const isAnyDeviceConnected = () =>
     connectionState() === ConnectionState.CONNECTED;
   const isConnecting = () => connectionState() === ConnectionState.CONNECTING;
 
   // Get device-specific information
-  const getSerialNumber = () => {
-    const device = deviceInfo();
-    if (device.type === DeviceType.VOLCANO) {
-      // Use the device information hook for Volcano
-      return getVolcanoSerialNumber();
-    }
-    // For Veazy/Venty, extract from device name (format: "S&B VY123456" or "S&B VZ123456")
-    return device.name ? device.name.split(" ")[1] || "" : "";
-  };
+  const getSerialNumber = () => deviceInfo().serialNumber ?? "";
 
   const getFirmwareVersion = () => {
     // This would need device-specific implementation

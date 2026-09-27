@@ -1,5 +1,6 @@
 import { RouteSectionProps } from "@solidjs/router";
-import { VolcanoDeviceProvider } from "../../../provider/VolcanoDeviceProvider";
+import { VolcanoProvider } from "../../../provider/VolcanoProvider";
+import { WorkflowProvider } from "../../../provider/WorkflowProvider";
 import { useBluetooth } from "../../../provider/BluetoothProvider";
 import { useNavigate } from "@solidjs/router";
 import { createEffect } from "solid-js";
@@ -7,7 +8,7 @@ import { ConnectionState } from "../../../utils/uuids";
 import { buildRoute } from "../../../routes";
 
 /**
- * Wrapper component that provides VolcanoDeviceProvider for workflow routes
+ * Wrapper for all Volcano routes: provides the device store and workflows
  */
 export const WorkflowWrapper = (props: RouteSectionProps) => {
   const navigate = useNavigate();
@@ -24,5 +25,9 @@ export const WorkflowWrapper = (props: RouteSectionProps) => {
     }
   });
 
-  return <VolcanoDeviceProvider>{props.children}</VolcanoDeviceProvider>;
+  return (
+    <WorkflowProvider>
+      <VolcanoProvider>{props.children}</VolcanoProvider>
+    </WorkflowProvider>
+  );
 };

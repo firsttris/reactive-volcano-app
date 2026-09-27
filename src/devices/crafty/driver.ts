@@ -17,6 +17,14 @@ import {
   parseText,
   parseUint16,
 } from "./protocol";
+import {
+  createCharacteristicDevice,
+  getOptionalCharacteristic,
+  getRequiredCharacteristic,
+  getService,
+  type Reader,
+  type UpdateListener,
+} from "../shared/characteristicDevice";
 
 export interface CraftyValues {
   targetTemp: number;
@@ -38,7 +46,7 @@ export interface CraftyValues {
 }
 
 export type CraftyUpdate = Partial<CraftyValues>;
-export type CraftyUpdateListener = (update: CraftyUpdate) => void;
+export type CraftyUpdateListener = UpdateListener<CraftyValues>;
 
 type Characteristic = BluetoothRemoteGATTCharacteristic;
 
@@ -64,10 +72,8 @@ interface Characteristics {
   factoryReset?: Characteristic;
 }
 
-type Reader = (value: DataView) => CraftyUpdate;
-
 // How each readable characteristic maps onto CraftyValues
-const readers: Partial<Record<keyof Characteristics, Reader>> = {
+const readers: Partial<Record<keyof Characteristics, Reader<CraftyValues>>> = {
   targetTemp: (v) => ({ targetTemp: parseTargetTemperature(v) }),
   currentTemp: (v) => ({ currentTemp: parseTemperature(v) }),
   boostTemp: (v) => ({ boostTemp: parseTemperature(v) }),
@@ -129,121 +135,54 @@ export const createCraftyDriver = (
   queue: PQueue
 ): CraftyDriver => {
   const isOld = isOldFirmware(firmwareVersion);
-  const listeners = new Set<CraftyUpdateListener>();
-  const notificationHandlers = new Map<Characteristic, (e: Event) => void>();
-  let disposed = false;
-
-  const emit = (update: CraftyUpdate) => {
-    listeners.forEach((listener) => listener(update));
-  };
-
-  const read = async (key: keyof Characteristics) => {
-    const characteristic = characteristics[key];
-    const reader = readers[key];
-    if (!characteristic || !reader || disposed) return;
-    const value = await queue.add(() => characteristic.readValue());
-    if (value && !disposed) emit(reader(value));
-  };
-
-  const write = async (key: keyof Characteristics, value: ArrayBuffer) => {
-    const characteristic = characteristics[key];
-    if (!characteristic) {
-      throw new Error(`Crafty characteristic "${key}" is not available`);
-    }
-    if (disposed) return;
-    await queue.add(() => characteristic.writeValue(value));
-  };
-
-  /** Writes the security code and the value as one queue entry */
-  const writeProtected = async (
-    key: keyof Characteristics,
-    code: number,
-    value: ArrayBuffer
-  ) => {
-    const { securityCode } = characteristics;
-    const characteristic = characteristics[key];
-    if (!securityCode || !characteristic) {
-      throw new Error(`Crafty characteristic "${key}" is not available`);
-    }
-    if (disposed) return;
-    await queue.add(async () => {
-      await securityCode.writeValue(encodeUint16(code));
-      await characteristic.writeValue(value);
-    });
-  };
-
-  const start = async () => {
-    for (const key of Object.keys(readers) as (keyof Characteristics)[]) {
-      await read(key);
-    }
-    for (const key of NOTIFYING) {
-      const characteristic = characteristics[key];
-      const reader = readers[key];
-      if (!characteristic || !reader || disposed) continue;
-      if (notificationHandlers.has(characteristic)) continue;
+  const device = createCharacteristicDevice<
+    keyof Characteristics,
+    CraftyValues
+  >(
+    {
+      characteristics: { ...characteristics },
+      readers,
       // Old firmware does not support notifications on the project register
-      if (isOld && key === "projectRegister") continue;
-      const handler = (event: Event) => {
-        const value = (event.target as Characteristic | null)?.value;
-        if (value) emit(reader(value));
-      };
-      await queue.add(() => characteristic.startNotifications());
-      characteristic.addEventListener("characteristicvaluechanged", handler);
-      notificationHandlers.set(characteristic, handler);
-    }
-  };
-
-  const dispose = async () => {
-    if (disposed) return;
-    disposed = true;
-    listeners.clear();
-    for (const [characteristic, handler] of notificationHandlers) {
-      characteristic.removeEventListener("characteristicvaluechanged", handler);
-      try {
-        await characteristic.stopNotifications();
-      } catch {
-        // Fails when the device is already disconnected
-      }
-    }
-    notificationHandlers.clear();
-  };
+      notifying: isOld
+        ? NOTIFYING.filter((key) => key !== "projectRegister")
+        : NOTIFYING,
+      name: "Crafty",
+    },
+    queue
+  );
 
   return {
     firmwareVersion,
     isOldFirmware: isOld,
-    subscribe(listener) {
-      listeners.add(listener);
-      return () => listeners.delete(listener);
-    },
-    start,
+    subscribe: device.subscribe,
+    start: device.start,
     setTargetTemperature: (celsius) =>
-      write("targetTemp", encodeTargetTemperature(celsius)),
+      device.write("targetTemp", encodeTargetTemperature(celsius)),
     setBoostTemperature: (celsius) =>
-      write("boostTemp", encodeBoostTemperature(celsius)),
-    setLedBrightness: (value) => write("ledBrightness", encodeUint16(value)),
+      device.write("boostTemp", encodeBoostTemperature(celsius)),
+    setLedBrightness: (value) =>
+      device.write("ledBrightness", encodeUint16(value)),
     setAutoOffCountdown: (seconds) =>
-      writeProtected(
-        "autoOffCountdown",
-        SecurityCode.AUTO_OFF_COUNTDOWN,
-        encodeUint16(seconds)
-      ),
-    heaterOn: () => write("heaterOn", encodeHeaterCommand()),
-    heaterOff: () => write("heaterOff", encodeHeaterCommand()),
+      device.writeSequence([
+        ["securityCode", encodeUint16(SecurityCode.AUTO_OFF_COUNTDOWN)],
+        ["autoOffCountdown", encodeUint16(seconds)],
+      ]),
+    heaterOn: () => device.write("heaterOn", encodeHeaterCommand()),
+    heaterOff: () => device.write("heaterOff", encodeHeaterCommand()),
     async factoryReset() {
-      await writeProtected(
-        "factoryReset",
-        SecurityCode.FACTORY_RESET,
-        encodeFactoryReset()
-      );
+      await device.writeSequence([
+        ["securityCode", encodeUint16(SecurityCode.FACTORY_RESET)],
+        ["factoryReset", encodeFactoryReset()],
+      ]);
       // Give the device time to restore its defaults, then refresh
       await new Promise((resolve) =>
         setTimeout(resolve, FACTORY_RESET_SETTLE_MS)
       );
       for (const key of RESET_AFFECTED) {
-        await read(key);
+        await device.read(key);
       }
     },
-    dispose,
+    dispose: device.dispose,
   };
 };
 
@@ -255,28 +194,18 @@ export const connectCrafty = async (
   server: BluetoothRemoteGATTServer,
   queue: PQueue
 ) => {
-  const service = async (uuid: string) => {
-    const result = await queue.add(() => server.getPrimaryService(uuid));
-    if (!result) throw new Error(`Crafty service ${uuid} not found`);
-    return result;
-  };
-  const control = await service(CraftyServiceUUIDs.Crafty1);
-  const deviceInfo = await service(CraftyServiceUUIDs.Crafty2);
-  const status = await service(CraftyServiceUUIDs.Crafty3);
+  const control = await getService(server, CraftyServiceUUIDs.Crafty1, queue);
+  const deviceInfo = await getService(
+    server,
+    CraftyServiceUUIDs.Crafty2,
+    queue
+  );
+  const status = await getService(server, CraftyServiceUUIDs.Crafty3, queue);
 
-  const required = async (s: BluetoothRemoteGATTService, uuid: string) => {
-    const result = await queue.add(() => s.getCharacteristic(uuid));
-    if (!result) throw new Error(`Crafty characteristic ${uuid} not found`);
-    return result;
-  };
-  const optional = async (s: BluetoothRemoteGATTService, uuid: string) => {
-    try {
-      return await required(s, uuid);
-    } catch (error) {
-      console.warn(`Crafty characteristic ${uuid} not available`, error);
-      return undefined;
-    }
-  };
+  const required = (s: BluetoothRemoteGATTService, uuid: string) =>
+    getRequiredCharacteristic(s, uuid, queue);
+  const optional = (s: BluetoothRemoteGATTService, uuid: string) =>
+    getOptionalCharacteristic(s, uuid, queue);
 
   const firmwareCharacteristic = await required(
     deviceInfo,

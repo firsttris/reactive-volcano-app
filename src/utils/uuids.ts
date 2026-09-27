@@ -1,12 +1,3 @@
-export enum States {
-  HEIZUNG_ENA = 0x0020,
-  ENABLE_AUTOBLESHUTDOWN = 0x0200,
-  PUMPE_FET_ENABLE = 0x2000,
-  FAHRENHEIT_ENA = 0x200,
-  DISPLAY_ON_COOLING = 0x1000,
-  VIBRATION = 0x400,
-}
-
 // Volcano Services
 export enum VolcanoServiceUUIDs {
   Bootloader = "00000001-1989-0108-1234-123456789abc",
@@ -98,14 +89,6 @@ export const ServiceUUIDs = {
   Crafty2: CraftyServiceUUIDs.Crafty2,
   Crafty3: CraftyServiceUUIDs.Crafty3,
 };
-
-const CharateristicUUIDs = {
-  ...VolcanoCharacteristicUUIDs,
-  ...VentyVeazyCharacteristicUUIDs,
-  ...CraftyCharacteristicUUIDs,
-};
-
-export type CharateristicUUIDsKeys = keyof typeof CharateristicUUIDs;
 
 export enum ConnectionState {
   NOT_CONNECTED = "NOT_CONNECTED",

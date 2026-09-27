@@ -1,5 +1,5 @@
 import { For, Show } from "solid-js";
-import { useVolcanoDeviceContext } from "../../../provider/VolcanoDeviceProvider";
+import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { Button } from "../../Button";
 import { useNavigate, useParams } from "@solidjs/router";
 import { buildRoute } from "../../../routes";
@@ -155,7 +155,7 @@ const EmptyState = styled("div")`
 `;
 
 export const WorkflowList = () => {
-  const { workflow } = useVolcanoDeviceContext();
+  const workflow = useWorkflowContext();
   const t = useTranslations();
   const {
     deleteWorkflowStepFromList,
@@ -195,7 +195,8 @@ export const WorkflowList = () => {
                     <StepActions>
                       <IconButton
                         onClick={() =>
-                          workflowListId && navigate(
+                          workflowListId &&
+                          navigate(
                             buildRoute.workflowForm(
                               workflowListId,
                               workflowItem.id
@@ -207,7 +208,8 @@ export const WorkflowList = () => {
                       </IconButton>
                       <IconButton
                         onClick={() =>
-                          workflowListId && deleteWorkflowStepFromList(
+                          workflowListId &&
+                          deleteWorkflowStepFromList(
                             workflowListId,
                             workflowItem.id
                           )

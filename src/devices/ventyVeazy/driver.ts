@@ -7,6 +7,14 @@ import {
   type Response,
   type VentyVeazyModel,
 } from "./protocol";
+import {
+  getRequiredCharacteristic,
+  getService,
+} from "../shared/characteristicDevice";
+import {
+  VentyVeazyCharacteristicUUIDs,
+  VentyVeazyServiceUUIDs,
+} from "../../utils/uuids";
 
 const POLL_INTERVAL_MS = 500;
 // Like the legacy app: every ~30 status polls also request the usage times
@@ -129,17 +137,20 @@ export const createVentyVeazyDriver = (
 
 /** Gets the control characteristic, enables notifications, returns a driver */
 export const connectVentyVeazy = async (
-  service: BluetoothRemoteGATTService,
-  controlCharacteristicUuid: string,
+  server: BluetoothRemoteGATTServer,
   model: VentyVeazyModel,
   queue: PQueue
 ) => {
-  const characteristic = await queue.add(() =>
-    service.getCharacteristic(controlCharacteristicUuid)
+  const service = await getService(
+    server,
+    VentyVeazyServiceUUIDs.Primary,
+    queue
   );
-  if (!characteristic) {
-    throw new Error("Venty/Veazy control characteristic not found");
-  }
+  const characteristic = await getRequiredCharacteristic(
+    service,
+    VentyVeazyCharacteristicUUIDs.control,
+    queue
+  );
   await queue.add(() => characteristic.startNotifications());
   return createVentyVeazyDriver(characteristic, model, queue);
 };
