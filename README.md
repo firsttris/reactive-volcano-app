@@ -14,7 +14,7 @@
 [![SolidJS](https://img.shields.io/badge/SolidJS-2c4f7c?style=for-the-badge&logo=solid&logoColor=c8c8c8)](https://www.solidjs.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Styled Components](https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white)](https://styled-components.com/)
+[![solid-styled-components](https://img.shields.io/badge/solid--styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white)](https://github.com/solidjs/solid-styled-components)
 
 **Control your Storz & Bickel devices with cutting-edge Web Bluetooth technology.**
 
@@ -41,6 +41,26 @@ This app supports the following Storz & Bickel devices:
 *Note: Available features may vary depending on the device model.*
 
 ## 🚀 Features
+
+### Volcano
+- 🌡️ **Temperature control** with live current/target temperature and heat-up progress
+- 💨 **Heater & air pump** control
+- 🔁 **Workflows**: create, edit and run multi-step heat/hold/pump sequences, with JSON import & export
+- ⚙️ **Settings**: brightness, vibration, standby light, auto-shutdown time, °C/°F
+- 🩺 **Device analysis** (self-check with recommendations)
+
+### Venty & Veazy
+- 🌡️ **Temperature control** incl. **Boost** and **Superboost**
+- 🔋 **Battery** status and charging info
+- ⚙️ **Settings**: brightness, vibration, permanent Bluetooth, charge current optimization, charge voltage limit, boost visualization, permanent boost
+- 📍 **Find my device**, device info, factory reset
+- 🩺 **Device analysis**
+
+### Crafty
+- 🌡️ **Temperature & heater** control, auto-shutdown time
+- 🔋 **Battery** status, charge indicator LED
+- 📍 **Find my device**, device info, factory reset
+- 🩺 **Device analysis**
 
 ### App Features
 - 🌑 **Dark mode**
@@ -75,10 +95,19 @@ Then open `http://localhost:8080`. *Note: Web Bluetooth only works in a secure c
 
 ## 🐧 Prerequisites
 
-Make sure the **Web Bluetooth API** is activated in your browser.
+The app requires a browser that supports the **[Web Bluetooth API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility)**:
+
+| Platform | Supported browsers |
+| --- | --- |
+| Windows, macOS, ChromeOS, Android | Chrome, Edge, Opera (enabled by default) |
+| Linux | Chrome / Chromium (flag must be enabled, see below) |
+| iOS / iPadOS | Not supported by Safari. Use a Web Bluetooth browser such as [Bluefy](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055) |
+| Firefox, Safari (all platforms) | ❌ Not supported |
+
+**Linux only:** enable Web Bluetooth manually:
 
 1. Open Chrome and navigate to `chrome://flags/#enable-web-bluetooth`.
-2. Enable the flag as shown in the image below.
+2. Enable the flag as shown in the image below and restart Chrome.
 
 ![Enabling Web Bluetooth API in Chrome](/docs/web-bluetooth-api.png)
 
@@ -124,14 +153,12 @@ The user interface is responsive and designed to work well on both desktop and m
 Progressive Web Apps can be installed on your device like native apps.
 
 ### On Android:
-1. Open the PWA in your browser (Chrome, Firefox, etc.).
+1. Open the PWA in Chrome.
 2. Tap on the browser's menu (usually three dots in the top right corner).
 3. Tap on "Add to Home screen".
 
 ### On iOS:
-1. Open the PWA in Safari.
-2. Tap the Share button (the box with an arrow pointing upwards).
-3. Scroll down and tap "Add to Home Screen".
+Safari does not support Web Bluetooth, so an app installed from Safari cannot connect to your device. Open the app in a Web Bluetooth browser such as [Bluefy](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055) instead.
 
 </details>
 
@@ -143,7 +170,7 @@ Progressive Web Apps can be installed on your device like native apps.
 <summary><b>Click to see Development and Build steps</b></summary>
 <br>
 
-To develop and build this project, follow these steps:
+**Requirements:** Node.js 22 or newer.
 
 1. Clone the repository:
    ```bash
@@ -163,8 +190,18 @@ To develop and build this project, follow these steps:
    ```
 5. To build the project:
    ```bash
-   npm run build
+   npm run build        # for GitHub Pages (served under /reactive-volcano-app/)
+   npm run build:root   # for hosting at the domain root (/), e.g. Docker
    ```
+
+**Quality checks:**
+
+```bash
+npm run typecheck    # TypeScript
+npm run lint         # Biome (npm run lint:fix to auto-fix)
+npm test             # Unit tests (Vitest)
+npm run test:e2e     # End-to-end tests (Playwright)
+```
 
 </details>
 
@@ -179,7 +216,7 @@ To develop and build this project, follow these steps:
 3. **Enable Bluetooth Web API for HTTP**: Go to `chrome://flags/#unsafely-treat-insecure-origin-as-secure` in Chrome on your PC.
 4. **Enter Your Local IP Address**: Add your local dev machine IP, enable, and restart.
    ![unsafely-treat-insecure-origin-as-secure](docs/chrome-insecure-origins.png)
-5. **Open Local Server URL**: Open `http://<YOUR_IP>:5174/` on your Android device.
+5. **Open Local Server URL**: Open `http://<YOUR_IP>:5173/` on your Android device.
 6. **Enable Remote Debugging**: On your PC, go to `chrome://inspect/#devices`.
    ![inspect](docs/inspect.png)
 7. **Debug**: Click "inspect" to open the DevTools.
@@ -197,7 +234,7 @@ Chrome ships a built-in diagnostics page that helps you figure out whether the p
 1. **Check the adapter**: Open `chrome://bluetooth-internals` and select **Adapter**. *Present* and *Powered* must both show a green check. *Discoverable* and *Discovering* showing a red cross is normal while no scan is running.
    - If the adapter is missing, Chrome can't access Bluetooth. On Linux, check `bluetoothctl show` (it must say `Powered: yes`). A Chrome installed as a Flatpak may not be able to reach BlueZ, so use the native package instead.
 2. **Scan for your device**: Turn your device on, go to **Devices** and click **Start Scan**.
-   - **Device shows up**: Bluetooth works, and the problem is in the browser. Make sure the Web Bluetooth flag is enabled (see [Prerequisites](#-prerequisites)). On Linux, also enable `chrome://flags/#enable-experimental-web-platform-features` and restart Chrome.
+   - **Device shows up**: Bluetooth works, and the problem is in the browser. Make sure you use a supported browser (see [Prerequisites](#-prerequisites)). On Linux, enable the Web Bluetooth flag and also `chrome://flags/#enable-experimental-web-platform-features` and restart Chrome.
    - **Device doesn't show up**: The device isn't advertising. It's most likely still connected to another device (e.g. your phone with the official app). Disconnect it there or turn off Bluetooth on your phone, then restart the device.
 3. **Linux CLI check** (optional): `bluetoothctl scan le` should list your device (e.g. `STORZ&BICKEL…` or `S&B…`).
 

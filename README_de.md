@@ -14,7 +14,7 @@
 [![SolidJS](https://img.shields.io/badge/SolidJS-2c4f7c?style=for-the-badge&logo=solid&logoColor=c8c8c8)](https://www.solidjs.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Styled Components](https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white)](https://styled-components.com/)
+[![solid-styled-components](https://img.shields.io/badge/solid--styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white)](https://github.com/solidjs/solid-styled-components)
 
 **Steuern Sie Ihre Storz & Bickel Geräte mit modernster Web Bluetooth Technologie.**
 
@@ -39,6 +39,26 @@ Diese App unterstützt die folgenden Storz & Bickel Geräte:
 *Hinweis: Verfügbare Funktionen können je nach Gerätemodell variieren.*
 
 ## 🚀 Funktionen
+
+### Volcano
+- 🌡️ **Temperatursteuerung** mit Live-Ist-/Solltemperatur und Aufheizfortschritt
+- 💨 Steuerung von **Heizung & Luftpumpe**
+- 🔁 **Workflows**: mehrstufige Abläufe (Heizen/Halten/Pumpen) erstellen, bearbeiten und ausführen, inkl. JSON-Import & -Export
+- ⚙️ **Einstellungen**: Helligkeit, Vibration, Standby-Licht, automatische Abschaltzeit, °C/°F
+- 🩺 **Geräteanalyse** (Selbsttest mit Empfehlungen)
+
+### Venty & Veazy
+- 🌡️ **Temperatursteuerung** inkl. **Boost** und **Superboost**
+- 🔋 **Akkustand** und Ladeinformationen
+- ⚙️ **Einstellungen**: Helligkeit, Vibration, permanentes Bluetooth, Ladestromoptimierung, Ladespannungsbegrenzung, Boost-Visualisierung, permanenter Boost
+- 📍 **Gerät finden**, Geräteinfo, Werksreset
+- 🩺 **Geräteanalyse**
+
+### Crafty
+- 🌡️ Steuerung von **Temperatur & Heizung**, automatische Abschaltzeit
+- 🔋 **Akkustand**, Ladeanzeige-LED
+- 📍 **Gerät finden**, Geräteinfo, Werksreset
+- 🩺 **Geräteanalyse**
 
 ### App-Funktionen
 - 🌑 **Dunkelmodus**
@@ -73,10 +93,19 @@ Anschließend `http://localhost:8080` öffnen. *Hinweis: Web Bluetooth funktioni
 
 ## 🐧 Voraussetzungen
 
-Stellen Sie sicher, dass die **Web Bluetooth API** in Ihrem Browser aktiviert ist.
+Die App benötigt einen Browser, der die **[Web Bluetooth API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility)** unterstützt:
+
+| Plattform | Unterstützte Browser |
+| --- | --- |
+| Windows, macOS, ChromeOS, Android | Chrome, Edge, Opera (standardmäßig aktiviert) |
+| Linux | Chrome / Chromium (Flag muss aktiviert werden, siehe unten) |
+| iOS / iPadOS | Von Safari nicht unterstützt. Nutzen Sie einen Web-Bluetooth-Browser wie [Bluefy](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055) |
+| Firefox, Safari (alle Plattformen) | ❌ Nicht unterstützt |
+
+**Nur unter Linux:** Web Bluetooth manuell aktivieren:
 
 1. Öffnen Sie Chrome und navigieren Sie zu `chrome://flags/#enable-web-bluetooth`.
-2. Aktivieren Sie das Flag wie im Bild unten gezeigt.
+2. Aktivieren Sie das Flag wie im Bild unten gezeigt und starten Sie Chrome neu.
 
 ![Aktivierung der Web Bluetooth API in Chrome](/docs/web-bluetooth-api.png)
 
@@ -122,14 +151,12 @@ Die Benutzeroberfläche ist responsiv und für Desktop- und Mobilgeräte optimie
 Progressive Web Apps können wie native Apps auf Ihrem Gerät installiert werden.
 
 ### Auf Android:
-1. Öffnen Sie die PWA in Ihrem Browser (Chrome, Firefox usw.).
+1. Öffnen Sie die PWA in Chrome.
 2. Tippen Sie auf das Browser-Menü (normalerweise drei Punkte in der oberen rechten Ecke).
 3. Tippen Sie auf "Zum Startbildschirm hinzufügen".
 
 ### Auf iOS:
-1. Öffnen Sie die PWA in Safari.
-2. Tippen Sie auf die Teilen-Schaltfläche (das Feld mit einem nach oben zeigenden Pfeil).
-3. Scrollen Sie nach unten und tippen Sie auf "Zum Startbildschirm hinzufügen".
+Safari unterstützt kein Web Bluetooth, daher kann sich eine über Safari installierte App nicht mit Ihrem Gerät verbinden. Öffnen Sie die App stattdessen in einem Web-Bluetooth-Browser wie [Bluefy](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055).
 
 </details>
 
@@ -141,7 +168,7 @@ Progressive Web Apps können wie native Apps auf Ihrem Gerät installiert werden
 <summary><b>Klicken, um Schritte für Entwicklung und Build anzuzeigen</b></summary>
 <br>
 
-Um dieses Projekt zu entwickeln und zu bauen, folgen Sie diesen Schritten:
+**Voraussetzung:** Node.js 22 oder neuer.
 
 1. Klonen Sie das Repository:
    ```bash
@@ -161,8 +188,18 @@ Um dieses Projekt zu entwickeln und zu bauen, folgen Sie diesen Schritten:
    ```
 5. Um das Projekt zu bauen:
    ```bash
-   npm run build
+   npm run build        # für GitHub Pages (ausgeliefert unter /reactive-volcano-app/)
+   npm run build:root   # für Hosting im Root-Pfad (/), z. B. Docker
    ```
+
+**Qualitätsprüfungen:**
+
+```bash
+npm run typecheck    # TypeScript
+npm run lint         # Biome (npm run lint:fix zum automatischen Beheben)
+npm test             # Unit-Tests (Vitest)
+npm run test:e2e     # End-to-End-Tests (Playwright)
+```
 
 </details>
 
@@ -177,7 +214,7 @@ Um dieses Projekt zu entwickeln und zu bauen, folgen Sie diesen Schritten:
 3. **Bluetooth Web API für HTTP aktivieren**: Gehen Sie zu `chrome://flags/#unsafely-treat-insecure-origin-as-secure` in Ihrem Chrome-Browser auf dem PC.
 4. **Geben Sie Ihre lokale IP-Adresse ein**: Fügen Sie die IP Ihres Entwicklungsrechners hinzu, aktivieren Sie die Option und starten Sie Chrome neu.
    ![unsafely-treat-insecure-origin-as-secure](docs/chrome-insecure-origins.png)
-5. **Öffnen Sie die URL Ihres lokalen Servers**: Öffnen Sie `http://<IHRE_IP>:5174/` auf Ihrem Android-Gerät.
+5. **Öffnen Sie die URL Ihres lokalen Servers**: Öffnen Sie `http://<IHRE_IP>:5173/` auf Ihrem Android-Gerät.
 6. **Remote-Debugging aktivieren**: Gehen Sie auf Ihrem PC zu `chrome://inspect/#devices`.
    ![inspect](docs/inspect.png)
 7. **Debuggen**: Klicken Sie auf "inspect", um die DevTools zu öffnen.
@@ -187,6 +224,17 @@ Um dieses Projekt zu entwickeln und zu bauen, folgen Sie diesen Schritten:
 ## ⚠️ Verbindungsprobleme und Fallstricke
 
 - **Einzelverbindung**: Der Volcano kann nur eine Bluetooth-Verbindung gleichzeitig aufrechterhalten. Trennen Sie bestehende Verbindungen, bevor Sie ein neues Gerät koppeln.
+
+### 🔍 Keine Geräte gefunden? Fehlersuche mit Bluetooth Internals
+
+Chrome bringt eine eingebaute Diagnoseseite mit, mit der Sie herausfinden können, ob das Problem am Adapter, am Browser oder am Gerät liegt.
+
+1. **Adapter prüfen**: Öffnen Sie `chrome://bluetooth-internals` und wählen Sie **Adapter**. *Present* und *Powered* müssen beide einen grünen Haken zeigen. Ein rotes Kreuz bei *Discoverable* und *Discovering* ist normal, solange kein Scan läuft.
+   - Fehlt der Adapter, kann Chrome nicht auf Bluetooth zugreifen. Prüfen Sie unter Linux `bluetoothctl show` (muss `Powered: yes` anzeigen). Ein als Flatpak installiertes Chrome kann BlueZ eventuell nicht erreichen – nutzen Sie stattdessen das native Paket.
+2. **Nach dem Gerät suchen**: Schalten Sie Ihr Gerät ein, gehen Sie zu **Devices** und klicken Sie auf **Start Scan**.
+   - **Gerät erscheint**: Bluetooth funktioniert, das Problem liegt im Browser. Stellen Sie sicher, dass Sie einen unterstützten Browser verwenden (siehe [Voraussetzungen](#-voraussetzungen)). Aktivieren Sie unter Linux das Web-Bluetooth-Flag und zusätzlich `chrome://flags/#enable-experimental-web-platform-features` und starten Sie Chrome neu.
+   - **Gerät erscheint nicht**: Das Gerät sendet keine Advertisements. Vermutlich ist es noch mit einem anderen Gerät verbunden (z. B. Ihrem Handy mit der offiziellen App). Trennen Sie die Verbindung dort oder schalten Sie Bluetooth am Handy aus und starten Sie das Gerät neu.
+3. **Linux-CLI-Check** (optional): `bluetoothctl scan le` sollte Ihr Gerät auflisten (z. B. `STORZ&BICKEL…` oder `S&B…`).
 
 ## 🤝 Mitwirken
 

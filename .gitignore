@@ -23,7 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-legacy-app
 coverage
 # Playwright
 playwright-report/

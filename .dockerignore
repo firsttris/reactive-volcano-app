@@ -3,7 +3,6 @@ dist
 dist-ssr
 .git
 .github
-legacy-app
 playwright-report
 test-results
 coverage
