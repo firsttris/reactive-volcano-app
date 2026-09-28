@@ -48,3 +48,22 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Prepare README for Docker Hub
+        run: |
+          RAW=https://raw.githubusercontent.com/${{ github.repository }}/main
+          BLOB=https://github.com/${{ github.repository }}/blob/main
+          sed -E \
+            -e "s#\]\((\./|/)?docs/#](${RAW}/docs/#g" \
+            -e "s#src=\"(\./|/)?docs/#src=\"${RAW}/docs/#g" \
+            -e "s#\]\((README_de\.md)\)#](${BLOB}/\1)#g" \
+            README.md > dockerhub-readme.md
+
+      - name: Update Docker Hub description
+        uses: peter-evans/dockerhub-description@v5
+        with:
+          username: tristanteu
+          password: ${{ secrets.DOCKER_PAT }}
+          repository: ${{ env.IMAGE }}
+          short-description: Control Storz & Bickel vaporizers (Volcano, Crafty, Venty, Veazy) via Web Bluetooth
+          readme-filepath: ./dockerhub-readme.md
