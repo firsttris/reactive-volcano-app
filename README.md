@@ -165,6 +165,17 @@ To develop and build this project, follow these steps:
 
 - **Single Connection**: The Volcano can maintain a Bluetooth connection with only one device at a time. Disconnect existing connections before pairing a new device.
 
+### 🔍 No Devices Found? Troubleshooting with Bluetooth Internals
+
+Chrome ships a built-in diagnostics page that helps you figure out whether the problem is your adapter, the browser, or the device.
+
+1. **Check the adapter**: Open `chrome://bluetooth-internals` and select **Adapter**. *Present* and *Powered* must both show a green check. *Discoverable* and *Discovering* showing a red cross is normal while no scan is running.
+   - If the adapter is missing, Chrome can't access Bluetooth. On Linux, check `bluetoothctl show` (it must say `Powered: yes`). A Chrome installed as a Flatpak may not be able to reach BlueZ, so use the native package instead.
+2. **Scan for your device**: Turn your device on, go to **Devices** and click **Start Scan**.
+   - **Device shows up**: Bluetooth works, and the problem is in the browser. Make sure the Web Bluetooth flag is enabled (see [Prerequisites](#-prerequisites)). On Linux, also enable `chrome://flags/#enable-experimental-web-platform-features` and restart Chrome.
+   - **Device doesn't show up**: The device isn't advertising. It's most likely still connected to another device (e.g. your phone with the official app). Disconnect it there or turn off Bluetooth on your phone, then restart the device.
+3. **Linux CLI check** (optional): `bluetoothctl scan le` should list your device (e.g. `STORZ&BICKEL…` or `S&B…`).
+
 ## 🤝 Contributing
 
 Want to contribute?
