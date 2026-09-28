@@ -2,6 +2,7 @@ import { type Component, createSignal, Show } from "solid-js";
 import { styled } from "solid-styled-components";
 import { useTranslations } from "../../i18n/utils";
 import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
+import { AnalysisSection } from "../AnalysisSection";
 import { Button } from "../Button";
 import { CollapsibleCard } from "../Card";
 import { Slider } from "../Slider";
@@ -26,6 +27,10 @@ const ResetButtonContainer = styled("div")`
   display: flex;
   justify-content: center;
   margin-top: 10px;
+`;
+
+const ActionButton = styled(Button)`
+  width: 200px;
 `;
 
 const ResetButton = styled(Button)`
@@ -205,6 +210,24 @@ export const Settings: Component = () => {
           onToggle={actions.setIsCelsius}
           label={state.status?.isCelsius ? t("celsius") : t("fahrenheit")}
         />
+      </SettingItem>
+
+      {/* Find My Device - only Veazy (like the legacy app) */}
+      <Show when={isVeazy()}>
+        <SettingItem>
+          <SettingLabel>{t("locateDevice")}</SettingLabel>
+          <ResetButtonContainer>
+            <ActionButton type="button" onClick={actions.triggerFindMyDevice}>
+              {t("findMyDevice")}
+            </ActionButton>
+          </ResetButtonContainer>
+        </SettingItem>
+      </Show>
+
+      {/* Analysis */}
+      <SettingItem>
+        <SettingLabel>{t("analysis")}</SettingLabel>
+        <AnalysisSection run={actions.runAnalysis} />
       </SettingItem>
 
       {/* Factory Reset Button */}

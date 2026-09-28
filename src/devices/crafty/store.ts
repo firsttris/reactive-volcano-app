@@ -1,13 +1,18 @@
 import { onCleanup } from "solid-js";
 import { createStore } from "solid-js/store";
+import type { AnalysisResult } from "../shared/analysis";
 import { createDebouncedWriter } from "../shared/debouncedWriter";
 import type { CraftyDriver, CraftyUpdate, CraftyValues } from "./driver";
 import {
+  analyzeCrafty,
   clamp,
+  hasBit,
   isHeaterActive,
   isSetpointReached,
   Limits,
   ProjectRegisterBit,
+  StatusRegister2Bit,
+  withBit,
 } from "./protocol";
 
 // Sliders and +/- buttons fire many changes; only the last one is written.
@@ -77,6 +82,13 @@ export const createCraftyStore = (driver: CraftyDriver) => {
   const logError = (action: string) => (error: unknown) =>
     console.error(`Crafty ${action} failed:`, error);
 
+  // Show the change right away; the read-back confirms it
+  const setStatusRegister2Bit = (bit: number, set: boolean, action: string) => {
+    const value = withBit(state.statusRegister2, bit, set);
+    setState("statusRegister2", value);
+    return driver.setStatusRegister2(value).catch(logError(action));
+  };
+
   const actions = {
     /** Target temperature in °C */
     setTargetTemp(celsius: number) {
@@ -126,11 +138,67 @@ export const createCraftyStore = (driver: CraftyDriver) => {
     factoryReset() {
       return driver.factoryReset().catch(logError("factory reset"));
     },
+    setVibration(enabled: boolean) {
+      return setStatusRegister2Bit(
+        StatusRegister2Bit.DISABLE_VIBRATION,
+        !enabled,
+        "vibration"
+      );
+    },
+    setChargeLed(enabled: boolean) {
+      return setStatusRegister2Bit(
+        StatusRegister2Bit.DISABLE_CHARGE_LED,
+        !enabled,
+        "charge LED"
+      );
+    },
+    setPermanentBluetooth(enabled: boolean) {
+      // The legacy app maps "Permanent Bluetooth" directly to this bit
+      return setStatusRegister2Bit(
+        StatusRegister2Bit.ENABLE_AUTO_BLE_SHUTDOWN,
+        enabled,
+        "permanent bluetooth"
+      );
+    },
+    /** Self-check like the legacy analysis (Crafty+ firmware only) */
+    async runAnalysis(): Promise<AnalysisResult> {
+      await driver.readDiagnostics();
+      return analyzeCrafty({
+        projectRegister: state.projectRegister,
+        statusRegister2: state.statusRegister2,
+        akkuStatus: state.akkuStatus ?? 0,
+        akkuStatus2: state.akkuStatus2 ?? 0,
+        systemStatus: state.systemStatus ?? 0,
+        ledBrightness: state.ledBrightness,
+        serialNumber: driver.serialNumber,
+        now: new Date(),
+      });
+    },
+    /** Lets the device beep and blink; it stops by itself after ~30 s */
+    findMyDevice() {
+      if (derived.isFindMyActive()) return Promise.resolve();
+      return setStatusRegister2Bit(
+        StatusRegister2Bit.FIND_DEVICE,
+        true,
+        "find my device"
+      );
+    },
   };
 
   const derived = {
     isHeaterActive: () => isHeaterActive(state.projectRegister),
     isSetpointReached: () => isSetpointReached(state.statusRegister2),
+    isVibrationOn: () =>
+      !hasBit(state.statusRegister2, StatusRegister2Bit.DISABLE_VIBRATION),
+    isChargeLedOn: () =>
+      !hasBit(state.statusRegister2, StatusRegister2Bit.DISABLE_CHARGE_LED),
+    isPermanentBluetooth: () =>
+      hasBit(
+        state.statusRegister2,
+        StatusRegister2Bit.ENABLE_AUTO_BLE_SHUTDOWN
+      ),
+    isFindMyActive: () =>
+      hasBit(state.statusRegister2, StatusRegister2Bit.FIND_DEVICE),
   };
 
   return {
@@ -139,6 +207,7 @@ export const createCraftyStore = (driver: CraftyDriver) => {
     derived,
     firmwareVersion: driver.firmwareVersion,
     isOldFirmware: driver.isOldFirmware,
+    isCraftyPlus: driver.isCraftyPlus,
   };
 };
 

@@ -48,6 +48,8 @@ const DEVICE: Record<string, Record<string, number[]>> = {
     [UUID.activity]: [0x20, 0x00], // heater on
     [UUID.display]: [0x00, 0x12], // fahrenheit + display off on cooling
     [UUID.vibration]: [0x00, 0x00],
+    [UUID.history1]: [0xde, 0xad],
+    [UUID.history2]: [0x01],
   },
   [ServiceUUIDs.DeviceControl]: {
     [UUID.targetTemperature]: [0x3a, 0x07],
@@ -187,6 +189,24 @@ describe("Volcano driver", () => {
       { uuid: UUID.vibration, bytes: [0x00, 0x04, 0x01, 0x00] },
     ]);
     expect(state.register3).toBe(0x0400);
+  });
+
+  it("switches to Fahrenheit by setting the register 2 bit", async () => {
+    const { driver, writes } = await connect();
+    await driver.setFahrenheit(true);
+    await driver.setFahrenheit(false);
+    expect(writes).toEqual([
+      { uuid: UUID.display, bytes: [0x00, 0x02, 0x01, 0x00] },
+      { uuid: UUID.display, bytes: [0x00, 0x02, 0x00, 0x00] },
+    ]);
+  });
+
+  it("returns the history dumps for the analysis", async () => {
+    const { driver } = await connect();
+    expect(await driver.readDiagnostics()).toEqual({
+      history1: "dead",
+      history2: "01",
+    });
   });
 
   it("stops notifications on dispose", async () => {

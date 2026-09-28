@@ -152,8 +152,16 @@ const createBluetoothMethods = () => {
         );
         break;
       }
-      default:
-        setCraftyDriver(await connectCrafty(server, bluetoothQueue));
+      default: {
+        const driver = await connectCrafty(server, bluetoothQueue);
+        setDeviceInfo({
+          type,
+          name,
+          serialNumber: driver.serialNumber || undefined,
+          firmwareVersion: driver.firmwareVersion,
+        });
+        setCraftyDriver(driver);
+      }
     }
   };
 

@@ -17,8 +17,10 @@ import {
   encodeHeaterCommand,
   encodeTargetTemperature,
   encodeUint16,
+  isCraftyPlus,
   isOldFirmware,
   parseBleFirmwareVersion,
+  parseSerialNumber,
   parseTargetTemperature,
   parseTemperature,
   parseText,
@@ -111,11 +113,29 @@ const RESET_AFFECTED: (keyof Characteristics)[] = [
   "statusRegister2",
 ];
 
+// Values the analysis needs fresh (most of them have no notifications)
+const DIAGNOSTICS: (keyof Characteristics)[] = [
+  "projectRegister",
+  "statusRegister2",
+  "akkuStatus",
+  "akkuStatus2",
+  "systemStatus",
+  "ledBrightness",
+];
+
 const FACTORY_RESET_SETTLE_MS = 1000;
+
+export interface CraftyInfo {
+  firmwareVersion: string;
+  serialNumber: string;
+}
 
 export interface CraftyDriver {
   readonly firmwareVersion: string;
+  readonly serialNumber: string;
   readonly isOldFirmware: boolean;
+  /** Crafty+ (firmware 3.x) supports find-my-device */
+  readonly isCraftyPlus: boolean;
   subscribe(listener: CraftyUpdateListener): () => void;
   /** Reads all values and enables notifications */
   start(): Promise<void>;
@@ -123,17 +143,22 @@ export interface CraftyDriver {
   setBoostTemperature(celsius: number): Promise<void>;
   setLedBrightness(value: number): Promise<void>;
   setAutoOffCountdown(seconds: number): Promise<void>;
+  /** Writes the whole status register 2 and reads it back */
+  setStatusRegister2(value: number): Promise<void>;
   heaterOn(): Promise<void>;
   heaterOff(): Promise<void>;
   factoryReset(): Promise<void>;
+  /** Re-reads the registers the analysis looks at */
+  readDiagnostics(): Promise<void>;
   dispose(): Promise<void>;
 }
 
 export const createCraftyDriver = (
   characteristics: Characteristics,
-  firmwareVersion: string,
+  info: CraftyInfo,
   queue: PQueue
 ): CraftyDriver => {
+  const { firmwareVersion, serialNumber } = info;
   const isOld = isOldFirmware(firmwareVersion);
   const device = createCharacteristicDevice<
     keyof Characteristics,
@@ -153,7 +178,9 @@ export const createCraftyDriver = (
 
   return {
     firmwareVersion,
+    serialNumber,
     isOldFirmware: isOld,
+    isCraftyPlus: isCraftyPlus(firmwareVersion),
     subscribe: device.subscribe,
     start: device.start,
     setTargetTemperature: (celsius) =>
@@ -167,6 +194,11 @@ export const createCraftyDriver = (
         ["securityCode", encodeUint16(SecurityCode.AUTO_OFF_COUNTDOWN)],
         ["autoOffCountdown", encodeUint16(seconds)],
       ]),
+    async setStatusRegister2(value) {
+      await device.write("statusRegister2", encodeUint16(value));
+      // Like the legacy app: read back what the device accepted
+      await device.read("statusRegister2");
+    },
     heaterOn: () => device.write("heaterOn", encodeHeaterCommand()),
     heaterOff: () => device.write("heaterOff", encodeHeaterCommand()),
     async factoryReset() {
@@ -179,6 +211,11 @@ export const createCraftyDriver = (
         setTimeout(resolve, FACTORY_RESET_SETTLE_MS)
       );
       for (const key of RESET_AFFECTED) {
+        await device.read(key);
+      }
+    },
+    async readDiagnostics() {
+      for (const key of DIAGNOSTICS) {
         await device.read(key);
       }
     },
@@ -215,6 +252,11 @@ export const connectCrafty = async (
     firmwareCharacteristic.readValue()
   );
   const firmwareVersion = firmwareValue ? parseText(firmwareValue) : "";
+  const serialCharacteristic = await optional(deviceInfo, UUID.serialNumber);
+  const serialValue =
+    serialCharacteristic &&
+    (await queue.add(() => serialCharacteristic.readValue()));
+  const serialNumber = serialValue ? parseSerialNumber(serialValue) : "";
   const isOld = isOldFirmware(firmwareVersion);
 
   const characteristics: Characteristics = {
@@ -244,5 +286,9 @@ export const connectCrafty = async (
     });
   }
 
-  return createCraftyDriver(characteristics, firmwareVersion, queue);
+  return createCraftyDriver(
+    characteristics,
+    { firmwareVersion, serialNumber },
+    queue
+  );
 };

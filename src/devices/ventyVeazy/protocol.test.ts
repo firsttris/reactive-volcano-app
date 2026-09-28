@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  analyzeVentyVeazy,
   Command,
   encodeBoostTemperature,
   encodeBoostTimeoutDisabled,
@@ -182,6 +183,17 @@ describe("Venty/Veazy protocol", () => {
     });
   });
 
+  it("parses ANALYSIS (0x03) error code and category", () => {
+    const response = parseResponse(
+      frame({ 0: Command.ANALYSIS, 1: 0x12, 2: 4 }),
+      "VENTY"
+    );
+    expect(response).toEqual({
+      command: Command.ANALYSIS,
+      data: { errorCode: 0x12, errorCategory: 4 },
+    });
+  });
+
   it("returns null for unknown commands", () => {
     expect(parseResponse(frame({ 0: 0x29 }), "VENTY")).toBe(null);
   });
@@ -281,5 +293,75 @@ describe("Venty/Veazy protocol", () => {
     expect(toDisplayTemperature(185, true)).toBe(185);
     expect(toDisplayTemperature(185, false)).toBe(365);
     expect(toDisplayOffset(10, false)).toBe(18);
+  });
+});
+
+describe("Venty/Veazy analysis", () => {
+  const status = parseResponse(
+    frame({ 0: Command.STATUS, 14: SettingsBit.BOOST_VISUALIZATION }),
+    "VENTY"
+  );
+  const input = {
+    analysis: { errorCode: 0, errorCategory: 0 },
+    status: status?.command === Command.STATUS ? status.data : null,
+    brightnessVibration: {
+      brightness: 9,
+      vibration: true,
+      boostTimeoutDisabled: false,
+    },
+    serialNumber: "VY123456",
+    now: new Date(0x65000000 * 1000),
+  };
+
+  it("reports no findings with default settings", () => {
+    expect(analyzeVentyVeazy(input)).toEqual({
+      errorReport: null,
+      findings: [],
+    });
+  });
+
+  it("reports an issue with a support report for category 4", () => {
+    const result = analyzeVentyVeazy({
+      ...input,
+      analysis: { errorCode: 0x12, errorCategory: 4 },
+    });
+    expect(result.findings).toEqual(["analysisIssueDetected"]);
+    expect(result.errorReport).toBe(
+      [
+        "SN   :   VY123456",
+        "date : 0x65000000",
+        "code : 0x12",
+        "cat  : 0x04",
+      ].join("\n")
+    );
+  });
+
+  it("lists settings that differ from the defaults", () => {
+    const changed = parseResponse(
+      frame({
+        0: Command.STATUS,
+        14:
+          SettingsBit.CHARGE_VOLTAGE_LIMIT |
+          SettingsBit.CHARGE_CURRENT_OPTIMIZATION,
+      }),
+      "VENTY"
+    );
+    const result = analyzeVentyVeazy({
+      ...input,
+      status: changed?.command === Command.STATUS ? changed.data : null,
+      brightnessVibration: {
+        brightness: 5,
+        vibration: false,
+        boostTimeoutDisabled: true,
+      },
+    });
+    expect(result.findings).toEqual([
+      "analysisLowBrightness",
+      "analysisChargeLimit",
+      "analysisBoostVisualizationDisabled",
+      "analysisBoostTimeoutDisabled",
+      "analysisChargeOptimization",
+      "analysisVibrationDisabled",
+    ]);
   });
 });

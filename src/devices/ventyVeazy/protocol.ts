@@ -9,11 +9,19 @@
  * byte fixtures.
  */
 
+import {
+  type AnalysisFinding,
+  type AnalysisResult,
+  formatErrorReport,
+  toHex,
+} from "../shared/analysis";
+
 export type VentyVeazyModel = "VENTY" | "VEAZY";
 
 export const Command = {
   STATUS: 0x01,
   FIRMWARE: 0x02,
+  ANALYSIS: 0x03,
   EXTENDED_DATA: 0x04,
   DEVICE_DATA: 0x05,
   BRIGHTNESS_VIBRATION: 0x06,
@@ -76,6 +84,9 @@ export const Limits = {
   MAX_BRIGHTNESS: 9,
 } as const;
 
+// Error category of an ANALYSIS response that means "issue detected"
+const ANALYSIS_ISSUE_CATEGORY = 4;
+
 const FRAME_SIZE = 20;
 const BRIGHTNESS_VIBRATION_FRAME_SIZE = 7;
 
@@ -128,6 +139,11 @@ export interface BrightnessVibrationResponse {
   boostTimeoutDisabled: boolean;
 }
 
+export interface AnalysisResponse {
+  errorCode: number;
+  errorCategory: number;
+}
+
 export interface AdvertisingInfoResponse {
   findMyDeviceActive: boolean;
 }
@@ -135,6 +151,7 @@ export interface AdvertisingInfoResponse {
 export type Response =
   | { command: typeof Command.STATUS; data: StatusResponse }
   | { command: typeof Command.FIRMWARE; data: FirmwareResponse }
+  | { command: typeof Command.ANALYSIS; data: AnalysisResponse }
   | { command: typeof Command.EXTENDED_DATA; data: ExtendedDataResponse }
   | { command: typeof Command.DEVICE_DATA; data: DeviceDataResponse }
   | {
@@ -226,6 +243,11 @@ export const parseBrightnessVibration = (
   };
 };
 
+export const parseAnalysis = (value: DataView): AnalysisResponse | null => {
+  if (value.byteLength < 3) return null;
+  return { errorCode: value.getUint8(1), errorCategory: value.getUint8(2) };
+};
+
 export const parseAdvertisingInfo = (
   value: DataView
 ): AdvertisingInfoResponse | null => {
@@ -247,6 +269,10 @@ export const parseResponse = (
     }
     case Command.FIRMWARE: {
       const data = parseFirmware(value);
+      return data && { command, data };
+    }
+    case Command.ANALYSIS: {
+      const data = parseAnalysis(value);
       return data && { command, data };
     }
     case Command.EXTENDED_DATA: {
@@ -393,3 +419,54 @@ export const toDisplayTemperature = (celsius: number, isCelsius: boolean) =>
 /** Boost offsets in °F are shown as a temperature difference (×1.8) */
 export const toDisplayOffset = (celsius: number, isCelsius: boolean) =>
   isCelsius ? celsius : Math.round(celsius * 1.8);
+
+// ---------------------------------------------------------------------------
+// Analysis
+// ---------------------------------------------------------------------------
+
+export interface VentyVeazyAnalysisInput {
+  analysis: AnalysisResponse;
+  status: StatusResponse | null;
+  brightnessVibration: BrightnessVibrationResponse | null;
+  serialNumber: string;
+  now: Date;
+}
+
+/** Same checks as the legacy analysis answer handler (command 3) */
+export const analyzeVentyVeazy = (
+  input: VentyVeazyAnalysisInput
+): AnalysisResult => {
+  const { analysis, status, brightnessVibration } = input;
+  if (analysis.errorCategory === ANALYSIS_ISSUE_CATEGORY) {
+    return {
+      errorReport: formatErrorReport(input.serialNumber, input.now, [
+        ["code ", `0x${toHex(analysis.errorCode, 2)}`],
+        ["cat  ", `0x${toHex(analysis.errorCategory, 2)}`],
+      ]),
+      findings: ["analysisIssueDetected"],
+    };
+  }
+
+  // Otherwise the legacy app lists settings that differ from the defaults
+  const findings: AnalysisFinding[] = [];
+  if (
+    brightnessVibration &&
+    brightnessVibration.brightness < Limits.MAX_BRIGHTNESS
+  ) {
+    findings.push("analysisLowBrightness");
+  }
+  if (status?.chargeVoltageLimit) findings.push("analysisChargeLimit");
+  if (status && !status.boostVisualization) {
+    findings.push("analysisBoostVisualizationDisabled");
+  }
+  if (brightnessVibration?.boostTimeoutDisabled) {
+    findings.push("analysisBoostTimeoutDisabled");
+  }
+  if (status?.chargeCurrentOptimization) {
+    findings.push("analysisChargeOptimization");
+  }
+  if (brightnessVibration && !brightnessVibration.vibration) {
+    findings.push("analysisVibrationDisabled");
+  }
+  return { errorReport: null, findings };
+};

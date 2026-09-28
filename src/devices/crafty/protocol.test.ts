@@ -1,16 +1,21 @@
 import { describe, expect, it } from "vitest";
 import {
+  analyzeCrafty,
+  type CraftyAnalysisInput,
   encodeBoostTemperature,
   encodeHeaterCommand,
   encodeTargetTemperature,
+  isCraftyPlus,
   isHeaterActive,
   isOldFirmware,
   isSetpointReached,
   parseBleFirmwareVersion,
+  parseSerialNumber,
   parseTargetTemperature,
   parseTemperature,
   parseText,
   parseUint16,
+  withBit,
 } from "./protocol";
 
 const view = (...bytes: number[]) => new DataView(new Uint8Array(bytes).buffer);
@@ -69,5 +74,79 @@ describe("Crafty protocol", () => {
 
   it("encodes heater commands as a 2-byte zero value", () => {
     expect(bytes(encodeHeaterCommand())).toEqual([0, 0]);
+  });
+
+  it("detects a Crafty+ by its 3.x firmware", () => {
+    expect(isCraftyPlus("V03.01")).toBe(true);
+    expect(isCraftyPlus("V02.51")).toBe(false);
+    expect(isCraftyPlus("")).toBe(false);
+  });
+
+  it("parses the first 8 characters of the serial number", () => {
+    const text = [..."CY123456XYZ"].map((c) => c.charCodeAt(0));
+    expect(parseSerialNumber(view(...text))).toBe("CY123456");
+  });
+
+  it("sets and clears single register bits", () => {
+    expect(withBit(0x04, 0x01, true)).toBe(0x05);
+    expect(withBit(0x05, 0x01, false)).toBe(0x04);
+    expect(withBit(0x05, 0x01, true)).toBe(0x05);
+  });
+});
+
+describe("Crafty analysis", () => {
+  const healthy: CraftyAnalysisInput = {
+    projectRegister: 0x10,
+    statusRegister2: 0x04,
+    akkuStatus: 0,
+    akkuStatus2: 0,
+    systemStatus: 0,
+    ledBrightness: 100,
+    serialNumber: "CY123456",
+    now: new Date(0x65000000 * 1000),
+  };
+
+  it("reports no findings for a healthy device", () => {
+    expect(analyzeCrafty(healthy)).toEqual({ errorReport: null, findings: [] });
+  });
+
+  it("creates a support report when an error bit is set", () => {
+    const result = analyzeCrafty({ ...healthy, systemStatus: 0x0200 });
+    expect(result.findings).toEqual([]);
+    expect(result.errorReport).toBe(
+      [
+        "SN   :   CY123456",
+        "date : 0x65000000",
+        "val_1: 0x0010",
+        "val_2: 0x0004",
+        "val_3: 0x0000",
+        "val_4: 0x0000",
+        "val_5: 0x0200",
+      ].join("\n")
+    );
+  });
+
+  it("lists battery hints by priority and changed settings", () => {
+    const result = analyzeCrafty({
+      ...healthy,
+      akkuStatus: 0x4000 | 0x0001,
+      statusRegister2: 0x1000 | 0x02 | 0x01,
+      projectRegister: 0x8000,
+      ledBrightness: 5,
+    });
+    expect(result.findings).toEqual([
+      "analysisCoolDown",
+      "analysisVibrationDisabled",
+      "analysisLedDisabled",
+      "analysisBluetoothAlwaysOn",
+      "analysisFactoryResetNeeded",
+      "analysisLowBrightness",
+    ]);
+  });
+
+  it("asks for another charger when only that bit is set", () => {
+    expect(analyzeCrafty({ ...healthy, akkuStatus2: 0x8000 }).findings).toEqual(
+      ["analysisUseOtherCharger"]
+    );
   });
 });

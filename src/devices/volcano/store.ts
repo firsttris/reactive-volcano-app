@@ -1,8 +1,10 @@
 import { onCleanup } from "solid-js";
 import { createStore } from "solid-js/store";
+import type { AnalysisResult } from "../shared/analysis";
 import { createDebouncedWriter } from "../shared/debouncedWriter";
 import type { VolcanoDriver, VolcanoValues } from "./driver";
 import {
+  analyzeVolcano,
   clamp,
   hasBit,
   Limits,
@@ -125,6 +127,29 @@ export const createVolcanoStore = (driver: VolcanoDriver) => {
       return driver
         .setDisplayOnCooling(enabled)
         .catch((error) => console.error("Volcano display failed:", error));
+    },
+    /** Self-check like the legacy analysis */
+    async runAnalysis(): Promise<AnalysisResult> {
+      const history = await driver.readDiagnostics();
+      return analyzeVolcano({
+        register1: state.register1,
+        register2: state.register2,
+        register3: state.register3,
+        brightness: state.brightness,
+        ...history,
+        serialNumber: driver.info.serialNumber,
+        now: new Date(),
+      });
+    },
+    setIsCelsius(isCelsius: boolean) {
+      setState("register2", (register) =>
+        isCelsius
+          ? register & ~Register2Bit.FAHRENHEIT
+          : register | Register2Bit.FAHRENHEIT
+      );
+      return driver
+        .setFahrenheit(!isCelsius)
+        .catch((error) => console.error("Volcano unit failed:", error));
     },
   };
 

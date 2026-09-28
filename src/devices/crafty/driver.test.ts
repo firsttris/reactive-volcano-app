@@ -55,6 +55,7 @@ const DEVICE: Record<string, Record<string, number[]>> = {
   },
   [CraftyServiceUUIDs.Crafty2]: {
     [UUID.firmwareVersion]: ascii("V03.01"),
+    [UUID.serialNumber]: ascii("CY123456\0\0"),
     [UUID.firmwareBLEVersion]: [1, 2, 3],
   },
   [CraftyServiceUUIDs.Crafty3]: {
@@ -144,6 +145,42 @@ describe("Crafty driver", () => {
       akkuStatus: 2,
       akkuStatus2: 3,
     });
+  });
+
+  it("reads the serial number and detects a Crafty+", async () => {
+    const { driver } = await collect();
+    expect(driver.serialNumber).toBe("CY123456");
+    expect(driver.isCraftyPlus).toBe(true);
+  });
+
+  it("does not treat Crafty firmware 2.x as Crafty+", async () => {
+    const { driver } = await collect("V02.51");
+    expect(driver.isOldFirmware).toBe(false);
+    expect(driver.isCraftyPlus).toBe(false);
+  });
+
+  it("writes status register 2 and reads it back", async () => {
+    const { driver, writes, characteristics } = await collect();
+    const register = characteristicOf(characteristics, UUID.statusRegister2);
+    const read = vi.spyOn(register, "readValue");
+    await driver.setStatusRegister2(0x1005);
+    expect(writes).toEqual([
+      { uuid: UUID.statusRegister2, bytes: [0x05, 0x10] },
+    ]);
+    expect(read).toHaveBeenCalledOnce();
+  });
+
+  it("re-reads the registers for the analysis", async () => {
+    const { driver, characteristics } = await collect();
+    const reads = [
+      UUID.akkuStatusCharacteristic,
+      UUID.akkuStatusCharacteristic2,
+      UUID.systemStatusCharacteristic,
+    ].map((uuid) =>
+      vi.spyOn(characteristicOf(characteristics, uuid), "readValue")
+    );
+    await driver.readDiagnostics();
+    for (const read of reads) expect(read).toHaveBeenCalledOnce();
   });
 
   it("enables notifications like the legacy app", async () => {

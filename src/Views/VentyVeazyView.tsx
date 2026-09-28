@@ -1,6 +1,9 @@
 import { useNavigate } from "@solidjs/router";
-import { type Component, createEffect } from "solid-js";
+import { type Component, createEffect, Show } from "solid-js";
 import { styled } from "solid-styled-components";
+import { Button } from "../components/Button";
+import { Card } from "../components/Card";
+import { DeviceInfo } from "../components/veazy-venty/DeviceInfo";
 import { Settings } from "../components/veazy-venty/Settings";
 import { Temperature } from "../components/veazy-venty/Temperature";
 import { useTranslations } from "../i18n/utils";
@@ -90,12 +93,59 @@ const BatteryFill = styled("div")<{ level: number; charging?: boolean }>`
   }
 `;
 
+const FindMyContainer = styled("div")`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 0;
+  text-align: center;
+  color: var(--text-color);
+`;
+
+const FindMyTitle = styled("h3")`
+  color: var(--accent-color);
+  font-family: CustomFont;
+  margin: 0;
+`;
+
+const FindMyHint = styled("div")`
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+  max-width: 320px;
+`;
+
+const FindMyButton = styled(Button)`
+  width: 200px;
+`;
+
+/**
+ * Shown while the device is switched off in find-my mode: it can only be
+ * made to beep until it is switched on again (like the legacy app).
+ */
+const FindMyDeviceBanner: Component = () => {
+  const { actions } = useVentyVeazy();
+  const t = useTranslations();
+
+  return (
+    <Card>
+      <FindMyContainer>
+        <FindMyTitle>{t("findMyDeviceEnabled")}</FindMyTitle>
+        <FindMyButton type="button" onClick={actions.triggerFindMyDevice}>
+          {t("findMyDevice")}
+        </FindMyButton>
+        <FindMyHint>{t("findMyDeviceSwitchOnHint")}</FindMyHint>
+      </FindMyContainer>
+    </Card>
+  );
+};
+
 const VentyVeazyViewContent: Component = () => {
   const { state } = useVentyVeazy();
   const t = useTranslations();
 
   return (
-    <>
+    <Show when={!state.findMyDeviceActive} fallback={<FindMyDeviceBanner />}>
       {/* Main Controls */}
       <div>
         <div style={{ "margin-top": "20px", "margin-bottom": "20px" }}>
@@ -118,8 +168,9 @@ const VentyVeazyViewContent: Component = () => {
 
         {/* Settings */}
         <Settings />
+        <DeviceInfo />
       </div>
-    </>
+    </Show>
   );
 };
 

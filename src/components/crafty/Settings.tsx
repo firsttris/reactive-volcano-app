@@ -1,11 +1,13 @@
-import { type Component, createSignal } from "solid-js";
+import { type Component, createSignal, Show } from "solid-js";
 import { styled } from "solid-styled-components";
 import { Limits } from "../../devices/crafty/protocol";
 import { useTranslations } from "../../i18n/utils";
 import { useCrafty } from "../../provider/CraftyProvider";
+import { AnalysisSection } from "../AnalysisSection";
 import { Button } from "../Button";
 import { CollapsibleCard } from "../Card";
 import { Slider } from "../Slider";
+import { Switch } from "../Switch";
 
 const SettingItem = styled("div")`
   margin-bottom: 25px;
@@ -59,10 +61,26 @@ const StatusValue = styled("div")`
   font-family: "CustomFont";
 `;
 
+const HintText = styled("div")`
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 10px;
+`;
+
 const ResetButtonContainer = styled("div")`
   display: flex;
   justify-content: center;
   margin-top: 10px;
+`;
+
+const ActionButton = styled(Button)`
+  width: 200px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 `;
 
 const ResetButton = styled(Button)`
@@ -132,7 +150,14 @@ const ModalButton = styled(Button)<{ variant?: "danger" | "cancel" }>`
 `;
 
 export const Settings: Component = () => {
-  const { state, actions, firmwareVersion, isOldFirmware } = useCrafty();
+  const {
+    state,
+    actions,
+    derived,
+    firmwareVersion,
+    isOldFirmware,
+    isCraftyPlus,
+  } = useCrafty();
 
   const t = useTranslations();
   const [showResetModal, setShowResetModal] = createSignal(false);
@@ -170,6 +195,57 @@ export const Settings: Component = () => {
             onInput={actions.setLedBrightness}
           />
         </SettingItem>
+
+        {/* Vibration */}
+        <SettingItem>
+          <SettingLabel>{t("vibration")}</SettingLabel>
+          <Switch
+            isOn={derived.isVibrationOn()}
+            onToggle={actions.setVibration}
+            label={t("enableVibration")}
+          />
+        </SettingItem>
+
+        {/* Charge Indicator LED */}
+        <SettingItem>
+          <SettingLabel>{t("chargeIndicatorLamp")}</SettingLabel>
+          <Switch
+            isOn={derived.isChargeLedOn()}
+            onToggle={actions.setChargeLed}
+            label={t("enableChargeLed")}
+          />
+        </SettingItem>
+
+        {/* Permanent Bluetooth - not on old firmware */}
+        <Show when={!isOldFirmware}>
+          <SettingItem>
+            <SettingLabel>{t("permanentBluetooth")}</SettingLabel>
+            <Switch
+              isOn={derived.isPermanentBluetooth()}
+              onToggle={actions.setPermanentBluetooth}
+              label={t("keepBluetoothAlwaysOn")}
+            />
+          </SettingItem>
+        </Show>
+
+        {/* Find My Device - only Crafty+ */}
+        <Show when={isCraftyPlus}>
+          <SettingItem>
+            <SettingLabel>{t("locateDevice")}</SettingLabel>
+            <ResetButtonContainer>
+              <ActionButton
+                type="button"
+                disabled={derived.isFindMyActive()}
+                onClick={actions.findMyDevice}
+              >
+                {t("findMyDevice")}
+              </ActionButton>
+            </ResetButtonContainer>
+            <Show when={derived.isFindMyActive()}>
+              <HintText>{t("findMyDeviceRunning")}</HintText>
+            </Show>
+          </SettingItem>
+        </Show>
 
         {/* Auto Shutdown Time - only on Crafty+ */}
         {!isOldFirmware && (
@@ -266,6 +342,14 @@ export const Settings: Component = () => {
             {!isOldFirmware && `${state.useMinutes ?? 0} minutes`}
           </InfoDisplay>
         </SettingItem>
+
+        {/* Analysis - not on old firmware */}
+        <Show when={!isOldFirmware}>
+          <SettingItem>
+            <SettingLabel>{t("analysis")}</SettingLabel>
+            <AnalysisSection run={actions.runAnalysis} />
+          </SettingItem>
+        </Show>
 
         {/* Factory Reset - only on Crafty+ */}
         {!isOldFirmware && (

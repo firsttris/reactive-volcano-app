@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  analyzeVolcano,
   encodeCommand,
   encodeRegisterBit,
   encodeTargetTemperature,
@@ -59,5 +60,54 @@ describe("Volcano protocol", () => {
   it("checks register bits", () => {
     expect(hasBit(0x2020, 0x2000)).toBe(true);
     expect(hasBit(0x0020, 0x2000)).toBe(false);
+  });
+});
+
+describe("Volcano analysis", () => {
+  const healthy = {
+    register1: 0x20,
+    register2: 0,
+    register3: 0,
+    brightness: 70,
+    history1: "dead",
+    history2: "beef",
+    serialNumber: "12345678",
+    now: new Date(0x65000000 * 1000),
+  };
+
+  it("reports no findings for a healthy device", () => {
+    expect(analyzeVolcano(healthy)).toEqual({
+      errorReport: null,
+      findings: [],
+    });
+  });
+
+  it("creates a support report with the history dumps on errors", () => {
+    expect(analyzeVolcano({ ...healthy, register1: 0x4000 }).errorReport).toBe(
+      [
+        "SN   :   12345678",
+        "date : 0x65000000",
+        "hist1:   dead",
+        "hist2:   beef",
+      ].join("\n")
+    );
+    expect(
+      analyzeVolcano({ ...healthy, register2: 0x01 }).errorReport
+    ).not.toBe(null);
+  });
+
+  it("lists changed settings", () => {
+    const result = analyzeVolcano({
+      ...healthy,
+      register2:
+        Register2Bit.DISPLAY_ON_COOLING_DISABLED | Register2Bit.FAHRENHEIT,
+      register3: Register3Bit.VIBRATION_DISABLED,
+      brightness: 20,
+    });
+    expect(result.findings).toEqual([
+      "analysisDisplayOnCoolingDisabled",
+      "analysisVibrationDisabled",
+      "analysisLowBrightness",
+    ]);
   });
 });

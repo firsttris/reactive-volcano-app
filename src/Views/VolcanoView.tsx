@@ -2,6 +2,7 @@ import { useNavigate } from "@solidjs/router";
 import { type Component, createEffect } from "solid-js";
 import { styled } from "solid-styled-components";
 import { Card, CollapsibleCard } from "../components/Card";
+import { Analysis } from "../components/volcano/Analysis";
 import { AutoShutdownSlider } from "../components/volcano/AutoshutdownSlider";
 import { BrightnessSlider } from "../components/volcano/BrightnessSlider";
 import { HeatAndPump } from "../components/volcano/HeatAndPump";
@@ -9,6 +10,7 @@ import { HeatingTimeDisplay } from "../components/volcano/HeatingTimeDisplay";
 import { ShutdownTime } from "../components/volcano/ShutdownTime";
 import { StandbyDisplaySwitch } from "../components/volcano/StandbyDisplaySwitch";
 import { Temperature } from "../components/volcano/Temperature";
+import { TemperatureUnitSwitch } from "../components/volcano/TemperatureUnitSwitch";
 import { VibrationSwitch } from "../components/volcano/VibrationSwitch";
 import { WorkFlowSection } from "../components/volcano/Workflow/WorkflowSection";
 import { useTranslations } from "../i18n/utils";
@@ -83,9 +85,15 @@ export const VolcanoView: Component = () => {
             <VibrationSwitch />
             <StandbyDisplaySwitch />
           </SwitchContainer>
+          <SwitchContainer>
+            <TemperatureUnitSwitch />
+          </SwitchContainer>
         </SwitchesContainer>
         <SettingItem>
           <HeatingTimeDisplay />
+        </SettingItem>
+        <SettingItem>
+          <Analysis />
         </SettingItem>
       </CollapsibleCard>
     </>

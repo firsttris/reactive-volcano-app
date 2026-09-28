@@ -1,8 +1,11 @@
 import { onCleanup } from "solid-js";
 import { createStore } from "solid-js/store";
+import type { AnalysisResult } from "../shared/analysis";
 import { createDebouncedWriter } from "../shared/debouncedWriter";
 import type { VentyVeazyDriver } from "./driver";
 import {
+  type AnalysisResponse,
+  analyzeVentyVeazy,
   type BrightnessVibrationResponse,
   Command,
   clamp,
@@ -38,6 +41,7 @@ import {
 // display does not jump back to the old value.
 const WRITE_DEBOUNCE_MS = 500;
 const IGNORE_POLL_AFTER_WRITE_MS = 1500;
+const ANALYSIS_TIMEOUT_MS = 5000;
 
 type DebouncedField = "targetTemp" | "boostTemp" | "superBoostTemp";
 
@@ -68,6 +72,9 @@ export const createVentyVeazyStore = (driver: VentyVeazyDriver) => {
     debounceMs: WRITE_DEBOUNCE_MS,
     holdAfterWriteMs: IGNORE_POLL_AFTER_WRITE_MS,
   });
+
+  // The analysis answer arrives as a notification
+  let pendingAnalysis: ((response: AnalysisResponse) => void) | undefined;
 
   const send = (frame: ArrayBuffer) =>
     driver.send(frame).catch((error) => {
@@ -102,6 +109,8 @@ export const createVentyVeazyStore = (driver: VentyVeazyDriver) => {
         return handleStatus(response.data);
       case Command.FIRMWARE:
         return setState("firmware", response.data);
+      case Command.ANALYSIS:
+        return pendingAnalysis?.(response.data);
       case Command.EXTENDED_DATA:
         return setState("extendedData", response.data);
       case Command.DEVICE_DATA:
@@ -122,6 +131,7 @@ export const createVentyVeazyStore = (driver: VentyVeazyDriver) => {
   onCleanup(() => {
     unsubscribe();
     writer.dispose();
+    pendingAnalysis = undefined;
   });
 
   const updateStatus = <K extends keyof StatusResponse>(
@@ -217,6 +227,36 @@ export const createVentyVeazyStore = (driver: VentyVeazyDriver) => {
     },
     triggerFindMyDevice() {
       return send(encodeFindMyDevice());
+    },
+    /** Asks the device to check itself, like the legacy analysis */
+    async runAnalysis(): Promise<AnalysisResult> {
+      // Brightness/vibration are not part of the status poll
+      await driver.send(encodeReadBrightnessVibration());
+      const response = await new Promise<AnalysisResponse>(
+        (resolve, reject) => {
+          const timeout = setTimeout(() => {
+            pendingAnalysis = undefined;
+            reject(new Error("No analysis answer from the device"));
+          }, ANALYSIS_TIMEOUT_MS);
+          pendingAnalysis = (data) => {
+            clearTimeout(timeout);
+            pendingAnalysis = undefined;
+            resolve(data);
+          };
+          driver.send(encodeRequest(Command.ANALYSIS)).catch((error) => {
+            clearTimeout(timeout);
+            pendingAnalysis = undefined;
+            reject(error);
+          });
+        }
+      );
+      return analyzeVentyVeazy({
+        analysis: response,
+        status: state.status,
+        brightnessVibration: state.brightnessVibration,
+        serialNumber: state.deviceData?.serialNumber ?? "",
+        now: new Date(),
+      });
     },
   };
 

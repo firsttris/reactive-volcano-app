@@ -3,8 +3,10 @@ import {
   ServiceUUIDs,
   VolcanoCharacteristicUUIDs as UUID,
 } from "../../utils/uuids";
+import { bytesToHex } from "../shared/analysis";
 import {
   createCharacteristicDevice,
+  getOptionalCharacteristic,
   getRequiredCharacteristic,
   getService,
   type Reader,
@@ -60,6 +62,8 @@ interface Characteristics {
   heaterOff: Characteristic;
   pumpOn: Characteristic;
   pumpOff: Characteristic;
+  history1?: Characteristic;
+  history2?: Characteristic;
 }
 
 const readers: Partial<Record<keyof Characteristics, Reader<VolcanoValues>>> = {
@@ -103,6 +107,9 @@ export interface VolcanoDriver {
   setBrightness(value: number): Promise<void>;
   setVibration(enabled: boolean): Promise<void>;
   setDisplayOnCooling(enabled: boolean): Promise<void>;
+  setFahrenheit(enabled: boolean): Promise<void>;
+  /** Re-reads the registers and returns the history dumps for the analysis */
+  readDiagnostics(): Promise<{ history1: string; history2: string }>;
   dispose(): Promise<void>;
 }
 
@@ -150,6 +157,29 @@ export const createVolcanoDriver = (
         "register2",
         encodeRegisterBit(Register2Bit.DISPLAY_ON_COOLING_DISABLED, !enabled)
       ),
+    setFahrenheit: (enabled) =>
+      device.write(
+        "register2",
+        encodeRegisterBit(Register2Bit.FAHRENHEIT, enabled)
+      ),
+    async readDiagnostics() {
+      for (const key of ["register1", "register2", "register3"] as const) {
+        await device.read(key);
+      }
+      const readHex = async (characteristic?: Characteristic) => {
+        if (!characteristic) return "";
+        const value = await queue.add(() => characteristic.readValue());
+        return value
+          ? bytesToHex(
+              new Uint8Array(value.buffer, value.byteOffset, value.byteLength)
+            )
+          : "";
+      };
+      return {
+        history1: await readHex(characteristics.history1),
+        history2: await readHex(characteristics.history2),
+      };
+    },
     dispose: device.dispose,
   };
 };
@@ -191,6 +221,8 @@ export const connectVolcano = async (
     heaterOff: await required(control, UUID.heaterOff),
     pumpOn: await required(control, UUID.pumpOn),
     pumpOff: await required(control, UUID.pumpOff),
+    history1: await getOptionalCharacteristic(state, UUID.history1, queue),
+    history2: await getOptionalCharacteristic(state, UUID.history2, queue),
   };
 
   return createVolcanoDriver(characteristics, info, queue);

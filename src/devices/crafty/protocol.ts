@@ -7,12 +7,32 @@
  * This module only contains pure functions so it can be unit-tested.
  */
 
+import {
+  type AnalysisFinding,
+  type AnalysisResult,
+  formatErrorReport,
+  toHex,
+} from "../shared/analysis";
+
 // Project register (0x93)
 export const ProjectRegisterBit = {
   HEATER_ACTIVE: 1 << 4,
   BOOST_MODE: 1 << 5,
   SUPERBOOST_MODE: 1 << 6,
+  FACTORY_RESET_REQUIRED: 1 << 15,
 } as const;
+
+// Masks the legacy analysis checks (their meaning is not documented)
+const AnalysisMask = {
+  PROJECT_ERROR: 0x2008,
+  AKKU_ERROR: 0x0600,
+  SYSTEM_ERROR: 0x0200,
+  AKKU_TOO_HOT: 0x4100,
+  AKKU_EMPTY: 0x0003,
+  AKKU2_BAD_CHARGER: 0x8000,
+} as const;
+
+const LOW_BRIGHTNESS = 10;
 
 // Status register 2 (0x1c3)
 export const StatusRegister2Bit = {
@@ -88,11 +108,27 @@ export const isOldFirmware = (version: string) => {
   return minor < 51 && major <= 2;
 };
 
+/** Crafty+ ships with firmware 3.x or newer (same check as the legacy app) */
+export const isCraftyPlus = (version: string) => {
+  const major = parseInt(version.trim().substring(1, 3), 10);
+  return !Number.isNaN(major) && major >= 3;
+};
+
+/** Serial number is the first 8 characters */
+export const parseSerialNumber = (value: DataView) =>
+  parseText(value).substring(0, 8);
+
 export const isHeaterActive = (projectRegister: number) =>
   (projectRegister & ProjectRegisterBit.HEATER_ACTIVE) !== 0;
 
 export const isSetpointReached = (statusRegister2: number) =>
   (statusRegister2 & StatusRegister2Bit.SETPOINT_REACHED) !== 0;
+
+export const hasBit = (register: number, bit: number) => (register & bit) !== 0;
+
+/** Returns the register with one bit set or cleared */
+export const withBit = (register: number, bit: number, set: boolean) =>
+  set ? register | bit : register & ~bit;
 
 // ---------------------------------------------------------------------------
 // Encoding
@@ -114,3 +150,66 @@ export const encodeBoostTemperature = (celsius: number) =>
 export const encodeHeaterCommand = () => encodeUint16(0);
 
 export const encodeFactoryReset = () => new ArrayBuffer(1);
+
+// ---------------------------------------------------------------------------
+// Analysis
+// ---------------------------------------------------------------------------
+
+export interface CraftyAnalysisInput {
+  projectRegister: number;
+  statusRegister2: number;
+  akkuStatus: number;
+  akkuStatus2: number;
+  systemStatus: number;
+  ledBrightness: number;
+  serialNumber: string;
+  now: Date;
+}
+
+/** Same checks as the legacy startAnalysisCRAFTYFunc */
+export const analyzeCrafty = (input: CraftyAnalysisInput): AnalysisResult => {
+  const hasError =
+    hasBit(input.akkuStatus, AnalysisMask.AKKU_ERROR) ||
+    hasBit(input.systemStatus, AnalysisMask.SYSTEM_ERROR) ||
+    hasBit(input.projectRegister, AnalysisMask.PROJECT_ERROR);
+  if (hasError) {
+    return {
+      errorReport: formatErrorReport(input.serialNumber, input.now, [
+        ["val_1", `0x${toHex(input.projectRegister, 4)}`],
+        ["val_2", `0x${toHex(input.statusRegister2, 4)}`],
+        ["val_3", `0x${toHex(input.akkuStatus, 4)}`],
+        ["val_4", `0x${toHex(input.akkuStatus2, 4)}`],
+        ["val_5", `0x${toHex(input.systemStatus, 4)}`],
+      ]),
+      findings: [],
+    };
+  }
+
+  const findings: AnalysisFinding[] = [];
+  if (hasBit(input.akkuStatus, AnalysisMask.AKKU_TOO_HOT)) {
+    findings.push("analysisCoolDown");
+  } else if (hasBit(input.akkuStatus, AnalysisMask.AKKU_EMPTY)) {
+    findings.push("analysisChargeDevice");
+  } else if (hasBit(input.akkuStatus2, AnalysisMask.AKKU2_BAD_CHARGER)) {
+    findings.push("analysisUseOtherCharger");
+  }
+  const register2 = input.statusRegister2;
+  if (hasBit(register2, StatusRegister2Bit.DISABLE_VIBRATION)) {
+    findings.push("analysisVibrationDisabled");
+  }
+  if (hasBit(register2, StatusRegister2Bit.DISABLE_CHARGE_LED)) {
+    findings.push("analysisLedDisabled");
+  }
+  if (hasBit(register2, StatusRegister2Bit.ENABLE_AUTO_BLE_SHUTDOWN)) {
+    findings.push("analysisBluetoothAlwaysOn");
+  }
+  if (
+    hasBit(input.projectRegister, ProjectRegisterBit.FACTORY_RESET_REQUIRED)
+  ) {
+    findings.push("analysisFactoryResetNeeded");
+  }
+  if (input.ledBrightness < LOW_BRIGHTNESS) {
+    findings.push("analysisLowBrightness");
+  }
+  return { errorReport: null, findings };
+};

@@ -3,6 +3,7 @@ import { type Component, createEffect } from "solid-js";
 import { Card } from "../components/Card";
 import { HeaterControl } from "../components/crafty/HeaterControl";
 import { Settings } from "../components/crafty/Settings";
+import { ShutdownTime } from "../components/crafty/ShutdownTime";
 import { Temperature } from "../components/crafty/Temperature";
 import { useWakeLock } from "../hooks/utils/useWakeLock";
 import { useBluetooth } from "../provider/BluetoothProvider";
@@ -18,6 +19,7 @@ const CraftyViewContent: Component = () => {
   return (
     <>
       {/* Main Controls */}
+      <ShutdownTime />
       <Card>
         <div style={{ "margin-bottom": "24px" }}>
           <Temperature />

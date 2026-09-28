@@ -8,6 +8,12 @@
  * This module only contains pure functions so it can be unit-tested.
  */
 
+import {
+  type AnalysisFinding,
+  type AnalysisResult,
+  formatErrorReport,
+} from "../shared/analysis";
+
 // Project register 1 ("activity", 0x1010000c)
 export const Register1Bit = {
   HEATER: 0x0020,
@@ -27,6 +33,11 @@ export const Register3Bit = {
   // Set = vibration is *off*
   VIBRATION_DISABLED: 0x0400,
 } as const;
+
+// Error bits the legacy analysis checks (their meaning is not documented)
+const Register1Error = 0x4018;
+const Register2Error = 0x003b;
+const LOW_BRIGHTNESS = 25;
 
 export const Limits = {
   MIN_TEMP: 40,
@@ -103,3 +114,47 @@ export const encodeCommand = () => encodeUint8(0);
 /** Sets or clears one bit of a project register */
 export const encodeRegisterBit = (bit: number, set: boolean) =>
   encodeUint32(set ? SET_BIT_FLAG + bit : bit);
+
+// ---------------------------------------------------------------------------
+// Analysis
+// ---------------------------------------------------------------------------
+
+export interface VolcanoAnalysisInput {
+  register1: number;
+  register2: number;
+  register3: number;
+  brightness: number;
+  /** Hex dumps of the two history characteristics */
+  history1: string;
+  history2: string;
+  serialNumber: string;
+  now: Date;
+}
+
+/** Same checks as the legacy startAnalysisVolcanoFunc */
+export const analyzeVolcano = (input: VolcanoAnalysisInput): AnalysisResult => {
+  if (
+    hasBit(input.register1, Register1Error) ||
+    hasBit(input.register2, Register2Error)
+  ) {
+    return {
+      errorReport: formatErrorReport(input.serialNumber, input.now, [
+        ["hist1", `  ${input.history1}`],
+        ["hist2", `  ${input.history2}`],
+      ]),
+      findings: [],
+    };
+  }
+
+  const findings: AnalysisFinding[] = [];
+  if (hasBit(input.register2, Register2Bit.DISPLAY_ON_COOLING_DISABLED)) {
+    findings.push("analysisDisplayOnCoolingDisabled");
+  }
+  if (hasBit(input.register3, Register3Bit.VIBRATION_DISABLED)) {
+    findings.push("analysisVibrationDisabled");
+  }
+  if (input.brightness < LOW_BRIGHTNESS) {
+    findings.push("analysisLowBrightness");
+  }
+  return { errorReport: null, findings };
+};
