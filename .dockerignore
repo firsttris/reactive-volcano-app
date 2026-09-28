@@ -1,0 +1,16 @@
+node_modules
+dist
+dist-ssr
+.git
+.github
+legacy-app
+playwright-report
+test-results
+coverage
+e2e
+docs
+*.log
+*.local
+Dockerfile
+docker-compose.yml
+volcano-app.container
