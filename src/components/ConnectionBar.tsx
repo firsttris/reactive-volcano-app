@@ -3,7 +3,7 @@ import {
   TbOutlineBluetoothX,
 } from "solid-icons/tb";
 import { VsLoading } from "solid-icons/vs";
-import { Show } from "solid-js";
+import { createSignal, onCleanup, Show } from "solid-js";
 import { styled } from "solid-styled-components";
 import { useTranslations } from "../i18n/utils";
 import { useBluetooth } from "../provider/BluetoothProvider";
@@ -124,13 +124,31 @@ const BluetoothIcon = styled("div")`
   border-radius: 50%;
   padding: 6px;
 
-  &:hover {
-    background: rgba(255, 102, 0, 0.1);
-    transform: scale(1.05);
-  }
+`;
 
-  &.clickable {
-    cursor: pointer;
+// Resets to the plain "disconnect" label if the second tap doesn't come
+const CONFIRM_TIMEOUT_MS = 4000;
+
+const DisconnectButton = styled("button")<{ confirming: boolean }>`
+  flex-shrink: 0;
+  white-space: nowrap;
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: 18px;
+  border: 1px solid
+    ${(props) =>
+      props.confirming ? "var(--accent-color)" : "var(--border-color)"};
+  background: ${(props) =>
+    props.confirming ? "var(--accent-color)" : "transparent"};
+  color: ${(props) => (props.confirming ? "#fff" : "var(--secondary-text)")};
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--accent-color);
+    color: ${(props) => (props.confirming ? "#fff" : "var(--accent-color)")};
   }
 `;
 
@@ -152,7 +170,18 @@ export const ConnectionBar = () => {
     return "";
   };
 
+  const [confirming, setConfirming] = createSignal(false);
+  let confirmTimer: ReturnType<typeof setTimeout> | undefined;
+  onCleanup(() => clearTimeout(confirmTimer));
+
   const handleDisconnect = async () => {
+    clearTimeout(confirmTimer);
+    if (!confirming()) {
+      setConfirming(true);
+      confirmTimer = setTimeout(() => setConfirming(false), CONFIRM_TIMEOUT_MS);
+      return;
+    }
+    setConfirming(false);
     await disconnect();
   };
 
@@ -188,12 +217,8 @@ export const ConnectionBar = () => {
 
       <Show when={isAnyDeviceConnected() && getDeviceInfo()}>
         <ConnectionInfo>
-          <BluetoothIcon class="clickable" onClick={handleDisconnect}>
-            <TbOutlineBluetoothConnected
-              size={22}
-              color="#f60"
-              title="Click to disconnect"
-            />
+          <BluetoothIcon>
+            <TbOutlineBluetoothConnected size={22} color="#f60" />
           </BluetoothIcon>
           <ConnectionDetails>
             <DeviceInfoRow>
@@ -225,6 +250,13 @@ export const ConnectionBar = () => {
               </div>
             </DeviceInfoRow>
           </ConnectionDetails>
+          <DisconnectButton
+            type="button"
+            confirming={confirming()}
+            onClick={handleDisconnect}
+          >
+            {confirming() ? t("confirmDisconnect") : t("disconnect")}
+          </DisconnectButton>
         </ConnectionInfo>
       </Show>
     </ConnectionBarContainer>

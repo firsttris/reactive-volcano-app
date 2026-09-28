@@ -3,7 +3,8 @@ import { styled } from "solid-styled-components";
 import { Limits } from "../../devices/crafty/protocol";
 import { useTranslations } from "../../i18n/utils";
 import { useCrafty } from "../../provider/CraftyProvider";
-import { RoundButton } from "../Button";
+import { HeatProgress } from "../HeatProgress";
+import { RepeatButton } from "../RepeatButton";
 import { TemperatureDisplay } from "../TemperatureDisplay";
 
 const TempDisplay = styled("div")`
@@ -69,7 +70,7 @@ const TempControls = styled("div")`
 `;
 
 export const Temperature = () => {
-  const { state, actions } = useCrafty();
+  const { state, actions, derived } = useCrafty();
 
   const t = useTranslations();
 
@@ -84,22 +85,30 @@ export const Temperature = () => {
           <TemperatureDisplay value={state.currentTemp} unit="C" />
         </DigitalText>
       </TempDisplay>
+      <HeatProgress
+        current={state.currentTemp}
+        target={state.targetTemp}
+        heating={derived.isHeaterActive()}
+        reached={derived.isSetpointReached()}
+      />
       <TempControls>
-        <RoundButton
-          onClick={decreaseTemperature}
+        <RepeatButton
+          onStep={decreaseTemperature}
           disabled={state.targetTemp <= Limits.MIN_TEMP}
+          aria-label={t("decreaseTemperature")}
         >
           <FaSolidMinus size="24px" />
-        </RoundButton>
+        </RepeatButton>
         <DigitalText isTarget={true}>
           <TemperatureDisplay value={state.targetTemp} unit="C" />
         </DigitalText>
-        <RoundButton
-          onClick={increaseTemperature}
+        <RepeatButton
+          onStep={increaseTemperature}
           disabled={state.targetTemp >= Limits.MAX_TEMP}
+          aria-label={t("increaseTemperature")}
         >
           <FaSolidPlus size="24px" />
-        </RoundButton>
+        </RepeatButton>
       </TempControls>
     </FlexContainer>
   );

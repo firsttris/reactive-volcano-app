@@ -1,7 +1,8 @@
 import { FaSolidMinus, FaSolidPlus } from "solid-icons/fa";
 import { styled } from "solid-styled-components";
 import { useTranslations } from "../../i18n/utils";
-import { RoundButton, WideButton } from "../Button";
+import { WideButton } from "../Button";
+import { RepeatButton } from "../RepeatButton";
 import { TemperatureDisplay } from "../TemperatureDisplay";
 
 const TemperatureCard = styled("div")`
@@ -143,18 +144,24 @@ export const MainTemperatureControl = (props: MainTemperatureControlProps) => {
       </TempDisplay>
 
       <TempControls>
-        <RoundButton onClick={() => props.onAdjustTemperature(-1)}>
+        <RepeatButton
+          onStep={() => props.onAdjustTemperature(-1)}
+          aria-label={t("decreaseTemperature")}
+        >
           <FaSolidMinus />
-        </RoundButton>
+        </RepeatButton>
 
         <WideButton onClick={props.onToggleHeater} isHeating={props.isHeating}>
           <span class="icon">🔥</span>
           {props.isHeating ? "ON" : "OFF"}
         </WideButton>
 
-        <RoundButton onClick={() => props.onAdjustTemperature(1)}>
+        <RepeatButton
+          onStep={() => props.onAdjustTemperature(1)}
+          aria-label={t("increaseTemperature")}
+        >
           <FaSolidPlus />
-        </RoundButton>
+        </RepeatButton>
       </TempControls>
     </TemperatureCard>
   );

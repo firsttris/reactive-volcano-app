@@ -86,6 +86,15 @@ export const ui = {
     workflowsExported: "All workflows exported successfully",
     workflowsImported: "All workflows imported successfully",
     confirmImportAll: "This will replace all existing workflows. Are you sure?",
+    disconnect: "Disconnect",
+    confirmDisconnect: "Really disconnect?",
+    increaseTemperature: "Increase temperature",
+    decreaseTemperature: "Decrease temperature",
+    heaterOff: "Heater off",
+    heatingUp: "Heating up",
+    coolingDown: "Cooling down",
+    temperatureReached: "Temperature reached",
+    remaining: "Remaining",
   },
   de: {
     settings: "Einstellungen",
@@ -168,6 +177,15 @@ export const ui = {
     workflowsImported: "Alle Workflows erfolgreich importiert",
     confirmImportAll:
       "Dies ersetzt alle vorhandenen Workflows. Sind Sie sicher?",
+    disconnect: "Trennen",
+    confirmDisconnect: "Wirklich trennen?",
+    increaseTemperature: "Temperatur erhöhen",
+    decreaseTemperature: "Temperatur verringern",
+    heaterOff: "Heizung aus",
+    heatingUp: "Heizt auf",
+    coolingDown: "Kühlt ab",
+    temperatureReached: "Temperatur erreicht",
+    remaining: "Noch",
   },
 } as const;
 

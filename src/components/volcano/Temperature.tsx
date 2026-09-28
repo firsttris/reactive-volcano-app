@@ -1,9 +1,11 @@
 import { FaSolidMinus, FaSolidPlus } from "solid-icons/fa";
 import { styled } from "solid-styled-components";
+import { Limits } from "../../devices/volcano/protocol";
 import { useTranslations } from "../../i18n/utils";
 import { useVolcano } from "../../provider/VolcanoProvider";
 import { convertCelsiusToFahrenheit } from "../../utils/bluetoothUtils";
-import { RoundButton } from "../Button";
+import { HeatProgress } from "../HeatProgress";
+import { RepeatButton } from "../RepeatButton";
 import { TemperatureDisplay } from "../TemperatureDisplay";
 
 const TempDisplay = styled("div")`
@@ -93,19 +95,32 @@ export const Temperature = () => {
           />
         </DigitalText>
       </TempDisplay>
+      <HeatProgress
+        current={state.currentTemp}
+        target={state.targetTemp}
+        heating={derived.isHeating()}
+      />
       <TempControls>
-        <RoundButton onClick={decreaseTemperature}>
+        <RepeatButton
+          onStep={decreaseTemperature}
+          disabled={state.targetTemp <= Limits.MIN_TEMP}
+          aria-label={t("decreaseTemperature")}
+        >
           <FaSolidMinus size="24px" />
-        </RoundButton>
+        </RepeatButton>
         <DigitalText isTarget={true}>
           <TemperatureDisplay
             value={toDisplayUnit(state.targetTemp)}
             unit={isCelsius() ? "C" : "F"}
           />
         </DigitalText>
-        <RoundButton onClick={increaseTemperature}>
+        <RepeatButton
+          onStep={increaseTemperature}
+          disabled={state.targetTemp >= Limits.MAX_TEMP}
+          aria-label={t("increaseTemperature")}
+        >
           <FaSolidPlus size="24px" />
-        </RoundButton>
+        </RepeatButton>
       </TempControls>
     </FlexContainer>
   );
