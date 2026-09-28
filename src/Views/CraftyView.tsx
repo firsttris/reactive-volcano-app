@@ -1,13 +1,13 @@
-import { Component, createEffect } from "solid-js";
-import { styled } from "solid-styled-components";
 import { useNavigate } from "@solidjs/router";
-import { Temperature } from "../components/crafty/Temperature";
+import { type Component, createEffect } from "solid-js";
+import { styled } from "solid-styled-components";
 import { HeaterControl } from "../components/crafty/HeaterControl";
 import { Settings } from "../components/crafty/Settings";
+import { Temperature } from "../components/crafty/Temperature";
 import { useBluetooth } from "../provider/BluetoothProvider";
-import { ConnectionState } from "../utils/uuids";
-import { buildRoute } from "../routes";
 import { CraftyProvider } from "../provider/CraftyProvider";
+import { buildRoute } from "../routes";
+import { ConnectionState } from "../utils/uuids";
 
 const MainCard = styled("div")`
   background: var(--secondary-bg);

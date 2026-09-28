@@ -1,11 +1,10 @@
-import { useCrafty } from "../../provider/CraftyProvider";
-import { Limits } from "../../devices/crafty/protocol";
+import { FaSolidMinus, FaSolidPlus } from "solid-icons/fa";
 import { styled } from "solid-styled-components";
-import { FaSolidMinus } from "solid-icons/fa";
-import { FaSolidPlus } from "solid-icons/fa";
+import { Limits } from "../../devices/crafty/protocol";
+import { useTranslations } from "../../i18n/utils";
+import { useCrafty } from "../../provider/CraftyProvider";
 import { RoundButton } from "../Button";
 import { TemperatureDisplay } from "../TemperatureDisplay";
-import { useTranslations } from "../../i18n/utils";
 
 const TempDisplay = styled("div")`
   text-align: center;

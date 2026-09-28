@@ -1,20 +1,20 @@
-import { Component, Show, createSignal } from "solid-js";
+import { useNavigate } from "@solidjs/router";
 import {
+  FiCheck,
+  FiDownload,
+  FiEdit2,
   FiPlay,
   FiSquare,
-  FiEdit2,
   FiTrash2,
-  FiCheck,
   FiX,
-  FiDownload,
 } from "solid-icons/fi";
+import { type Component, createSignal, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useNavigate } from "@solidjs/router";
-import { Workflow } from "../../../utils/workflowData";
-import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { useWorkflowScheduler } from "../../../hooks/volcano/useWorkflowScheduler";
-import { buildRoute } from "../../../routes";
 import { useTranslations } from "../../../i18n/utils";
+import { useWorkflowContext } from "../../../provider/WorkflowProvider";
+import { buildRoute } from "../../../routes";
+import type { Workflow } from "../../../utils/workflowData";
 
 interface WorkflowItemProps {
   workflow: Workflow;

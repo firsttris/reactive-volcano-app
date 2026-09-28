@@ -43,7 +43,7 @@ export const createDebouncedWriter = <K extends string>(options: {
       return now() < (holdUntil.get(key) ?? 0);
     },
     dispose() {
-      timers.forEach((timer) => clearTimeout(timer));
+      for (const timer of timers.values()) clearTimeout(timer);
       timers.clear();
       holdUntil.clear();
     },

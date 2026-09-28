@@ -1,12 +1,14 @@
-import { styled } from "solid-styled-components";
-import { TbBluetoothConnected } from "solid-icons/tb";
-import { TbBluetoothX } from "solid-icons/tb";
-import { ConnectionState, DeviceType } from "../utils/uuids";
-import { useDarkMode } from "../provider/DarkModeProvider";
-import { useTranslations } from "../i18n/utils";
+import {
+  TbOutlineBluetoothConnected,
+  TbOutlineBluetoothX,
+} from "solid-icons/tb";
 import { VsLoading } from "solid-icons/vs";
 import { Show } from "solid-js";
+import { styled } from "solid-styled-components";
+import { useTranslations } from "../i18n/utils";
 import { useBluetooth } from "../provider/BluetoothProvider";
+import { useDarkMode } from "../provider/DarkModeProvider";
+import { ConnectionState, DeviceType } from "../utils/uuids";
 
 interface ConnectionBarContainerProps {
   isDarkMode: boolean;
@@ -165,7 +167,7 @@ export const ConnectionBar = () => {
       <Show when={!isAnyDeviceConnected() && !isConnecting()}>
         <ConnectionInfo>
           <BluetoothIcon>
-            <TbBluetoothX size={22} color="#ccc" />
+            <TbOutlineBluetoothX size={22} color="#ccc" />
           </BluetoothIcon>
           <ConnectionDetails>
             <StatusText>{t("deviceNotConnected")}</StatusText>
@@ -187,7 +189,7 @@ export const ConnectionBar = () => {
       <Show when={isAnyDeviceConnected() && getDeviceInfo()}>
         <ConnectionInfo>
           <BluetoothIcon class="clickable" onClick={handleDisconnect}>
-            <TbBluetoothConnected
+            <TbOutlineBluetoothConnected
               size={22}
               color="#f60"
               title="Click to disconnect"

@@ -3,12 +3,12 @@ import { createStore } from "solid-js/store";
 import { createDebouncedWriter } from "../shared/debouncedWriter";
 import type { VolcanoDriver, VolcanoValues } from "./driver";
 import {
+  clamp,
+  hasBit,
   Limits,
   Register1Bit,
   Register2Bit,
   Register3Bit,
-  clamp,
-  hasBit,
 } from "./protocol";
 
 // +/- buttons and sliders fire many changes; only the last one is written.

@@ -1,11 +1,11 @@
-import { createContext, Show, useContext } from "solid-js";
 import type { JSX } from "solid-js";
-import { useBluetooth } from "./BluetoothProvider";
+import { createContext, Show, useContext } from "solid-js";
 import type { VentyVeazyDriver } from "../devices/ventyVeazy/driver";
 import {
   createVentyVeazyStore,
   type VentyVeazyStore,
 } from "../devices/ventyVeazy/store";
+import { useBluetooth } from "./BluetoothProvider";
 
 const VentyVeazyContext = createContext<VentyVeazyStore>();
 
@@ -13,7 +13,7 @@ const VentyVeazyStoreProvider = (props: {
   driver: VentyVeazyDriver;
   children: JSX.Element;
 }) => {
-  // eslint-disable-next-line solid/reactivity -- one store per driver instance
+  // Read once on purpose: one store per driver instance
   const store = createVentyVeazyStore(props.driver);
   return (
     <VentyVeazyContext.Provider value={store}>

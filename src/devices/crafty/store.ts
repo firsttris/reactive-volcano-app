@@ -3,11 +3,11 @@ import { createStore } from "solid-js/store";
 import { createDebouncedWriter } from "../shared/debouncedWriter";
 import type { CraftyDriver, CraftyUpdate, CraftyValues } from "./driver";
 import {
-  Limits,
-  ProjectRegisterBit,
   clamp,
   isHeaterActive,
   isSetpointReached,
+  Limits,
+  ProjectRegisterBit,
 } from "./protocol";
 
 // Sliders and +/- buttons fire many changes; only the last one is written.

@@ -1,7 +1,7 @@
-import { useVolcano } from "../../provider/VolcanoProvider";
 import { BsPhoneVibrate } from "solid-icons/bs";
-import { Switch } from "../Switch";
 import { useTranslations } from "../../i18n/utils";
+import { useVolcano } from "../../provider/VolcanoProvider";
+import { Switch } from "../Switch";
 
 export const VibrationSwitch = () => {
   const t = useTranslations();

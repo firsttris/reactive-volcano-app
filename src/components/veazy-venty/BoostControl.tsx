@@ -1,6 +1,6 @@
+import { FaSolidMinus, FaSolidPlus } from "solid-icons/fa";
 import { styled } from "solid-styled-components";
 import { SmallRoundButton } from "../Button";
-import { FaSolidMinus, FaSolidPlus } from "solid-icons/fa";
 import { TemperatureDisplay } from "../TemperatureDisplay";
 
 const BoostCard = styled("div")<{ active?: boolean }>`

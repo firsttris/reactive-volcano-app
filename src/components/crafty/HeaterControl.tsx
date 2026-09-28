@@ -1,8 +1,8 @@
-import { ActiveRoundButton } from "../Button";
 import { SiFireship } from "solid-icons/si";
-import { useCrafty } from "../../provider/CraftyProvider";
-import { styled } from "solid-styled-components";
 import { Show } from "solid-js";
+import { styled } from "solid-styled-components";
+import { useCrafty } from "../../provider/CraftyProvider";
+import { ActiveRoundButton } from "../Button";
 
 const Container = styled("div")`
   display: flex;
@@ -40,8 +40,7 @@ export const HeaterControl = () => {
         when={!isOldFirmware}
         fallback={
           <WarningText>
-            ⚠️ Heater controls not available on old Crafty (firmware &lt;=
-            2.51).
+            ⚠️ Heater controls not available on old Crafty (firmware &lt;= 2.51).
             <br />
             Battery status is shown below.
           </WarningText>

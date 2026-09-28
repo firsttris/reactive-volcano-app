@@ -6,6 +6,7 @@ import "@fontsource/roboto";
 import { Routes } from "./Router";
 
 const root = document.getElementById("root");
+if (!root) throw new Error("Root element #root not found");
 
 const dispose = render(
   () => (
@@ -15,7 +16,7 @@ const dispose = render(
       </BluetoothProvider>
     </DarkModeProvider>
   ),
-  root!
+  root
 );
 /** Hot Module Replacement */
 if (import.meta.hot) {

@@ -1,11 +1,10 @@
-import { useVolcano } from "../../provider/VolcanoProvider";
+import { FaSolidMinus, FaSolidPlus } from "solid-icons/fa";
 import { styled } from "solid-styled-components";
-import { FaSolidMinus } from "solid-icons/fa";
-import { FaSolidPlus } from "solid-icons/fa";
+import { useTranslations } from "../../i18n/utils";
+import { useVolcano } from "../../provider/VolcanoProvider";
+import { convertCelsiusToFahrenheit } from "../../utils/bluetoothUtils";
 import { RoundButton } from "../Button";
 import { TemperatureDisplay } from "../TemperatureDisplay";
-import { useTranslations } from "../../i18n/utils";
-import { convertCelsiusToFahrenheit } from "../../utils/bluetoothUtils";
 
 const TempDisplay = styled("div")`
   text-align: center;

@@ -1,13 +1,13 @@
-import { createContext, createSignal, useContext } from "solid-js";
 import type { JSX } from "solid-js";
-import { ConnectionState, DeviceType, ServiceUUIDs } from "../utils/uuids";
-import { bluetoothQueue } from "../utils/bluetoothQueue";
+import { createContext, createSignal, useContext } from "solid-js";
+import { type CraftyDriver, connectCrafty } from "../devices/crafty/driver";
 import {
   connectVentyVeazy,
   type VentyVeazyDriver,
 } from "../devices/ventyVeazy/driver";
-import { connectCrafty, type CraftyDriver } from "../devices/crafty/driver";
 import { connectVolcano, type VolcanoDriver } from "../devices/volcano/driver";
+import { bluetoothQueue } from "../utils/bluetoothQueue";
+import { ConnectionState, DeviceType, ServiceUUIDs } from "../utils/uuids";
 
 export type DeviceInfo = {
   type: DeviceType;

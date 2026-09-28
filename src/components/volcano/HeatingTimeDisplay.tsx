@@ -1,7 +1,7 @@
-import { Component } from "solid-js";
+import type { Component } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useVolcano } from "../../provider/VolcanoProvider";
 import { useTranslations } from "../../i18n/utils";
+import { useVolcano } from "../../provider/VolcanoProvider";
 
 const Container = styled("div")`
   display: flex;

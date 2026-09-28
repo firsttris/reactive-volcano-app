@@ -1,5 +1,13 @@
 import type PQueue from "p-queue";
 import {
+  VentyVeazyCharacteristicUUIDs,
+  VentyVeazyServiceUUIDs,
+} from "../../utils/uuids";
+import {
+  getRequiredCharacteristic,
+  getService,
+} from "../shared/characteristicDevice";
+import {
   Command,
   encodeReadBrightnessVibration,
   encodeRequest,
@@ -7,14 +15,6 @@ import {
   type Response,
   type VentyVeazyModel,
 } from "./protocol";
-import {
-  getRequiredCharacteristic,
-  getService,
-} from "../shared/characteristicDevice";
-import {
-  VentyVeazyCharacteristicUUIDs,
-  VentyVeazyServiceUUIDs,
-} from "../../utils/uuids";
 
 const POLL_INTERVAL_MS = 500;
 // Like the legacy app: every ~30 status polls also request the usage times
@@ -71,7 +71,7 @@ export const createVentyVeazyDriver = (
     if (!value) return;
     const response = parseResponse(value, model);
     if (!response) return;
-    listeners.forEach((listener) => listener(response));
+    for (const listener of listeners) listener(response);
   };
   characteristic.addEventListener(
     "characteristicvaluechanged",

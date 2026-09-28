@@ -1,11 +1,10 @@
-import { RouteSectionProps } from "@solidjs/router";
+import { type RouteSectionProps, useNavigate } from "@solidjs/router";
+import { createEffect } from "solid-js";
+import { useBluetooth } from "../../../provider/BluetoothProvider";
 import { VolcanoProvider } from "../../../provider/VolcanoProvider";
 import { WorkflowProvider } from "../../../provider/WorkflowProvider";
-import { useBluetooth } from "../../../provider/BluetoothProvider";
-import { useNavigate } from "@solidjs/router";
-import { createEffect } from "solid-js";
-import { ConnectionState } from "../../../utils/uuids";
 import { buildRoute } from "../../../routes";
+import { ConnectionState } from "../../../utils/uuids";
 
 /**
  * Wrapper for all Volcano routes: provides the device store and workflows

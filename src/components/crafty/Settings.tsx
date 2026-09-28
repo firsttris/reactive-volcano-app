@@ -1,11 +1,11 @@
-import { Component, createSignal } from "solid-js";
+import { type Component, createSignal } from "solid-js";
 import { styled } from "solid-styled-components";
-import { Slider } from "../Slider";
-import { Button } from "../Button";
-import { DarkModeSwitch } from "../DarkModeSwitch";
-import { useCrafty } from "../../provider/CraftyProvider";
 import { Limits } from "../../devices/crafty/protocol";
 import { useTranslations } from "../../i18n/utils";
+import { useCrafty } from "../../provider/CraftyProvider";
+import { Button } from "../Button";
+import { DarkModeSwitch } from "../DarkModeSwitch";
+import { Slider } from "../Slider";
 
 const SettingsContainer = styled("div")`
   max-width: 600px;

@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import PQueue from "p-queue";
-import { connectVolcano, type VolcanoValues } from "./driver";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   ServiceUUIDs,
   VolcanoCharacteristicUUIDs as UUID,
 } from "../../utils/uuids";
+import { connectVolcano, type VolcanoValues } from "./driver";
 
 type Write = { uuid: string; bytes: number[] };
 
@@ -62,6 +62,15 @@ const DEVICE: Record<string, Record<string, number[]>> = {
     [UUID.pumpOn]: [],
     [UUID.pumpOff]: [],
   },
+};
+
+const characteristicOf = (
+  characteristics: Map<string, FakeCharacteristic>,
+  uuid: string
+) => {
+  const characteristic = characteristics.get(uuid);
+  if (!characteristic) throw new Error(`Missing characteristic ${uuid}`);
+  return characteristic;
 };
 
 const createServer = () => {
@@ -147,7 +156,7 @@ describe("Volcano driver", () => {
 
   it("forwards notifications and skips invalid temperatures", async () => {
     const { state, characteristics } = await connect();
-    const current = characteristics.get(UUID.currentTemperature)!;
+    const current = characteristicOf(characteristics, UUID.currentTemperature);
     current.notify([0x08, 0x07]);
     expect(state.currentTemp).toBe(180);
     current.notify([0xff, 0xff]);
@@ -172,7 +181,7 @@ describe("Volcano driver", () => {
 
   it("disables vibration by setting the bit and reads it back", async () => {
     const { driver, writes, state, characteristics } = await connect();
-    characteristics.get(UUID.vibration)!.bytes = [0x00, 0x04];
+    characteristicOf(characteristics, UUID.vibration).bytes = [0x00, 0x04];
     await driver.setVibration(false);
     expect(writes).toEqual([
       { uuid: UUID.vibration, bytes: [0x00, 0x04, 0x01, 0x00] },
@@ -183,10 +192,12 @@ describe("Volcano driver", () => {
   it("stops notifications on dispose", async () => {
     const { driver, state, characteristics } = await connect();
     await driver.dispose();
-    characteristics.get(UUID.currentTemperature)!.notify([0x08, 0x07]);
+    characteristicOf(characteristics, UUID.currentTemperature).notify([
+      0x08, 0x07,
+    ]);
     expect(state.currentTemp).toBe(200);
     expect(
-      characteristics.get(UUID.activity)!.stopNotifications
+      characteristicOf(characteristics, UUID.activity).stopNotifications
     ).toHaveBeenCalledOnce();
   });
 });

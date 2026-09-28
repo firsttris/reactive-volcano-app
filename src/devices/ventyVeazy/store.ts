@@ -3,11 +3,11 @@ import { createStore } from "solid-js/store";
 import { createDebouncedWriter } from "../shared/debouncedWriter";
 import type { VentyVeazyDriver } from "./driver";
 import {
+  type BrightnessVibrationResponse,
   Command,
-  HeaterMode,
-  Limits,
-  SettingsBit,
   clamp,
+  type DeviceDataResponse,
+  type ExtendedDataResponse,
   encodeBoostTemperature,
   encodeBoostTimeoutDisabled,
   encodeBoostVisualization,
@@ -23,14 +23,14 @@ import {
   encodeSuperBoostTemperature,
   encodeTargetTemperature,
   encodeVibration,
+  type FirmwareResponse,
+  HeaterMode,
+  Limits,
+  type Response,
+  SettingsBit,
+  type StatusResponse,
   toDisplayOffset,
   toDisplayTemperature,
-  type BrightnessVibrationResponse,
-  type DeviceDataResponse,
-  type ExtendedDataResponse,
-  type FirmwareResponse,
-  type Response,
-  type StatusResponse,
 } from "./protocol";
 
 // Temperature writes are delayed until the user stops clicking (like the

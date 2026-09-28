@@ -1,12 +1,12 @@
-import { BsBluetooth } from "solid-icons/bs";
-import { ConnectionState, DeviceType } from "../utils/uuids";
-import { Show, createEffect } from "solid-js";
-import { BlinkingSquares } from "./volcano/BlinkingSquares";
-import { styled } from "solid-styled-components";
-import { useBluetooth } from "../provider/BluetoothProvider";
 import { useNavigate } from "@solidjs/router";
-import { buildRoute } from "../routes";
+import { BsBluetooth } from "solid-icons/bs";
+import { createEffect, Show } from "solid-js";
+import { styled } from "solid-styled-components";
 import { useTranslations } from "../i18n/utils";
+import { useBluetooth } from "../provider/BluetoothProvider";
+import { buildRoute } from "../routes";
+import { ConnectionState, DeviceType } from "../utils/uuids";
+import { BlinkingSquares } from "./volcano/BlinkingSquares";
 
 const Centered = styled("div")`
   display: flex;

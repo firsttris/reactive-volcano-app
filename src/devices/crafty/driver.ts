@@ -1,10 +1,17 @@
 import type PQueue from "p-queue";
 import {
-  CraftyCharacteristicUUIDs as UUID,
   CraftyServiceUUIDs,
+  CraftyCharacteristicUUIDs as UUID,
 } from "../../utils/uuids";
 import {
-  SecurityCode,
+  createCharacteristicDevice,
+  getOptionalCharacteristic,
+  getRequiredCharacteristic,
+  getService,
+  type Reader,
+  type UpdateListener,
+} from "../shared/characteristicDevice";
+import {
   encodeBoostTemperature,
   encodeFactoryReset,
   encodeHeaterCommand,
@@ -16,15 +23,8 @@ import {
   parseTemperature,
   parseText,
   parseUint16,
+  SecurityCode,
 } from "./protocol";
-import {
-  createCharacteristicDevice,
-  getOptionalCharacteristic,
-  getRequiredCharacteristic,
-  getService,
-  type Reader,
-  type UpdateListener,
-} from "../shared/characteristicDevice";
 
 export interface CraftyValues {
   targetTemp: number;

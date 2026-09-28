@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import PQueue from "p-queue";
-import { connectCrafty, type CraftyUpdate } from "./driver";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  CraftyCharacteristicUUIDs as UUID,
   CraftyServiceUUIDs,
+  CraftyCharacteristicUUIDs as UUID,
 } from "../../utils/uuids";
+import { type CraftyUpdate, connectCrafty } from "./driver";
 
 type Write = { uuid: string; bytes: number[] };
 
@@ -68,6 +68,15 @@ const DEVICE: Record<string, Record<string, number[]>> = {
     [UUID.akkuStatusCharacteristic2]: [3, 0],
     [UUID.factoryResetCharacteristic]: [],
   },
+};
+
+const characteristicOf = (
+  characteristics: Map<string, FakeCharacteristic>,
+  uuid: string
+) => {
+  const characteristic = characteristics.get(uuid);
+  if (!characteristic) throw new Error(`Missing characteristic ${uuid}`);
+  return characteristic;
 };
 
 const createServer = (firmware = "V03.01") => {
@@ -169,7 +178,10 @@ describe("Crafty driver", () => {
 
   it("forwards notifications and stops them on dispose", async () => {
     const { driver, state, characteristics } = await collect();
-    const current = characteristics.get(UUID.currTemperatureChanged)!;
+    const current = characteristicOf(
+      characteristics,
+      UUID.currTemperatureChanged
+    );
 
     current.notify([0x08, 0x07]); // 180 °C
     expect(state.currentTemp).toBe(180);
@@ -193,7 +205,7 @@ describe("Crafty driver", () => {
     const { driver, writes, state, characteristics } = await collect();
     vi.useFakeTimers();
     vi.spyOn(
-      characteristics.get(UUID.writeTemp)!,
+      characteristicOf(characteristics, UUID.writeTemp),
       "readValue"
     ).mockResolvedValue(new DataView(new Uint8Array([0x08, 0x07]).buffer));
 

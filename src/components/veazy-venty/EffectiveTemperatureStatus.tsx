@@ -1,6 +1,6 @@
 import { styled } from "solid-styled-components";
-import { TemperatureDisplay } from "../TemperatureDisplay";
 import { useTranslations } from "../../i18n/utils";
+import { TemperatureDisplay } from "../TemperatureDisplay";
 
 const StatusBar = styled("div")`
   display: flex;

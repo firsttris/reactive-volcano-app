@@ -1,11 +1,11 @@
 import { Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
 import { HeaterMode } from "../../devices/ventyVeazy/protocol";
+import { useTranslations } from "../../i18n/utils";
+import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
+import { BoostControl } from "./BoostControl";
 import { EffectiveTemperatureStatus } from "./EffectiveTemperatureStatus";
 import { MainTemperatureControl } from "./MainTemperatureControl";
-import { BoostControl } from "./BoostControl";
-import { useTranslations } from "../../i18n/utils";
 
 // Styled Components
 const Container = styled("div")`

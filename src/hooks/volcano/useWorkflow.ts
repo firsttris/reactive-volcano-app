@@ -1,10 +1,10 @@
 import { createMemo } from "solid-js";
-import {
-  Workflow,
-  WorkflowStep,
-  initialListOfWorkflows,
-} from "../../utils/workflowData";
 import { v4 as uuidv4 } from "uuid";
+import {
+  initialListOfWorkflows,
+  type Workflow,
+  type WorkflowStep,
+} from "../../utils/workflowData";
 import { useIndexedDB } from "../utils/useIndexedDB";
 export const useWorkflow = () => {
   const [workflowList, setWorkflowList] = useIndexedDB(
@@ -269,8 +269,7 @@ export const useWorkflow = () => {
     };
 
     const dataStr = JSON.stringify(exportData, null, 2);
-    const dataUri =
-      "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+    const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
 
     const exportFileDefaultName = `${workflow.name.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_workflow.json`;
 
@@ -308,12 +307,14 @@ export const useWorkflow = () => {
           const newWorkflow: Workflow = {
             id: uuidv4(),
             name: importData.name,
-            workflowSteps: importData.workflowSteps.map((step: any) => ({
-              id: uuidv4(),
-              temperature: step.temperature,
-              holdTimeInSeconds: step.holdTimeInSeconds,
-              pumpTimeInSeconds: step.pumpTimeInSeconds,
-            })),
+            workflowSteps: importData.workflowSteps.map(
+              (step: WorkflowStep) => ({
+                id: uuidv4(),
+                temperature: step.temperature,
+                holdTimeInSeconds: step.holdTimeInSeconds,
+                pumpTimeInSeconds: step.pumpTimeInSeconds,
+              })
+            ),
           };
 
           setWorkflowList([...workflowList(), newWorkflow]);
@@ -346,8 +347,7 @@ export const useWorkflow = () => {
     };
 
     const dataStr = JSON.stringify(exportData, null, 2);
-    const dataUri =
-      "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+    const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
 
     const exportFileDefaultName = `all_workflows_${new Date().toISOString().split("T")[0]}.json`;
 
@@ -395,12 +395,14 @@ export const useWorkflow = () => {
             const newWorkflow: Workflow = {
               id: uuidv4(),
               name: workflowData.name,
-              workflowSteps: workflowData.workflowSteps.map((step: any) => ({
-                id: uuidv4(),
-                temperature: step.temperature,
-                holdTimeInSeconds: step.holdTimeInSeconds,
-                pumpTimeInSeconds: step.pumpTimeInSeconds,
-              })),
+              workflowSteps: workflowData.workflowSteps.map(
+                (step: WorkflowStep) => ({
+                  id: uuidv4(),
+                  temperature: step.temperature,
+                  holdTimeInSeconds: step.holdTimeInSeconds,
+                  pumpTimeInSeconds: step.pumpTimeInSeconds,
+                })
+              ),
             };
 
             newWorkflows.push(newWorkflow);

@@ -1,6 +1,6 @@
-import { useVolcano } from "../../provider/VolcanoProvider";
 import { styled } from "solid-styled-components";
 import { useTranslations } from "../../i18n/utils";
+import { useVolcano } from "../../provider/VolcanoProvider";
 
 interface StyledDivProps {
   isVisible: boolean;

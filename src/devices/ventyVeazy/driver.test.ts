@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import PQueue from "p-queue";
-import { createVentyVeazyDriver, type ControlCharacteristic } from "./driver";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { type ControlCharacteristic, createVentyVeazyDriver } from "./driver";
 import { Command } from "./protocol";
 
 class FakeCharacteristic extends EventTarget implements ControlCharacteristic {

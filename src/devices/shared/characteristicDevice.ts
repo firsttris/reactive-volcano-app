@@ -38,7 +38,7 @@ export const createCharacteristicDevice = <Key extends string, Values>(
   let disposed = false;
 
   const emit = (update: Partial<Values>) => {
-    listeners.forEach((listener) => listener(update));
+    for (const listener of listeners) listener(update);
   };
 
   const require = (key: Key) => {

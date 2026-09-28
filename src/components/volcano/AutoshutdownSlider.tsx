@@ -1,6 +1,6 @@
-import { Slider } from "../Slider";
-import { useVolcano } from "../../provider/VolcanoProvider";
 import { useTranslations } from "../../i18n/utils";
+import { useVolcano } from "../../provider/VolcanoProvider";
+import { Slider } from "../Slider";
 
 export const AutoShutdownSlider = () => {
   const t = useTranslations();

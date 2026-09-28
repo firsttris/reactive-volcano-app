@@ -1,12 +1,17 @@
-import { Component, createEffect, createMemo, createSignal } from "solid-js";
-import { Slider } from "../../Slider";
-import { useTranslations } from "../../../i18n/utils";
-import { Button } from "../../Button";
-import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { useNavigate, useParams } from "@solidjs/router";
-import { buildRoute } from "../../../routes";
-import { styled } from "solid-styled-components";
 import { FiSave, FiX } from "solid-icons/fi";
+import {
+  type Component,
+  createEffect,
+  createMemo,
+  createSignal,
+} from "solid-js";
+import { styled } from "solid-styled-components";
+import { useTranslations } from "../../../i18n/utils";
+import { useWorkflowContext } from "../../../provider/WorkflowProvider";
+import { buildRoute } from "../../../routes";
+import { Button } from "../../Button";
+import { Slider } from "../../Slider";
 
 const Container = styled("div")`
   max-width: 600px;

@@ -1,20 +1,20 @@
-import { Component, createEffect } from "solid-js";
-import { styled } from "solid-styled-components";
 import { useNavigate } from "@solidjs/router";
-import { Temperature } from "../components/volcano/Temperature";
-import { HeatAndPump } from "../components/volcano/HeatAndPump";
-import { ShutdownTime } from "../components/volcano/ShutdownTime";
-import { BrightnessSlider } from "../components/volcano/BrightnessSlider";
-import { AutoShutdownSlider } from "../components/volcano/AutoshutdownSlider";
-import { VibrationSwitch } from "../components/volcano/VibrationSwitch";
+import { type Component, createEffect } from "solid-js";
+import { styled } from "solid-styled-components";
 import { DarkModeSwitch } from "../components/DarkModeSwitch";
-import { StandbyDisplaySwitch } from "../components/volcano/StandbyDisplaySwitch";
-import { WorkFlowSection } from "../components/volcano/Workflow/WorkflowSection";
+import { AutoShutdownSlider } from "../components/volcano/AutoshutdownSlider";
+import { BrightnessSlider } from "../components/volcano/BrightnessSlider";
+import { HeatAndPump } from "../components/volcano/HeatAndPump";
 import { HeatingTimeDisplay } from "../components/volcano/HeatingTimeDisplay";
+import { ShutdownTime } from "../components/volcano/ShutdownTime";
+import { StandbyDisplaySwitch } from "../components/volcano/StandbyDisplaySwitch";
+import { Temperature } from "../components/volcano/Temperature";
+import { VibrationSwitch } from "../components/volcano/VibrationSwitch";
+import { WorkFlowSection } from "../components/volcano/Workflow/WorkflowSection";
 import { useTranslations } from "../i18n/utils";
 import { useBluetooth } from "../provider/BluetoothProvider";
-import { ConnectionState } from "../utils/uuids";
 import { buildRoute } from "../routes";
+import { ConnectionState } from "../utils/uuids";
 
 const MainCard = styled("div")`
   background: var(--secondary-bg);

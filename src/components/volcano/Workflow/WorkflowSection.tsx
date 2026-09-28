@@ -1,10 +1,10 @@
+import { FiDownload, FiPlus, FiUpload } from "solid-icons/fi";
 import { For } from "solid-js";
-import { WorkflowItem } from "./WorkflowItem";
 import { styled } from "solid-styled-components";
+import { useTranslations } from "../../../i18n/utils";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { Button } from "../../Button";
-import { FiPlus, FiDownload, FiUpload } from "solid-icons/fi";
-import { useTranslations } from "../../../i18n/utils";
+import { WorkflowItem } from "./WorkflowItem";
 
 const WorkflowContainer = styled("div")`
   max-width: 600px;

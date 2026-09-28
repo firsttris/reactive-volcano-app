@@ -1,11 +1,11 @@
-import { createContext, Show, useContext } from "solid-js";
 import type { JSX } from "solid-js";
-import { useBluetooth } from "./BluetoothProvider";
+import { createContext, Show, useContext } from "solid-js";
 import type { VolcanoDriver } from "../devices/volcano/driver";
 import {
   createVolcanoStore,
   type VolcanoStore,
 } from "../devices/volcano/store";
+import { useBluetooth } from "./BluetoothProvider";
 
 const VolcanoContext = createContext<VolcanoStore>();
 
@@ -13,7 +13,7 @@ const VolcanoStoreProvider = (props: {
   driver: VolcanoDriver;
   children: JSX.Element;
 }) => {
-  // eslint-disable-next-line solid/reactivity -- one store per driver instance
+  // Read once on purpose: one store per driver instance
   const store = createVolcanoStore(props.driver);
   return (
     <VolcanoContext.Provider value={store}>

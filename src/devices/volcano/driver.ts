@@ -11,8 +11,6 @@ import {
   type UpdateListener,
 } from "../shared/characteristicDevice";
 import {
-  Register2Bit,
-  Register3Bit,
   encodeCommand,
   encodeRegisterBit,
   encodeTargetTemperature,
@@ -22,6 +20,8 @@ import {
   parseTemperature,
   parseText,
   parseUint16,
+  Register2Bit,
+  Register3Bit,
 } from "./protocol";
 
 export interface VolcanoValues {

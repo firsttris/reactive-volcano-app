@@ -1,7 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-  Register2Bit,
-  Register3Bit,
   encodeCommand,
   encodeRegisterBit,
   encodeTargetTemperature,
@@ -9,6 +7,8 @@ import {
   parseCurrentTemperature,
   parseShortText,
   parseTemperature,
+  Register2Bit,
+  Register3Bit,
 } from "./protocol";
 
 const view = (...bytes: number[]) => new DataView(new Uint8Array(bytes).buffer);

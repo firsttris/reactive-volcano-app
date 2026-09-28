@@ -1,6 +1,6 @@
-import { Component, Show, createEffect, createSignal } from "solid-js";
-import { styled } from "solid-styled-components";
 import type { JSX } from "solid-js";
+import { type Component, createEffect, createSignal, Show } from "solid-js";
+import { styled } from "solid-styled-components";
 
 const Container = styled("div")`
   display: flex;

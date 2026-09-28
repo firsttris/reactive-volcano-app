@@ -1,8 +1,8 @@
-import { createContext, Show, useContext } from "solid-js";
 import type { JSX } from "solid-js";
-import { useBluetooth } from "./BluetoothProvider";
+import { createContext, Show, useContext } from "solid-js";
 import type { CraftyDriver } from "../devices/crafty/driver";
-import { createCraftyStore, type CraftyStore } from "../devices/crafty/store";
+import { type CraftyStore, createCraftyStore } from "../devices/crafty/store";
+import { useBluetooth } from "./BluetoothProvider";
 
 const CraftyContext = createContext<CraftyStore>();
 
@@ -10,7 +10,7 @@ const CraftyStoreProvider = (props: {
   driver: CraftyDriver;
   children: JSX.Element;
 }) => {
-  // eslint-disable-next-line solid/reactivity -- one store per driver instance
+  // Read once on purpose: one store per driver instance
   const store = createCraftyStore(props.driver);
   return (
     <CraftyContext.Provider value={store}>

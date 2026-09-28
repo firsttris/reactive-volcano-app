@@ -1,6 +1,6 @@
-import { Accessor, createSignal, onCleanup } from "solid-js";
+import { type Accessor, createSignal, onCleanup } from "solid-js";
 import { useVolcano } from "../../provider/VolcanoProvider";
-import { WorkflowStep } from "../../utils/workflowData";
+import type { WorkflowStep } from "../../utils/workflowData";
 
 // Like the legacy app, the pump always runs for at least this long
 const MIN_PUMP_TIME_MS = 500;
@@ -35,7 +35,7 @@ export const useWorkflowScheduler = (
 
   const cancelRun = () => {
     runId++;
-    pendingCancels.forEach((cancel) => cancel());
+    for (const cancel of pendingCancels) cancel();
     pendingCancels.clear();
   };
 

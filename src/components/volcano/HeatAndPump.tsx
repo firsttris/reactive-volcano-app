@@ -1,9 +1,9 @@
-import { ActiveRoundButton } from "../Button";
 import { FaSolidWind } from "solid-icons/fa";
 import { SiFireship } from "solid-icons/si";
-import { useVolcano } from "../../provider/VolcanoProvider";
 import { styled } from "solid-styled-components";
 import { useTranslations } from "../../i18n/utils";
+import { useVolcano } from "../../provider/VolcanoProvider";
+import { ActiveRoundButton } from "../Button";
 
 const Container = styled("div")`
   display: flex;

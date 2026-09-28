@@ -1,8 +1,8 @@
 import { VsColorMode } from "solid-icons/vs";
 import "./DarkModeSwitch.css";
-import { Switch } from "./Switch";
-import { useDarkMode } from "../provider/DarkModeProvider";
 import { useTranslations } from "../i18n/utils";
+import { useDarkMode } from "../provider/DarkModeProvider";
+import { Switch } from "./Switch";
 
 export const DarkModeSwitch = () => {
   const { toggleDarkMode, isDarkMode } = useDarkMode();

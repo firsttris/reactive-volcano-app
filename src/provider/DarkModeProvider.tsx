@@ -1,12 +1,12 @@
+import type { Accessor, JSX } from "solid-js";
 import {
-  Component,
+  type Component,
   createContext,
   createEffect,
   createSignal,
   onMount,
   useContext,
 } from "solid-js";
-import type { Accessor, JSX } from "solid-js";
 
 interface DarkModeContextType {
   isDarkMode: Accessor<boolean>;

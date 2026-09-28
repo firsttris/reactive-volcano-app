@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, JSX } from "solid-js";
+import { createEffect, createSignal, For, type JSX } from "solid-js";
 import { styled } from "solid-styled-components";
 
 const SliderInput = styled("input")`

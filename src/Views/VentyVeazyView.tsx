@@ -1,15 +1,15 @@
-import { Component, createEffect } from "solid-js";
-import { styled } from "solid-styled-components";
 import { useNavigate } from "@solidjs/router";
-import { Temperature } from "../components/veazy-venty/Temperature";
+import { type Component, createEffect } from "solid-js";
+import { styled } from "solid-styled-components";
 import { Settings } from "../components/veazy-venty/Settings";
-import { useBluetooth } from "../provider/BluetoothProvider";
-import { ConnectionState } from "../utils/uuids";
-import {
-  VentyVeazyProvider,
-  useVentyVeazy,
-} from "../provider/VentyVeazyProvider";
+import { Temperature } from "../components/veazy-venty/Temperature";
 import { useTranslations } from "../i18n/utils";
+import { useBluetooth } from "../provider/BluetoothProvider";
+import {
+  useVentyVeazy,
+  VentyVeazyProvider,
+} from "../provider/VentyVeazyProvider";
+import { ConnectionState } from "../utils/uuids";
 
 const BatteryContainer = styled("div")`
   margin: 20px auto;
@@ -106,7 +106,7 @@ const VentyVeazyViewContent: Component = () => {
         <BatteryContainer>
           <BatteryLabel>
             {t("battery")}: {state.status?.batteryLevel ?? 0}%{" "}
-            {state.status?.isCharging ? "⚡ " + t("charging") : ""}
+            {state.status?.isCharging ? `⚡ ${t("charging")}` : ""}
           </BatteryLabel>
           <BatteryBar charging={state.status?.isCharging ?? false}>
             <BatteryFill

@@ -1,7 +1,7 @@
-import { useVolcano } from "../../provider/VolcanoProvider";
 import { FaSolidLightbulb } from "solid-icons/fa";
-import { Switch } from "../Switch";
 import { useTranslations } from "../../i18n/utils";
+import { useVolcano } from "../../provider/VolcanoProvider";
+import { Switch } from "../Switch";
 
 export const StandbyDisplaySwitch = () => {
   const t = useTranslations();
