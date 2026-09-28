@@ -97,6 +97,19 @@ export const HeatProgress = (props: HeatProgressProps) => {
     )
   );
 
+  // A short buzz when the target is reached, where the device supports it
+  createEffect(
+    on(
+      status,
+      (next, previous) => {
+        if (next === "reached" && previous === "heating") {
+          navigator.vibrate?.(200);
+        }
+      },
+      { defer: true }
+    )
+  );
+
   // Notifications only arrive on change, so keep the estimate from going stale
   const timer = setInterval(() => setNow(Date.now()), 1000);
   onCleanup(() => clearInterval(timer));

@@ -4,24 +4,8 @@ import { styled } from "solid-styled-components";
 import { useTranslations } from "../../../i18n/utils";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { Button } from "../../Button";
+import { Card, CardTitle } from "../../Card";
 import { WorkflowItem } from "./WorkflowItem";
-
-const WorkflowContainer = styled("div")`
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  background: var(--secondary-bg);
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
-`;
-
-const WorkflowTitle = styled("h2")`
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  margin-bottom: 24px;
-  text-align: center;
-  font-family: CustomFont;
-`;
 
 const Container = styled("div")`
   display: grid;
@@ -135,8 +119,8 @@ export const WorkFlowSection = () => {
   };
 
   return (
-    <WorkflowContainer>
-      <WorkflowTitle>{t("workflows")}</WorkflowTitle>
+    <Card>
+      <CardTitle>{t("workflows")}</CardTitle>
       <Container>
         <For each={workflowList()}>
           {(workflow) => <WorkflowItem workflow={workflow} />}
@@ -169,6 +153,6 @@ export const WorkFlowSection = () => {
           {t("importWorkflow")}
         </BulkOperationButton>
       </BulkOperationsContainer>
-    </WorkflowContainer>
+    </Card>
   );
 };

@@ -1,37 +1,35 @@
 import { useNavigate } from "@solidjs/router";
 import { type Component, createEffect } from "solid-js";
-import { styled } from "solid-styled-components";
+import { Card } from "../components/Card";
 import { HeaterControl } from "../components/crafty/HeaterControl";
 import { Settings } from "../components/crafty/Settings";
 import { Temperature } from "../components/crafty/Temperature";
+import { useWakeLock } from "../hooks/utils/useWakeLock";
 import { useBluetooth } from "../provider/BluetoothProvider";
-import { CraftyProvider } from "../provider/CraftyProvider";
+import { CraftyProvider, useCrafty } from "../provider/CraftyProvider";
 import { buildRoute } from "../routes";
 import { ConnectionState } from "../utils/uuids";
 
-const MainCard = styled("div")`
-  background: var(--secondary-bg);
-  border-radius: 16px;
-  padding: 24px;
-  margin: 20px auto;
-  border: 1px solid var(--border-color);
-  max-width: 600px;
-`;
+const CraftyViewContent: Component = () => {
+  const { derived } = useCrafty();
+  // Keep the screen on while the device heats
+  useWakeLock(derived.isHeaterActive);
 
-const CraftyViewContent: Component = () => (
-  <>
-    {/* Main Controls */}
-    <MainCard>
-      <div style={{ "margin-bottom": "24px" }}>
-        <Temperature />
-      </div>
-      <HeaterControl />
-    </MainCard>
+  return (
+    <>
+      {/* Main Controls */}
+      <Card>
+        <div style={{ "margin-bottom": "24px" }}>
+          <Temperature />
+        </div>
+        <HeaterControl />
+      </Card>
 
-    {/* Settings */}
-    <Settings />
-  </>
-);
+      {/* Settings */}
+      <Settings />
+    </>
+  );
+};
 
 export const CraftyView: Component = () => {
   const navigate = useNavigate();

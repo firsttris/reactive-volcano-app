@@ -30,7 +30,7 @@ const DigitalText = styled("div")<{ isTarget?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${(props) => (props.isTarget ? "var(--text-color)" : "#f60")};
+  color: ${(props) => (props.isTarget ? "var(--text-color)" : "var(--accent-color)")};
   transition: all 0.3s ease;
 
   ${(props) =>

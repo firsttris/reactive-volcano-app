@@ -12,7 +12,10 @@ interface SwitchButtonProps {
   darkMode?: boolean;
 }
 
-const SwitchWrapper = styled("div")`
+const SwitchWrapper = styled("button")`
+  flex-shrink: 0;
+  box-sizing: content-box;
+  padding: 0;
   width: 72px;
   height: 36px;
   background: var(--secondary-bg);
@@ -22,9 +25,11 @@ const SwitchWrapper = styled("div")`
   transition: background 0.3s;
   border: 2px solid var(--border-color);
 
-  &:hover {
-    background: var(--bg-color);
-    border-color: var(--text-color);
+  @media (hover: hover) {
+    &:hover {
+      background: var(--bg-color);
+      border-color: var(--text-color);
+    }
   }
 `;
 
@@ -32,7 +37,8 @@ const SwitchButton = styled("div")<SwitchButtonProps>`
   width: 30px;
   height: 30px;
   color: var(--text-color);
-  background: ${(props) => (props.isOn ? "#f60" : "var(--border-color)")};
+  background: ${(props) =>
+    props.isOn ? "var(--accent-color)" : "var(--border-color)"};
   position: absolute;
   top: 3px;
   left: ${(props) => (props.isOn ? "39px" : "1px")};
@@ -74,7 +80,13 @@ export const Switch: Component<SwitchProps> = (props) => {
 
   return (
     <Container>
-      <SwitchWrapper onClick={toggleSwitch}>
+      <SwitchWrapper
+        type="button"
+        role="switch"
+        aria-checked={isOn()}
+        aria-label={props.label}
+        onClick={toggleSwitch}
+      >
         <SwitchButton isOn={isOn()}>{props.icon}</SwitchButton>
       </SwitchWrapper>
       <Show when={props.label}>

@@ -1,6 +1,7 @@
 import { render } from "solid-js/web";
 import { BluetoothProvider } from "./provider/BluetoothProvider";
 import { DarkModeProvider } from "./provider/DarkModeProvider";
+import { ToastProvider } from "./provider/ToastProvider";
 import "./css/main.css";
 import "@fontsource/roboto";
 import { Routes } from "./Router";
@@ -11,9 +12,11 @@ if (!root) throw new Error("Root element #root not found");
 const dispose = render(
   () => (
     <DarkModeProvider>
-      <BluetoothProvider>
-        <Routes />
-      </BluetoothProvider>
+      <ToastProvider>
+        <BluetoothProvider>
+          <Routes />
+        </BluetoothProvider>
+      </ToastProvider>
     </DarkModeProvider>
   ),
   root

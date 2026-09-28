@@ -1,8 +1,9 @@
 import { SiFireship } from "solid-icons/si";
 import { Show } from "solid-js";
 import { styled } from "solid-styled-components";
+import { useTranslations } from "../../i18n/utils";
 import { useCrafty } from "../../provider/CraftyProvider";
-import { ActiveRoundButton } from "../Button";
+import { ActiveRoundButton, ToggleWithLabel } from "../Button";
 
 const Container = styled("div")`
   display: flex;
@@ -32,6 +33,7 @@ const WarningText = styled("div")`
 
 export const HeaterControl = () => {
   const { actions, derived, isOldFirmware } = useCrafty();
+  const t = useTranslations();
 
   return (
     <Container>
@@ -46,12 +48,18 @@ export const HeaterControl = () => {
           </WarningText>
         }
       >
-        <ActiveRoundButton
-          isActive={derived.isHeaterActive()}
-          onClick={actions.toggleHeater}
-        >
-          <SiFireship size="30px" />
-        </ActiveRoundButton>
+        <ToggleWithLabel isActive={derived.isHeaterActive()}>
+          <ActiveRoundButton
+            type="button"
+            isActive={derived.isHeaterActive()}
+            aria-pressed={derived.isHeaterActive()}
+            aria-label={t("heater")}
+            onClick={actions.toggleHeater}
+          >
+            <SiFireship size="30px" />
+          </ActiveRoundButton>
+          {t("heater")}
+        </ToggleWithLabel>
       </Show>
     </Container>
   );

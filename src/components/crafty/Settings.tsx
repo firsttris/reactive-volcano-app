@@ -4,24 +4,8 @@ import { Limits } from "../../devices/crafty/protocol";
 import { useTranslations } from "../../i18n/utils";
 import { useCrafty } from "../../provider/CraftyProvider";
 import { Button } from "../Button";
-import { DarkModeSwitch } from "../DarkModeSwitch";
+import { CollapsibleCard } from "../Card";
 import { Slider } from "../Slider";
-
-const SettingsContainer = styled("div")`
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  background: var(--secondary-bg);
-  border-radius: 8px;
-`;
-
-const SettingsTitle = styled("h2")`
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  text-align: center;
-  font-family: CustomFont;
-`;
 
 const SettingItem = styled("div")`
   margin-bottom: 25px;
@@ -115,7 +99,7 @@ const ModalContent = styled("div")`
   border-radius: 8px;
   max-width: 400px;
   text-align: center;
-  border: 2px solid #f60;
+  border: 2px solid var(--accent-color);
 `;
 
 const ModalTitle = styled("h3")`
@@ -160,9 +144,7 @@ export const Settings: Component = () => {
 
   return (
     <>
-      <SettingsContainer>
-        <SettingsTitle>{t("settings")}</SettingsTitle>
-
+      <CollapsibleCard title={t("settings")} storageKey="crafty-settings">
         {/* Boost Temperature */}
         <SettingItem>
           <SettingLabel>Boost Temperature</SettingLabel>
@@ -296,12 +278,7 @@ export const Settings: Component = () => {
             </ResetButtonContainer>
           </SettingItem>
         )}
-
-        {/* Dark Mode */}
-        <SettingItem>
-          <DarkModeSwitch />
-        </SettingItem>
-      </SettingsContainer>
+      </CollapsibleCard>
 
       {/* Factory Reset Modal */}
       <Modal isOpen={showResetModal()}>

@@ -13,6 +13,7 @@ export type DeviceInfo = {
   type: DeviceType;
   name: string;
   serialNumber?: string;
+  firmwareVersion?: string;
 };
 
 const BluetoothContext =
@@ -21,6 +22,10 @@ const BluetoothContext =
 type BluetoothProviderProps = {
   children: JSX.Element;
 };
+
+export type ConnectionError =
+  | { kind: "failed"; message: string }
+  | { kind: "lost" };
 
 const NO_DEVICE: DeviceInfo = { type: DeviceType.UNKNOWN, name: "" };
 
@@ -64,6 +69,7 @@ const createBluetoothMethods = () => {
     ConnectionState.NOT_CONNECTED
   );
   const [deviceInfo, setDeviceInfo] = createSignal<DeviceInfo>(NO_DEVICE);
+  const [connectionError, setConnectionError] = createSignal<ConnectionError>();
 
   // One driver per device type; the device providers subscribe to them
   const [volcanoDriver, setVolcanoDriver] = createSignal<VolcanoDriver>();
@@ -97,9 +103,11 @@ const createBluetoothMethods = () => {
     disposeDrivers();
     releaseDevice();
     setConnectionState(ConnectionState.NOT_CONNECTED);
+    setConnectionError({ kind: "lost" });
   }
 
   const disconnect = async () => {
+    setConnectionError(undefined);
     await disposeDrivers();
     releaseDevice();
     setConnectionState(ConnectionState.NOT_CONNECTED);
@@ -125,7 +133,12 @@ const createBluetoothMethods = () => {
     switch (type) {
       case DeviceType.VOLCANO: {
         const driver = await connectVolcano(server, bluetoothQueue);
-        setDeviceInfo({ type, name, serialNumber: driver.info.serialNumber });
+        setDeviceInfo({
+          type,
+          name,
+          serialNumber: driver.info.serialNumber,
+          firmwareVersion: driver.info.firmwareVersion,
+        });
         setVolcanoDriver(driver);
         break;
       }
@@ -146,6 +159,7 @@ const createBluetoothMethods = () => {
 
   const connect = async () => {
     setConnectionState(ConnectionState.CONNECTING);
+    setConnectionError(undefined);
     try {
       const bluetoothDevice = await navigator.bluetooth.requestDevice({
         filters: getDeviceFilters(),
@@ -160,10 +174,15 @@ const createBluetoothMethods = () => {
       releaseDevice();
       setConnectionState(ConnectionState.CONNECTION_FAILED);
 
-      // Closing the device chooser is not an error worth an alert
+      // Closing the device chooser is not an error worth showing
       const userCancelled =
         error instanceof DOMException && error.name === "NotFoundError";
-      if (error instanceof Error && !userCancelled) alert(error.message);
+      if (!userCancelled) {
+        setConnectionError({
+          kind: "failed",
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
     }
   };
 
@@ -171,6 +190,7 @@ const createBluetoothMethods = () => {
     connect,
     disconnect,
     connectionState,
+    connectionError,
     deviceInfo,
     volcanoDriver,
     craftyDriver,

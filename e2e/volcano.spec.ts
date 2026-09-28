@@ -58,11 +58,13 @@ test.describe("Volcano Gerät - Temperatursteuerung", () => {
   });
 
   test("sollte Temperaturregler anzeigen", async ({ page }) => {
-    // Prüfe ob Slider oder Input für Temperatur vorhanden ist
-    const tempControl = page
-      .locator('input[type="range"], input[type="number"]')
-      .first();
-    await expect(tempControl).toBeVisible({ timeout: 5000 });
+    // Prüfe ob die +/- Buttons für die Zieltemperatur vorhanden sind
+    await expect(
+      page.getByRole("button", { name: "Increase temperature" })
+    ).toBeVisible({ timeout: 5000 });
+    await expect(
+      page.getByRole("button", { name: "Decrease temperature" })
+    ).toBeVisible({ timeout: 5000 });
   });
 
   test("sollte Heizungssteuerung anzeigen", async ({ page }) => {

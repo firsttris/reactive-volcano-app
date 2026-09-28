@@ -106,7 +106,7 @@ const VentyVeazyViewContent: Component = () => {
         <BatteryContainer>
           <BatteryLabel>
             {t("battery")}: {state.status?.batteryLevel ?? 0}%{" "}
-            {state.status?.isCharging ? `⚡ ${t("charging")}` : ""}
+            {state.status?.isCharging ? t("charging") : ""}
           </BatteryLabel>
           <BatteryBar charging={state.status?.isCharging ?? false}>
             <BatteryFill

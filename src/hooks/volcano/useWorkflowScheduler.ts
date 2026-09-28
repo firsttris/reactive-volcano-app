@@ -5,6 +5,10 @@ import type { WorkflowStep } from "../../utils/workflowData";
 // Like the legacy app, the pump always runs for at least this long
 const MIN_PUMP_TIME_MS = 500;
 
+export type WorkflowPhase =
+  | { type: "heating"; targetTemp: number }
+  | { type: "holding" | "pumping"; endsAt: number };
+
 class WorkflowCancelledError extends Error {
   constructor() {
     super("Workflow cancelled");
@@ -17,6 +21,7 @@ export const useWorkflowScheduler = (
   const [currentStep, setCurrentStep] = createSignal(0);
   const [isRunning, setIsRunning] = createSignal(false);
   const [isPaused, setIsPaused] = createSignal(false);
+  const [phase, setPhase] = createSignal<WorkflowPhase>();
 
   const { state, actions, derived } = useVolcano();
   const getCurrentTemperature = () => state.currentTemp;
@@ -87,6 +92,7 @@ export const useWorkflowScheduler = (
     console.log(`Executing step ${currentStep() + 1}:`, step);
 
     // Set target temperature and turn on heater
+    setPhase({ type: "heating", targetTemp: step.temperature });
     await setTargetTemperature(step.temperature);
     ensureActive(id);
 
@@ -104,6 +110,10 @@ export const useWorkflowScheduler = (
     // Hold time (wait before activating pump)
     if (step.holdTimeInSeconds > 0) {
       console.log(`Holding for ${step.holdTimeInSeconds} seconds...`);
+      setPhase({
+        type: "holding",
+        endsAt: Date.now() + step.holdTimeInSeconds * 1000,
+      });
       await delayFor(step.holdTimeInSeconds * 1000);
     }
 
@@ -119,6 +129,7 @@ export const useWorkflowScheduler = (
     }
 
     // Wait for pump time, then turn off
+    setPhase({ type: "pumping", endsAt: Date.now() + pumpTimeMs });
     await delayFor(pumpTimeMs);
 
     if (isPumpActive()) {
@@ -165,6 +176,7 @@ export const useWorkflowScheduler = (
     setIsRunning(false);
     setIsPaused(false);
     setCurrentStep(0);
+    setPhase(undefined);
 
     // Turn off heat and pump
     if (isHeatingActive()) {
@@ -200,5 +212,6 @@ export const useWorkflowScheduler = (
     currentStep,
     isRunning,
     isPaused,
+    phase,
   };
 };

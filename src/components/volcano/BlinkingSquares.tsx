@@ -3,7 +3,7 @@ import { styled } from "solid-styled-components";
 const Square = styled("div")<{ delay: string }>`
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, #ff6600 0%, #ff8833 100%);
+  background: linear-gradient(135deg, var(--accent-color) 0%, #ff8833 100%);
   border-radius: 8px;
   opacity: 1;
   animation: blink-glow 2s ${(props) => props.delay} infinite ease-in-out;

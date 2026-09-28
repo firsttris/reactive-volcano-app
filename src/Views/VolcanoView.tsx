@@ -1,7 +1,7 @@
 import { useNavigate } from "@solidjs/router";
 import { type Component, createEffect } from "solid-js";
 import { styled } from "solid-styled-components";
-import { DarkModeSwitch } from "../components/DarkModeSwitch";
+import { Card, CollapsibleCard } from "../components/Card";
 import { AutoShutdownSlider } from "../components/volcano/AutoshutdownSlider";
 import { BrightnessSlider } from "../components/volcano/BrightnessSlider";
 import { HeatAndPump } from "../components/volcano/HeatAndPump";
@@ -15,32 +15,6 @@ import { useTranslations } from "../i18n/utils";
 import { useBluetooth } from "../provider/BluetoothProvider";
 import { buildRoute } from "../routes";
 import { ConnectionState } from "../utils/uuids";
-
-const MainCard = styled("div")`
-  background: var(--secondary-bg);
-  border-radius: 16px;
-  padding: 24px;
-  margin: 20px auto;
-  border: 1px solid var(--border-color);
-  max-width: 600px;
-`;
-
-const SettingsContainer = styled("div")`
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  background: var(--secondary-bg);
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
-`;
-
-const SettingsTitle = styled("h2")`
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  margin-bottom: 24px;
-  text-align: center;
-  font-family: CustomFont;
-`;
 
 const SettingItem = styled("div")`
   margin-bottom: 20px;
@@ -86,20 +60,18 @@ export const VolcanoView: Component = () => {
     <>
       {/* Main Controls */}
       <ShutdownTime />
-      <MainCard>
+      <Card>
         <div style={{ "margin-bottom": "24px" }}>
           <Temperature />
         </div>
         <HeatAndPump />
-      </MainCard>
+      </Card>
 
       {/* Workflows */}
       <WorkFlowSection />
 
       {/* Settings */}
-      <SettingsContainer>
-        <SettingsTitle>{t("settings")}</SettingsTitle>
-
+      <CollapsibleCard title={t("settings")} storageKey="volcano-settings">
         <SettingItem>
           <AutoShutdownSlider />
         </SettingItem>
@@ -111,14 +83,11 @@ export const VolcanoView: Component = () => {
             <VibrationSwitch />
             <StandbyDisplaySwitch />
           </SwitchContainer>
-          <SwitchContainer>
-            <DarkModeSwitch />
-          </SwitchContainer>
         </SwitchesContainer>
         <SettingItem>
           <HeatingTimeDisplay />
         </SettingItem>
-      </SettingsContainer>
+      </CollapsibleCard>
     </>
   );
 };

@@ -1,6 +1,7 @@
 import { Show } from "solid-js";
 import { styled } from "solid-styled-components";
 import { HeaterMode } from "../../devices/ventyVeazy/protocol";
+import { useWakeLock } from "../../hooks/utils/useWakeLock";
 import { useTranslations } from "../../i18n/utils";
 import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
 import { BoostControl } from "./BoostControl";
@@ -43,12 +44,12 @@ const StatusItem = styled("div")<{ highlight?: boolean }>`
   justify-content: center;
   gap: 8px;
   font-size: 0.95rem;
-  color: ${(props) => (props.highlight ? "#f60" : "#ccc")};
+  color: ${(props) => (props.highlight ? "var(--accent-color)" : "var(--secondary-text)")};
   padding: 8px 16px;
   background: ${(props) =>
     props.highlight ? "rgba(255, 102, 0, 0.1)" : "#1a1a1a"};
   border-radius: 8px;
-  border: 1px solid ${(props) => (props.highlight ? "#f60" : "#444")};
+  border: 1px solid ${(props) => (props.highlight ? "var(--accent-color)" : "var(--border-color)")};
   font-weight: ${(props) => (props.highlight ? "600" : "normal")};
 `;
 
@@ -59,6 +60,9 @@ export const Temperature = () => {
   const isCelsius = () => state.status?.isCelsius ?? true;
   const isHeating = () =>
     (state.status?.heaterMode ?? HeaterMode.OFF) !== HeaterMode.OFF;
+
+  // Keep the screen on while the device heats
+  useWakeLock(isHeating);
 
   // Verwende heaterMode vom Gerät anstatt lokalen State
   const getCurrentBoostMode = () => {

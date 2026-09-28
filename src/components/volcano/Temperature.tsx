@@ -31,7 +31,7 @@ const DigitalText = styled("div")<{ isTarget?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${(props) => (props.isTarget ? "var(--text-color)" : "#f60")};
+  color: ${(props) => (props.isTarget ? "var(--text-color)" : "var(--accent-color)")};
   transition: all 0.3s ease;
 
   ${(props) =>
@@ -53,17 +53,12 @@ const FlexContainer = styled("div")`
 
 const TempControls = styled("div")`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 45px;
-
-  @media (max-width: 375px) {
-    gap: 25px;
-  }
-
-  @media (max-width: 320px) {
-    gap: 5px;
-  }
+  gap: 12px;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
 `;
 
 export const Temperature = () => {

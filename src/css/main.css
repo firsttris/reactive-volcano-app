@@ -3,6 +3,10 @@
   src: url("./../font/technology/Technology-Bold.ttf") format("truetype");
 }
 
+html {
+  background-color: var(--bg-color);
+}
+
 body {
   font-family: "Roboto", sans-serif;
   user-select: none;
@@ -41,4 +45,23 @@ body {
   --battery-charging: linear-gradient(90deg, #f60, #ff8533);
   --heating-color: #ff6600;
   --reached-color: #00ff66;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Must win over component styles, hence !important */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: see above */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: see above */
+    animation-iteration-count: 1 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: see above */
+    transition-duration: 0.01ms !important;
+  }
 }

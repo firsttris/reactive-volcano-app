@@ -3,25 +3,9 @@ import { styled } from "solid-styled-components";
 import { useTranslations } from "../../i18n/utils";
 import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
 import { Button } from "../Button";
-import { DarkModeSwitch } from "../DarkModeSwitch";
+import { CollapsibleCard } from "../Card";
 import { Slider } from "../Slider";
 import { Switch } from "../Switch";
-
-const SettingsContainer = styled("div")`
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  background: var(--secondary-bg);
-  border-radius: 8px;
-`;
-
-const SettingsTitle = styled("h2")`
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  text-align: center;
-  font-family: CustomFont;
-`;
 
 const SettingItem = styled("div")`
   margin-bottom: 25px;
@@ -78,7 +62,7 @@ const ModalContent = styled("div")`
   border-radius: 8px;
   max-width: 400px;
   text-align: center;
-  border: 2px solid #f60;
+  border: 2px solid var(--accent-color);
 `;
 
 const ModalTitle = styled("h3")`
@@ -131,9 +115,7 @@ export const Settings: Component = () => {
   };
 
   return (
-    <SettingsContainer>
-      <SettingsTitle>{t("settings")}</SettingsTitle>
-
+    <CollapsibleCard title={t("settings")} storageKey="venty-veazy-settings">
       {/* LED Brightness - Common for both Venty & Veazy */}
       <SettingItem>
         <SettingLabel>{t("ledBrightness")}</SettingLabel>
@@ -225,12 +207,6 @@ export const Settings: Component = () => {
         />
       </SettingItem>
 
-      {/* Dark Mode */}
-      <SettingItem>
-        <SettingLabel>{t("darkMode")}</SettingLabel>
-        <DarkModeSwitch />
-      </SettingItem>
-
       {/* Factory Reset Button */}
       <SettingItem>
         <SettingLabel>{t("factoryReset")}</SettingLabel>
@@ -259,6 +235,6 @@ export const Settings: Component = () => {
           </ModalButtonGroup>
         </ModalContent>
       </Modal>
-    </SettingsContainer>
+    </CollapsibleCard>
   );
 };

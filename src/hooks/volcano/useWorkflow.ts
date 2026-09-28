@@ -62,19 +62,31 @@ export const useWorkflow = () => {
     ]);
   };
 
+  /** Deletes the workflow and returns a function that puts it back */
   const deleteWorkflowFromList = (workflowId: string) => {
     const workflows = workflowList();
     const workflowIndex = findWorkflowIndex(workflowId);
 
     if (workflowIndex === -1) {
       console.log(`Workflow with id ${workflowId} not found`);
-      return;
+      return undefined;
     }
 
+    const deleted = workflows[workflowIndex];
     setWorkflowList([
       ...workflows.slice(0, workflowIndex),
       ...workflows.slice(workflowIndex + 1),
     ]);
+
+    return () => {
+      const current = workflowList();
+      if (current.some((workflow) => workflow.id === deleted.id)) return;
+      setWorkflowList([
+        ...current.slice(0, workflowIndex),
+        deleted,
+        ...current.slice(workflowIndex),
+      ]);
+    };
   };
 
   const deleteWorkflowStepFromList = (

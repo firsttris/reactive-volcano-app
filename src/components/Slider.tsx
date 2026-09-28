@@ -7,15 +7,15 @@ const SliderInput = styled("input")`
   -webkit-appearance: none;
   appearance: none;
   background: var(--border-color);
-  outline: none;
   border-radius: 4px;
+  touch-action: pan-y;
   transition: all 0.2s;
 
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     background: var(--accent-color);
     cursor: pointer;
@@ -29,8 +29,8 @@ const SliderInput = styled("input")`
   }
 
   &::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     background: var(--accent-color);
     cursor: pointer;
