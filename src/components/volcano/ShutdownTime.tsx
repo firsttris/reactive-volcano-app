@@ -1,6 +1,6 @@
-import { useVolcanoDeviceContext } from "../../provider/VolcanoDeviceProvider";
 import { styled } from "solid-styled-components";
 import { useTranslations } from "../../i18n/utils";
+import { useVolcano } from "../../provider/VolcanoProvider";
 
 interface StyledDivProps {
   isVisible: boolean;
@@ -22,16 +22,14 @@ const StyledDiv = styled("div")<StyledDivProps>`
 `;
 
 export const ShutdownTime = () => {
-  const { deviceStatus, shutdowntime } = useVolcanoDeviceContext();
-  const { isAutoShutdownActive } = deviceStatus;
-  const { getAutoOffTimeInSec } = shutdowntime;
+  const { state, derived } = useVolcano();
 
   const t = useTranslations();
 
   return (
-    <StyledDiv isVisible={isAutoShutdownActive()}>
+    <StyledDiv isVisible={derived.isAutoShutdownActive()}>
       <div>
-        {t("deviceWillShutdownIn")} {getAutoOffTimeInSec()} {t("sec")}
+        {t("deviceWillShutdownIn")} {state.autoOffRemaining} {t("sec")}
       </div>
     </StyledDiv>
   );

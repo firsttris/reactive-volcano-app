@@ -1,26 +1,13 @@
-import { Component, createSignal } from "solid-js";
+import { type Component, createSignal, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { Slider } from "../Slider";
-import { Button } from "../Button";
-import { DarkModeSwitch } from "../DarkModeSwitch";
-import { useCraftyDeviceContext } from "../../provider/CraftyDeviceProvider";
+import { Limits } from "../../devices/crafty/protocol";
 import { useTranslations } from "../../i18n/utils";
-
-const SettingsContainer = styled("div")`
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  background: var(--secondary-bg);
-  border-radius: 8px;
-`;
-
-const SettingsTitle = styled("h2")`
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  text-align: center;
-  font-family: CustomFont;
-`;
+import { useCrafty } from "../../provider/CraftyProvider";
+import { AnalysisSection } from "../AnalysisSection";
+import { Button } from "../Button";
+import { CollapsibleCard } from "../Card";
+import { Slider } from "../Slider";
+import { Switch } from "../Switch";
 
 const SettingItem = styled("div")`
   margin-bottom: 25px;
@@ -74,10 +61,26 @@ const StatusValue = styled("div")`
   font-family: "CustomFont";
 `;
 
+const HintText = styled("div")`
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 10px;
+`;
+
 const ResetButtonContainer = styled("div")`
   display: flex;
   justify-content: center;
   margin-top: 10px;
+`;
+
+const ActionButton = styled(Button)`
+  width: 200px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 `;
 
 const ResetButton = styled(Button)`
@@ -114,7 +117,7 @@ const ModalContent = styled("div")`
   border-radius: 8px;
   max-width: 400px;
   text-align: center;
-  border: 2px solid #f60;
+  border: 2px solid var(--accent-color);
 `;
 
 const ModalTitle = styled("h3")`
@@ -147,50 +150,36 @@ const ModalButton = styled(Button)<{ variant?: "danger" | "cancel" }>`
 `;
 
 export const Settings: Component = () => {
-  const { settings, temperature, firmware, systemStatus, usageTime, power } =
-    useCraftyDeviceContext();
   const {
-    getLedBrightness,
-    getAutoOffCountdown,
-    getAutoOffCurrentValue,
-    setLedBrightness,
-    setAutoOffCountdown,
-  } = settings;
-  const { getBoostTemperature, setBoostTemp } = temperature;
-  const { getBatteryPercent } = power;
-  const {
-    getFirmwareVersion,
-    getFirmwareBLEVersion,
-    getStatusRegister2,
-    isOldCrafty,
-  } = firmware;
-  const { getSystemStatus, getAkkuStatus, getAkkuStatus2, factoryReset } =
-    systemStatus;
-  const { getUseHours, getUseMinutes } = usageTime;
+    state,
+    actions,
+    derived,
+    firmwareVersion,
+    isOldFirmware,
+    isCraftyPlus,
+  } = useCrafty();
 
   const t = useTranslations();
   const [showResetModal, setShowResetModal] = createSignal(false);
 
   const handleFactoryReset = () => {
-    factoryReset();
+    actions.factoryReset();
     setShowResetModal(false);
   };
 
   return (
     <>
-      <SettingsContainer>
-        <SettingsTitle>{t("settings")}</SettingsTitle>
-
+      <CollapsibleCard title={t("settings")} storageKey="crafty-settings">
         {/* Boost Temperature */}
         <SettingItem>
           <SettingLabel>Boost Temperature</SettingLabel>
           <Slider
-            min={0}
-            max={30}
+            min={Limits.MIN_BOOST}
+            max={Limits.MAX_BOOST}
             step={1}
-            value={getBoostTemperature()}
-            label={`Boost Temperature: ${getBoostTemperature()}`}
-            onInput={setBoostTemp}
+            value={state.boostTemp}
+            label={`Boost Temperature: ${state.boostTemp}`}
+            onInput={actions.setBoostTemp}
           />
         </SettingItem>
 
@@ -198,27 +187,78 @@ export const Settings: Component = () => {
         <SettingItem>
           <SettingLabel>{t("deviceBrightness")}</SettingLabel>
           <Slider
-            min={0}
-            max={100}
+            min={Limits.MIN_BRIGHTNESS}
+            max={Limits.MAX_BRIGHTNESS}
             step={10}
-            value={getLedBrightness()}
-            label={`${t("deviceBrightness")}: ${getLedBrightness()} %`}
-            onInput={setLedBrightness}
+            value={state.ledBrightness}
+            label={`${t("deviceBrightness")}: ${state.ledBrightness} %`}
+            onInput={actions.setLedBrightness}
           />
         </SettingItem>
 
+        {/* Vibration */}
+        <SettingItem>
+          <SettingLabel>{t("vibration")}</SettingLabel>
+          <Switch
+            isOn={derived.isVibrationOn()}
+            onToggle={actions.setVibration}
+            label={t("enableVibration")}
+          />
+        </SettingItem>
+
+        {/* Charge Indicator LED */}
+        <SettingItem>
+          <SettingLabel>{t("chargeIndicatorLamp")}</SettingLabel>
+          <Switch
+            isOn={derived.isChargeLedOn()}
+            onToggle={actions.setChargeLed}
+            label={t("enableChargeLed")}
+          />
+        </SettingItem>
+
+        {/* Permanent Bluetooth - not on old firmware */}
+        <Show when={!isOldFirmware}>
+          <SettingItem>
+            <SettingLabel>{t("permanentBluetooth")}</SettingLabel>
+            <Switch
+              isOn={derived.isPermanentBluetooth()}
+              onToggle={actions.setPermanentBluetooth}
+              label={t("keepBluetoothAlwaysOn")}
+            />
+          </SettingItem>
+        </Show>
+
+        {/* Find My Device - only Crafty+ */}
+        <Show when={isCraftyPlus}>
+          <SettingItem>
+            <SettingLabel>{t("locateDevice")}</SettingLabel>
+            <ResetButtonContainer>
+              <ActionButton
+                type="button"
+                disabled={derived.isFindMyActive()}
+                onClick={actions.findMyDevice}
+              >
+                {t("findMyDevice")}
+              </ActionButton>
+            </ResetButtonContainer>
+            <Show when={derived.isFindMyActive()}>
+              <HintText>{t("findMyDeviceRunning")}</HintText>
+            </Show>
+          </SettingItem>
+        </Show>
+
         {/* Auto Shutdown Time - only on Crafty+ */}
-        {!isOldCrafty() && (
+        {!isOldFirmware && (
           <>
             <SettingItem>
               <SettingLabel>{t("autoMaticShutdownTime")}</SettingLabel>
               <Slider
-                min={0}
-                max={600}
-                step={60}
-                value={getAutoOffCountdown()}
-                label={`${t("autoMaticShutdownTime")}: ${Math.floor(getAutoOffCountdown() / 60)} min`}
-                onInput={setAutoOffCountdown}
+                min={Limits.MIN_AUTO_OFF}
+                max={Limits.MAX_AUTO_OFF}
+                step={30}
+                value={state.autoOffCountdown ?? Limits.MIN_AUTO_OFF}
+                label={`${t("autoMaticShutdownTime")}: ${state.autoOffCountdown ?? "-"} s`}
+                onInput={actions.setAutoOffCountdown}
               />
             </SettingItem>
 
@@ -226,9 +266,11 @@ export const Settings: Component = () => {
             <SettingItem>
               <SettingLabel>Current Auto-Off Time</SettingLabel>
               <InfoDisplay>
-                {Math.floor(getAutoOffCurrentValue() / 60)}:
-                {(getAutoOffCurrentValue() % 60).toString().padStart(2, "0")} min
-                remaining
+                {Math.floor((state.autoOffRemaining ?? 0) / 60)}:
+                {((state.autoOffRemaining ?? 0) % 60)
+                  .toString()
+                  .padStart(2, "0")}{" "}
+                min remaining
               </InfoDisplay>
             </SettingItem>
           </>
@@ -240,20 +282,20 @@ export const Settings: Component = () => {
           <StatusContainer>
             <StatusItem>
               <StatusLabel>Firmware Version</StatusLabel>
-              <StatusValue>{getFirmwareVersion()}</StatusValue>
+              <StatusValue>{firmwareVersion}</StatusValue>
             </StatusItem>
-            {!isOldCrafty() && (
+            {!isOldFirmware && (
               <StatusItem>
                 <StatusLabel>BLE Firmware Version</StatusLabel>
-                <StatusValue>{getFirmwareBLEVersion()}</StatusValue>
+                <StatusValue>{state.bleFirmwareVersion ?? "-"}</StatusValue>
               </StatusItem>
             )}
             <StatusItem>
               <StatusLabel>Status Register 2</StatusLabel>
-              <StatusValue>{getStatusRegister2()}</StatusValue>
+              <StatusValue>{state.statusRegister2}</StatusValue>
             </StatusItem>
           </StatusContainer>
-          {isOldCrafty() && (
+          {isOldFirmware && (
             <InfoDisplay style="margin-top: 10px; font-size: 0.9rem; color: var(--secondary-text);">
               ⚠️ Old Crafty detected. Some features are not available.
             </InfoDisplay>
@@ -266,27 +308,27 @@ export const Settings: Component = () => {
           <StatusContainer>
             <StatusItem>
               <StatusLabel>Battery Level</StatusLabel>
-              <StatusValue>{getBatteryPercent()} %</StatusValue>
+              <StatusValue>{state.batteryLevel} %</StatusValue>
             </StatusItem>
           </StatusContainer>
         </SettingItem>
 
         {/* System Status - only on Crafty+ */}
-        {!isOldCrafty() && (
+        {!isOldFirmware && (
           <SettingItem>
             <SettingLabel>System Status (Crafty+ only)</SettingLabel>
             <StatusContainer>
               <StatusItem>
                 <StatusLabel>System Status</StatusLabel>
-                <StatusValue>{getSystemStatus()}</StatusValue>
+                <StatusValue>{state.systemStatus ?? "-"}</StatusValue>
               </StatusItem>
               <StatusItem>
                 <StatusLabel>Akku Status 1</StatusLabel>
-                <StatusValue>{getAkkuStatus()}</StatusValue>
+                <StatusValue>{state.akkuStatus ?? "-"}</StatusValue>
               </StatusItem>
               <StatusItem>
                 <StatusLabel>Akku Status 2</StatusLabel>
-                <StatusValue>{getAkkuStatus2()}</StatusValue>
+                <StatusValue>{state.akkuStatus2 ?? "-"}</StatusValue>
               </StatusItem>
             </StatusContainer>
           </SettingItem>
@@ -296,12 +338,21 @@ export const Settings: Component = () => {
         <SettingItem>
           <SettingLabel>Usage Time</SettingLabel>
           <InfoDisplay>
-            {getUseHours()} hours {!isOldCrafty() && `${getUseMinutes()} minutes`}
+            {state.useHours} hours{" "}
+            {!isOldFirmware && `${state.useMinutes ?? 0} minutes`}
           </InfoDisplay>
         </SettingItem>
 
+        {/* Analysis - not on old firmware */}
+        <Show when={!isOldFirmware}>
+          <SettingItem>
+            <SettingLabel>{t("analysis")}</SettingLabel>
+            <AnalysisSection run={actions.runAnalysis} />
+          </SettingItem>
+        </Show>
+
         {/* Factory Reset - only on Crafty+ */}
-        {!isOldCrafty() && (
+        {!isOldFirmware && (
           <SettingItem>
             <SettingLabel>Factory Reset</SettingLabel>
             <ResetButtonContainer>
@@ -311,12 +362,7 @@ export const Settings: Component = () => {
             </ResetButtonContainer>
           </SettingItem>
         )}
-
-        {/* Dark Mode */}
-        <SettingItem>
-          <DarkModeSwitch />
-        </SettingItem>
-      </SettingsContainer>
+      </CollapsibleCard>
 
       {/* Factory Reset Modal */}
       <Modal isOpen={showResetModal()}>

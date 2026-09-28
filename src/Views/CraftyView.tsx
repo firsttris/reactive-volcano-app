@@ -1,29 +1,44 @@
-import { Component, createEffect } from "solid-js";
-import { styled } from "solid-styled-components";
 import { useNavigate } from "@solidjs/router";
-import { Temperature } from "../components/crafty/Temperature";
+import { type Component, createEffect } from "solid-js";
+import { Card } from "../components/Card";
 import { HeaterControl } from "../components/crafty/HeaterControl";
 import { Settings } from "../components/crafty/Settings";
+import { ShutdownTime } from "../components/crafty/ShutdownTime";
+import { Temperature } from "../components/crafty/Temperature";
+import { useWakeLock } from "../hooks/utils/useWakeLock";
 import { useBluetooth } from "../provider/BluetoothProvider";
-import { ConnectionState } from "../utils/uuids";
+import { CraftyProvider, useCrafty } from "../provider/CraftyProvider";
 import { buildRoute } from "../routes";
-import { CraftyDeviceProvider } from "../provider/CraftyDeviceProvider";
-
-const MainCard = styled("div")`
-  background: var(--secondary-bg);
-  border-radius: 16px;
-  padding: 24px;
-  margin: 20px auto;
-  border: 1px solid var(--border-color);
-  max-width: 600px;
-`;
+import { ConnectionState } from "../utils/uuids";
 
 const CraftyViewContent: Component = () => {
-  console.log("Crafty View: Rendering Crafty view");
+  const { derived } = useCrafty();
+  // Keep the screen on while the device heats
+  useWakeLock(derived.isHeaterActive);
+
+  return (
+    <>
+      {/* Main Controls */}
+      <ShutdownTime />
+      <Card>
+        <div style={{ "margin-bottom": "24px" }}>
+          <Temperature />
+        </div>
+        <HeaterControl />
+      </Card>
+
+      {/* Settings */}
+      <Settings />
+    </>
+  );
+};
+
+export const CraftyView: Component = () => {
   const navigate = useNavigate();
   const { connectionState } = useBluetooth();
 
-  // Redirect to connect page if not connected
+  // Redirect to connect page if not connected (the provider renders nothing
+  // without a connected device, so this must live outside of it)
   createEffect(() => {
     const state = connectionState();
     if (
@@ -35,25 +50,8 @@ const CraftyViewContent: Component = () => {
   });
 
   return (
-    <>
-      {/* Main Controls */}
-      <MainCard>
-        <div style={{ "margin-bottom": "24px" }}>
-          <Temperature />
-        </div>
-        <HeaterControl />
-      </MainCard>
-
-      {/* Settings */}
-      <Settings />
-    </>
-  );
-};
-
-export const CraftyView: Component = () => {
-  return (
-    <CraftyDeviceProvider>
+    <CraftyProvider>
       <CraftyViewContent />
-    </CraftyDeviceProvider>
+    </CraftyProvider>
   );
 };

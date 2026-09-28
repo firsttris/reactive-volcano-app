@@ -1,36 +1,3 @@
-export enum States {
-  HEIZUNG_ENA = 0x0020,
-  ENABLE_AUTOBLESHUTDOWN = 0x0200,
-  PUMPE_FET_ENABLE = 0x2000,
-  FAHRENHEIT_ENA = 0x200,
-  DISPLAY_ON_COOLING = 0x1000,
-  VIBRATION = 0x400,
-}
-
-// Veazy/Venty Write Masks (from qvap.js)
-export enum VentyVeazyWriteMasks {
-  SET_TEMPERATURE = 1 << 1,
-  SET_BOOST = 1 << 2,
-  SET_SUPERBOOST = 1 << 3,
-  HEATER = 1 << 5,
-  SETTINGS = 1 << 7,
-}
-
-// Veazy/Venty Settings Bits (from qvap.js)
-export enum VentyVeazySettingsBits {
-  UNIT = 1 << 0,
-  SETPOINT_REACHED = 1 << 1,
-  FACTORY_RESET = 1 << 2,
-  ECOMODE_CHARGE = 1 << 3,
-  BUTTON_CHANGED_FILLING_CHAMBER = 1 << 4,
-  ECOMODE_VOLTAGE = 1 << 5,
-  BOOST_VISUALIZATION = 1 << 6,
-}
-
-export enum VentyVeazySettings2Bits {
-  BLE_PERMANENT = 1 << 0,
-}
-
 // Volcano Services
 export enum VolcanoServiceUUIDs {
   Bootloader = "00000001-1989-0108-1234-123456789abc",
@@ -65,6 +32,8 @@ export enum VolcanoCharacteristicUUIDs {
   serialNumber = "10100008-5354-4f52-5a26-4249434b454c",
   firmwareVersion = "10100003-5354-4f52-5a26-4249434b454c",
   firmwareBLEVersion = "10100004-5354-4f52-5a26-4249434b454c",
+  history1 = "10100015-5354-4f52-5a26-4249434b454c",
+  history2 = "10100016-5354-4f52-5a26-4249434b454c",
   currentAutoOffValue = "1011000c-5354-4f52-5a26-4249434b454c",
   hoursOfHeating = "10110015-5354-4f52-5a26-4249434b454c",
   minutesOfHeating = "10110016-5354-4f52-5a26-4249434b454c",
@@ -86,6 +55,7 @@ export enum CraftyCharacteristicUUIDs {
   currTemperatureChanged = "00000011-4c45-4b43-4942-265a524f5453",
   writeBoostTemp = "00000031-4c45-4b43-4942-265a524f5453",
   firmwareVersion = "00000032-4c45-4b43-4942-265a524f5453",
+  serialNumber = "00000052-4c45-4b43-4942-265a524f5453",
   firmwareBLEVersion = "00000072-4c45-4b43-4942-265a524f5453",
   statusRegister2 = "000001c3-4c45-4b43-4942-265a524f5453",
   useHoursCharacteristic = "00000023-4c45-4b43-4942-265a524f5453",
@@ -122,25 +92,6 @@ export const ServiceUUIDs = {
   Crafty2: CraftyServiceUUIDs.Crafty2,
   Crafty3: CraftyServiceUUIDs.Crafty3,
 };
-
-const CharateristicUUIDs = {
-  ...VolcanoCharacteristicUUIDs,
-  ...VentyVeazyCharacteristicUUIDs,
-  ...CraftyCharacteristicUUIDs,
-};
-
-// Device-specific characteristic types
-export type VolcanoCharacteristics = Record<
-  keyof typeof VolcanoCharacteristicUUIDs,
-  BluetoothRemoteGATTCharacteristic | undefined
->;
-
-export type CraftyCharacteristics = Record<
-  keyof typeof CraftyCharacteristicUUIDs,
-  BluetoothRemoteGATTCharacteristic | undefined
->;
-
-export type CharateristicUUIDsKeys = keyof typeof CharateristicUUIDs;
 
 export enum ConnectionState {
   NOT_CONNECTED = "NOT_CONNECTED",

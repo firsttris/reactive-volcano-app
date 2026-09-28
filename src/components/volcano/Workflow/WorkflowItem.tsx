@@ -1,20 +1,21 @@
-import { Component, Show, createSignal } from "solid-js";
+import { useNavigate } from "@solidjs/router";
 import {
+  FiCheck,
+  FiDownload,
+  FiEdit2,
   FiPlay,
   FiSquare,
-  FiEdit2,
   FiTrash2,
-  FiCheck,
   FiX,
-  FiDownload,
 } from "solid-icons/fi";
+import { type Component, createSignal, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useNavigate } from "@solidjs/router";
-import { Workflow } from "../../../utils/workflowData";
-import { useVolcanoDeviceContext } from "../../../provider/VolcanoDeviceProvider";
-import { useWorkflowScheduler } from "../../../hooks/volcano/useWorkflowScheduler";
-import { buildRoute } from "../../../routes";
 import { useTranslations } from "../../../i18n/utils";
+import { useToast } from "../../../provider/ToastProvider";
+import { useWorkflowContext } from "../../../provider/WorkflowProvider";
+import { useWorkflowRunner } from "../../../provider/WorkflowRunnerProvider";
+import { buildRoute } from "../../../routes";
+import type { Workflow } from "../../../utils/workflowData";
 
 interface WorkflowItemProps {
   workflow: Workflow;
@@ -32,11 +33,13 @@ const Card = styled("div")<{ isActive?: boolean }>`
   transition: all 0.3s ease;
   position: relative;
 
-  &:hover {
-    border-color: var(--accent-color);
-    background: rgba(255, 102, 0, 0.05);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 102, 0, 0.2);
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--accent-color);
+      background: rgba(255, 102, 0, 0.05);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 102, 0, 0.2);
+    }
   }
 `;
 
@@ -83,9 +86,11 @@ const SmallIconButton = styled("button")`
   border-radius: 4px;
   transition: all 0.2s ease;
 
-  &:hover {
-    color: var(--accent-color);
-    background: var(--secondary-bg);
+  @media (hover: hover) {
+    &:hover {
+      color: var(--accent-color);
+      background: var(--secondary-bg);
+    }
   }
 `;
 
@@ -113,7 +118,7 @@ const IconButton = styled("button")<{
 }>`
   background: ${(props) => {
     if (props.variant === "play")
-      return "linear-gradient(135deg, #f60 0%, #ff7700 100%)";
+      return "linear-gradient(135deg, var(--accent-color) 0%, #ff7700 100%)";
     if (props.variant === "stop")
       return "linear-gradient(135deg, #d32f2f 0%, #f44336 100%)";
     return "transparent";
@@ -135,23 +140,25 @@ const IconButton = styled("button")<{
       : "var(--secondary-text)"};
   transition: all 0.2s ease;
 
-  &:hover {
-    background: ${(props) => {
-      if (props.variant === "play")
-        return "linear-gradient(135deg, #ff7700 0%, #ff8800 100%)";
-      if (props.variant === "stop")
-        return "linear-gradient(135deg, #f44336 0%, #e57373 100%)";
-      return "var(--secondary-bg)";
-    }};
-    color: ${(props) =>
-      props.variant === "edit" || props.variant === "delete"
-        ? "var(--accent-color)"
-        : "white"};
-    transform: scale(1.05);
-    box-shadow: ${(props) =>
-      props.variant === "play" || props.variant === "stop"
-        ? "0 2px 8px rgba(255, 102, 0, 0.4)"
-        : "0 2px 8px rgba(0, 0, 0, 0.1)"};
+  @media (hover: hover) {
+    &:hover {
+      background: ${(props) => {
+        if (props.variant === "play")
+          return "linear-gradient(135deg, #ff7700 0%, #ff8800 100%)";
+        if (props.variant === "stop")
+          return "linear-gradient(135deg, #f44336 0%, #e57373 100%)";
+        return "var(--secondary-bg)";
+      }};
+      color: ${(props) =>
+        props.variant === "edit" || props.variant === "delete"
+          ? "var(--accent-color)"
+          : "white"};
+      transform: scale(1.05);
+      box-shadow: ${(props) =>
+        props.variant === "play" || props.variant === "stop"
+          ? "0 2px 8px rgba(255, 102, 0, 0.4)"
+          : "0 2px 8px rgba(0, 0, 0, 0.1)"};
+    }
   }
 
   &:active {
@@ -162,7 +169,7 @@ const IconButton = styled("button")<{
 const ProgressBar = styled("div")`
   width: 100%;
   height: 4px;
-  background: #333;
+  background: var(--border-color);
   border-radius: 2px;
   overflow: hidden;
   margin-top: 12px;
@@ -171,12 +178,12 @@ const ProgressBar = styled("div")`
 const ProgressFill = styled("div")<{ progress: number }>`
   width: ${(props) => props.progress}%;
   height: 100%;
-  background: linear-gradient(90deg, #f60, #ff7700);
+  background: linear-gradient(90deg, var(--accent-color), #ff7700);
   transition: width 0.3s ease;
 `;
 
 export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
-  const { workflow } = useVolcanoDeviceContext();
+  const workflow = useWorkflowContext();
   const {
     setSelectedWorkflowId,
     deleteWorkflowFromList,
@@ -189,13 +196,12 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
   const [isEditingName, setIsEditingName] = createSignal(false);
   const [editedName, setEditedName] = createSignal(props.workflow.name);
 
+  const runner = useWorkflowRunner();
+  const showToast = useToast();
+
   const workflowSteps = () => props.workflow.workflowSteps;
-  const {
-    startWorkflow,
-    stopWorkflow,
-    currentStep,
-    isRunning: schedulerIsRunning,
-  } = useWorkflowScheduler(() => workflowSteps());
+  const schedulerIsRunning = () => runner.isRunningWorkflow(props.workflow.id);
+  const currentStep = runner.currentStep;
 
   const progress = () => {
     if (!schedulerIsRunning()) return 0;
@@ -207,12 +213,12 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
   const handlePlay = async (e: MouseEvent) => {
     e.stopPropagation();
     setSelectedWorkflowId(props.workflow.id);
-    await startWorkflow();
+    await runner.start(props.workflow.id);
   };
 
   const handleStop = async (e: MouseEvent) => {
     e.stopPropagation();
-    await stopWorkflow();
+    await runner.stop();
   };
 
   const handleEdit = (e: MouseEvent) => {
@@ -221,11 +227,17 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
     navigate(buildRoute.workflowList(props.workflow.id));
   };
 
-  const handleDelete = (e: MouseEvent) => {
+  const handleDelete = async (e: MouseEvent) => {
     e.stopPropagation();
-    if (confirm(`${t("deleteWorkflow")} "${props.workflow.name}"?`)) {
-      deleteWorkflowFromList(props.workflow.id);
-    }
+    const name = props.workflow.name;
+    if (schedulerIsRunning()) await runner.stop();
+    const undo = deleteWorkflowFromList(props.workflow.id);
+    if (!undo) return;
+    showToast({
+      message: `„${name}“ ${t("workflowDeleted")}`,
+      actionLabel: t("undo"),
+      onAction: undo,
+    });
   };
 
   const handleExport = (e: MouseEvent) => {
@@ -290,7 +302,7 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
         {workflowSteps().length}{" "}
         {workflowSteps().length === 1 ? t("step") : t("steps")}
         <Show when={schedulerIsRunning()}>
-          {" "}
+          {" · "}
           {t("step")} {currentStep() + 1}/{workflowSteps().length}
         </Show>
       </StepCount>
@@ -298,26 +310,43 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
         <Show
           when={!schedulerIsRunning()}
           fallback={
-            <IconButton variant="stop" onClick={handleStop}>
+            <IconButton
+              variant="stop"
+              onClick={handleStop}
+              aria-label={t("stop")}
+            >
               <FiSquare size={18} />
             </IconButton>
           }
         >
-          <IconButton variant="play" onClick={handlePlay}>
+          <IconButton
+            variant="play"
+            onClick={handlePlay}
+            aria-label={t("start")}
+          >
             <FiPlay size={18} />
           </IconButton>
         </Show>
-        <IconButton variant="edit" onClick={handleEdit}>
+        <IconButton
+          variant="edit"
+          onClick={handleEdit}
+          aria-label={t("editWorkflowSteps")}
+        >
           <FiEdit2 size={18} />
         </IconButton>
         <IconButton
           variant="export"
           onClick={handleExport}
           title={t("exportWorkflowDescription")}
+          aria-label={t("exportWorkflow")}
         >
           <FiDownload size={18} />
         </IconButton>
-        <IconButton variant="delete" onClick={handleDelete}>
+        <IconButton
+          variant="delete"
+          onClick={handleDelete}
+          aria-label={t("deleteWorkflow")}
+        >
           <FiTrash2 size={18} />
         </IconButton>
       </ActionButtons>

@@ -86,6 +86,76 @@ export const ui = {
     workflowsExported: "All workflows exported successfully",
     workflowsImported: "All workflows imported successfully",
     confirmImportAll: "This will replace all existing workflows. Are you sure?",
+    disconnect: "Disconnect",
+    confirmDisconnect: "Really disconnect?",
+    increaseTemperature: "Increase temperature",
+    decreaseTemperature: "Decrease temperature",
+    heaterOff: "Heater off",
+    heatingUp: "Heating up",
+    coolingDown: "Cooling down",
+    temperatureReached: "Temperature reached",
+    remaining: "Remaining",
+    firmwareVersion: "Firmware",
+    bluetoothUnsupported: "Web Bluetooth is not available",
+    bluetoothUnsupportedHint:
+      "Please use Chrome or Edge on Android, Windows, macOS or Linux. On iOS, use a browser with Web Bluetooth such as WebBLE.",
+    connectionFailed: "Connection failed",
+    connectionLost: "Connection lost",
+    tipDeviceOn: "Make sure the device is switched on and nearby.",
+    tipOtherConnection:
+      "Disconnect it from other apps (e.g. the official app on your phone).",
+    tipBluetoothEnabled: "Check that Bluetooth is enabled on this computer.",
+    moreTroubleshooting: "More troubleshooting tips",
+    heater: "Heater",
+    pump: "Pump",
+    heatingTo: "Heating to",
+    holding: "Holding",
+    pumping: "Pumping",
+    start: "Start",
+    stop: "Stop",
+    workflowDeleted: "deleted",
+    undo: "Undo",
+    chargeIndicatorLamp: "Charge Indicator Lamp",
+    enableChargeLed: "Show charging status with the LED",
+    locateDevice: "Locate Device",
+    findMyDevice: "Find My Device",
+    findMyDeviceRunning: "The device beeps and blinks for 30 seconds.",
+    findMyDeviceEnabled: "Find My Device function enabled",
+    findMyDeviceSwitchOnHint:
+      "To switch on the device, press the power button or plug in the USB-C cable.",
+    deviceInfo: "Device Info",
+    bootloaderVersion: "Bootloader",
+    batteryChargingTime: "Battery charging time",
+    analysis: "Analysis",
+    startAnalysis: "Start analysis",
+    analysisRunning: "Analysing…",
+    analysisOk: "Device analysis successful and without any issues.",
+    analysisFailed: "Analysis failed",
+    analysisContactSupport:
+      "Please contact STORZ & BICKEL with the following information:",
+    analysisIssueDetected: "The device reported an issue.",
+    analysisCoolDown: "Please let the device cool down.",
+    analysisChargeDevice: "Please charge the device.",
+    analysisUseOtherCharger: "Please use a different charger or cable.",
+    analysisVibrationDisabled:
+      "Vibration is disabled. Activate it if required.",
+    analysisLedDisabled:
+      "LED signalization is disabled. Activate it if required.",
+    analysisBluetoothAlwaysOn:
+      "Automatic shutdown is disabled: Bluetooth stays on and drains the battery faster.",
+    analysisFactoryResetNeeded:
+      "Please perform a factory reset by pressing the power button for 10 seconds.",
+    analysisLowBrightness:
+      "Brightness is set to a low value. Change it if required.",
+    analysisDisplayOnCoolingDisabled:
+      "Temperature display while cooling down is disabled. Activate it if required.",
+    analysisChargeLimit:
+      "Charge limit is active: improves battery life but reduces capacity.",
+    analysisChargeOptimization:
+      "Charge optimization is active: improves battery life but reduces charging speed.",
+    analysisBoostVisualizationDisabled:
+      "Boost & Superboost visualization is disabled.",
+    analysisBoostTimeoutDisabled: "Boost & Superboost timeout is disabled.",
   },
   de: {
     settings: "Einstellungen",
@@ -168,6 +238,79 @@ export const ui = {
     workflowsImported: "Alle Workflows erfolgreich importiert",
     confirmImportAll:
       "Dies ersetzt alle vorhandenen Workflows. Sind Sie sicher?",
+    disconnect: "Trennen",
+    confirmDisconnect: "Wirklich trennen?",
+    increaseTemperature: "Temperatur erhöhen",
+    decreaseTemperature: "Temperatur verringern",
+    heaterOff: "Heizung aus",
+    heatingUp: "Heizt auf",
+    coolingDown: "Kühlt ab",
+    temperatureReached: "Temperatur erreicht",
+    remaining: "Noch",
+    firmwareVersion: "Firmware",
+    bluetoothUnsupported: "Web Bluetooth ist nicht verfügbar",
+    bluetoothUnsupportedHint:
+      "Bitte Chrome oder Edge unter Android, Windows, macOS oder Linux verwenden. Unter iOS einen Browser mit Web Bluetooth wie WebBLE nutzen.",
+    connectionFailed: "Verbindung fehlgeschlagen",
+    connectionLost: "Verbindung verloren",
+    tipDeviceOn: "Prüfen Sie, ob das Gerät eingeschaltet und in der Nähe ist.",
+    tipOtherConnection:
+      "Trennen Sie es von anderen Apps (z. B. der offiziellen App auf dem Handy).",
+    tipBluetoothEnabled:
+      "Prüfen Sie, ob Bluetooth an diesem Computer aktiviert ist.",
+    moreTroubleshooting: "Weitere Tipps zur Fehlerbehebung",
+    heater: "Heizung",
+    pump: "Pumpe",
+    heatingTo: "Heizt auf",
+    holding: "Hält",
+    pumping: "Pumpt",
+    start: "Starten",
+    stop: "Stopp",
+    workflowDeleted: "gelöscht",
+    undo: "Rückgängig",
+    chargeIndicatorLamp: "Ladeanzeige-LED",
+    enableChargeLed: "Ladezustand über die LED anzeigen",
+    locateDevice: "Gerät finden",
+    findMyDevice: "Gerät orten",
+    findMyDeviceRunning: "Das Gerät piept und blinkt 30 Sekunden lang.",
+    findMyDeviceEnabled: "Gerätesuche ist aktiv",
+    findMyDeviceSwitchOnHint:
+      "Zum Einschalten die Power-Taste drücken oder das USB-C-Kabel einstecken.",
+    deviceInfo: "Geräteinfo",
+    bootloaderVersion: "Bootloader",
+    batteryChargingTime: "Ladezeit des Akkus",
+    analysis: "Analyse",
+    startAnalysis: "Analyse starten",
+    analysisRunning: "Analysiere…",
+    analysisOk: "Analyse erfolgreich, keine Probleme gefunden.",
+    analysisFailed: "Analyse fehlgeschlagen",
+    analysisContactSupport:
+      "Bitte wenden Sie sich mit folgenden Informationen an STORZ & BICKEL:",
+    analysisIssueDetected: "Das Gerät hat ein Problem gemeldet.",
+    analysisCoolDown: "Bitte lassen Sie das Gerät abkühlen.",
+    analysisChargeDevice: "Bitte laden Sie das Gerät auf.",
+    analysisUseOtherCharger:
+      "Bitte verwenden Sie ein anderes Ladegerät oder Kabel.",
+    analysisVibrationDisabled:
+      "Vibration ist deaktiviert. Bei Bedarf aktivieren.",
+    analysisLedDisabled:
+      "LED-Signalisierung ist deaktiviert. Bei Bedarf aktivieren.",
+    analysisBluetoothAlwaysOn:
+      "Automatische Abschaltung ist deaktiviert: Bluetooth bleibt an und entlädt den Akku schneller.",
+    analysisFactoryResetNeeded:
+      "Bitte einen Werksreset durchführen: Power-Taste 10 Sekunden gedrückt halten.",
+    analysisLowBrightness:
+      "Helligkeit ist auf einen niedrigen Wert eingestellt. Bei Bedarf ändern.",
+    analysisDisplayOnCoolingDisabled:
+      "Temperaturanzeige beim Abkühlen ist deaktiviert. Bei Bedarf aktivieren.",
+    analysisChargeLimit:
+      "Ladebegrenzung ist aktiv: schont den Akku, verringert aber die Kapazität.",
+    analysisChargeOptimization:
+      "Ladeoptimierung ist aktiv: schont den Akku, lädt aber langsamer.",
+    analysisBoostVisualizationDisabled:
+      "Boost- & Superboost-Anzeige ist deaktiviert.",
+    analysisBoostTimeoutDisabled:
+      "Boost- & Superboost-Timeout ist deaktiviert.",
   },
 } as const;
 

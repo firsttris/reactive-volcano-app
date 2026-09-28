@@ -4,25 +4,38 @@ import { vi } from "vitest";
  * Creates a mock IndexedDB implementation for testing.
  * This mock simulates the async behavior of IndexedDB operations.
  */
+type MockRequest<T> = {
+  result?: T;
+  error: Error | null;
+  onsuccess: (() => void) | null;
+  onerror: (() => void) | null;
+};
+
+const createRequest = <T>(result?: T): MockRequest<T> => ({
+  result,
+  error: null,
+  onsuccess: null,
+  onerror: null,
+});
+
 export const createMockIndexedDB = () => {
-  let mockDB: any;
   let shouldTriggerUpgrade = false;
   let shouldError = false;
   let errorMessage = "";
-  let storeData: Map<string, any> = new Map();
+  const storeData = new Map<string, unknown>();
 
   const MockIDBObjectStore = {
     get: (key: string) => {
-      const request: any = {};
+      const request = createRequest<unknown>();
       setTimeout(() => {
         request.result = storeData.get(key);
         if (request.onsuccess) request.onsuccess();
       }, 0);
       return request;
     },
-    put: (value: any, key: string) => {
+    put: (value: unknown, key: string) => {
       storeData.set(key, value);
-      const request: any = {};
+      const request = createRequest<unknown>();
       setTimeout(() => {
         if (request.onsuccess) request.onsuccess();
       }, 0);
@@ -37,10 +50,13 @@ export const createMockIndexedDB = () => {
     error: null as Error | null,
   };
 
-  mockDB = {
+  const mockDB = {
     objectStoreNames: {
       contains: (name: string) => {
-        return shouldTriggerUpgrade && (name === "workflows" || name === "selectedWorkflow");
+        return (
+          shouldTriggerUpgrade &&
+          (name === "workflows" || name === "selectedWorkflow")
+        );
       },
     },
     createObjectStore: vi.fn(),
@@ -61,19 +77,18 @@ export const createMockIndexedDB = () => {
 
   const mockIndexedDB = {
     open: vi.fn(() => {
-      const request: any = {
-        result: mockDB,
-        error: null,
-        onsuccess: null,
-        onerror: null,
-        onupgradeneeded: null,
+      const request = {
+        ...createRequest(mockDB),
+        onupgradeneeded: null as
+          | ((event: { target: { result: typeof mockDB } }) => void)
+          | null,
       };
 
       setTimeout(() => {
         if (shouldTriggerUpgrade && request.onupgradeneeded) {
           request.onupgradeneeded({ target: { result: mockDB } });
         }
-        
+
         if (shouldError && request.onerror) {
           request.error = new Error(errorMessage);
           request.onerror();
@@ -89,7 +104,9 @@ export const createMockIndexedDB = () => {
   return {
     mockIndexedDB,
     mockDB,
-    setTriggerUpgrade: (value: boolean) => { shouldTriggerUpgrade = value; },
+    setTriggerUpgrade: (value: boolean) => {
+      shouldTriggerUpgrade = value;
+    },
     setError: (message: string) => {
       shouldError = !!message;
       errorMessage = message;
@@ -99,6 +116,8 @@ export const createMockIndexedDB = () => {
       errorMessage = "";
     },
     getStoreData: () => storeData,
-    clearStoreData: () => { storeData.clear(); },
+    clearStoreData: () => {
+      storeData.clear();
+    },
   };
 };

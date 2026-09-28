@@ -1,21 +1,25 @@
 import { render } from "solid-js/web";
 import { BluetoothProvider } from "./provider/BluetoothProvider";
 import { DarkModeProvider } from "./provider/DarkModeProvider";
+import { ToastProvider } from "./provider/ToastProvider";
 import "./css/main.css";
 import "@fontsource/roboto";
 import { Routes } from "./Router";
 
 const root = document.getElementById("root");
+if (!root) throw new Error("Root element #root not found");
 
 const dispose = render(
   () => (
     <DarkModeProvider>
-      <BluetoothProvider>
-        <Routes />
-      </BluetoothProvider>
+      <ToastProvider>
+        <BluetoothProvider>
+          <Routes />
+        </BluetoothProvider>
+      </ToastProvider>
     </DarkModeProvider>
   ),
-  root!
+  root
 );
 /** Hot Module Replacement */
 if (import.meta.hot) {

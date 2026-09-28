@@ -1,10 +1,11 @@
-import { useCraftyDeviceContext } from "../../provider/CraftyDeviceProvider";
+import { FaSolidMinus, FaSolidPlus } from "solid-icons/fa";
 import { styled } from "solid-styled-components";
-import { FaSolidMinus } from "solid-icons/fa";
-import { FaSolidPlus } from "solid-icons/fa";
-import { RoundButton } from "../Button";
-import { TemperatureDisplay } from "../TemperatureDisplay";
+import { Limits } from "../../devices/crafty/protocol";
 import { useTranslations } from "../../i18n/utils";
+import { useCrafty } from "../../provider/CraftyProvider";
+import { HeatProgress } from "../HeatProgress";
+import { RepeatButton } from "../RepeatButton";
+import { TemperatureDisplay } from "../TemperatureDisplay";
 
 const TempDisplay = styled("div")`
   text-align: center;
@@ -29,7 +30,7 @@ const DigitalText = styled("div")<{ isTarget?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${(props) => (props.isTarget ? "var(--text-color)" : "#f60")};
+  color: ${(props) => (props.isTarget ? "var(--text-color)" : "var(--accent-color)")};
   transition: all 0.3s ease;
 
   ${(props) =>
@@ -69,53 +70,45 @@ const TempControls = styled("div")`
 `;
 
 export const Temperature = () => {
-  const { temperature } = useCraftyDeviceContext();
-  const { getTargetTemperature, getCurrentTemperature, setTemperature } =
-    temperature;
+  const { state, actions, derived } = useCrafty();
 
   const t = useTranslations();
-  
-  const MIN_TEMP = 40;
-  const MAX_TEMP = 210;
 
-  const increaseTemperature = () => {
-    const currentTemp = getTargetTemperature();
-    if (currentTemp < MAX_TEMP) {
-      setTemperature(currentTemp + 1);
-    }
-  };
-
-  const decreaseTemperature = () => {
-    const currentTemp = getTargetTemperature();
-    if (currentTemp > MIN_TEMP) {
-      setTemperature(currentTemp - 1);
-    }
-  };
+  const increaseTemperature = () => actions.setTargetTemp(state.targetTemp + 1);
+  const decreaseTemperature = () => actions.setTargetTemp(state.targetTemp - 1);
 
   return (
     <FlexContainer>
       <TempDisplay>
         <TempLabel>{t("currentTemperature")}</TempLabel>
         <DigitalText>
-          <TemperatureDisplay value={getCurrentTemperature()} unit="C" />
+          <TemperatureDisplay value={state.currentTemp} unit="C" />
         </DigitalText>
       </TempDisplay>
+      <HeatProgress
+        current={state.currentTemp}
+        target={state.targetTemp}
+        heating={derived.isHeaterActive()}
+        reached={derived.isSetpointReached()}
+      />
       <TempControls>
-        <RoundButton 
-          onClick={decreaseTemperature}
-          disabled={getTargetTemperature() <= MIN_TEMP}
+        <RepeatButton
+          onStep={decreaseTemperature}
+          disabled={state.targetTemp <= Limits.MIN_TEMP}
+          aria-label={t("decreaseTemperature")}
         >
           <FaSolidMinus size="24px" />
-        </RoundButton>
+        </RepeatButton>
         <DigitalText isTarget={true}>
-          <TemperatureDisplay value={getTargetTemperature()} unit="C" />
+          <TemperatureDisplay value={state.targetTemp} unit="C" />
         </DigitalText>
-        <RoundButton 
-          onClick={increaseTemperature}
-          disabled={getTargetTemperature() >= MAX_TEMP}
+        <RepeatButton
+          onStep={increaseTemperature}
+          disabled={state.targetTemp >= Limits.MAX_TEMP}
+          aria-label={t("increaseTemperature")}
         >
           <FaSolidPlus size="24px" />
-        </RoundButton>
+        </RepeatButton>
       </TempControls>
     </FlexContainer>
   );

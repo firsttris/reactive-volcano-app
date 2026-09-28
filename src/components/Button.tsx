@@ -22,10 +22,12 @@ const BaseModernButton = styled("button")`
   cursor: pointer;
   transition: all 0.3s ease;
 
-  &:hover {
-    border-color: var(--accent-color);
-    background: var(--bg-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--accent-color);
+      background: var(--bg-color);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
   }
 
   &:active {
@@ -63,8 +65,10 @@ export const Button = styled("button")<ButtonProps>`
   transform: ${(props) => (props.isActive ? "translateY(4px)" : "none")};
   color: ${(props) =>
     props.isActive ? "var(--accent-color)" : "var(--text-color)"};
-  &:hover {
-    background-color: var(--border-color);
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--border-color);
+    }
   }
   &:active {
     background-color: var(--bg-color);
@@ -88,26 +92,30 @@ export const RoundButton = styled(BaseModernButton)`
   height: 50px;
   font-size: 1rem;
 
-  &:hover {
-    border-color: var(--accent-color);
-    background: var(--bg-color);
-    color: var(--accent-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--accent-color);
+      background: var(--bg-color);
+      color: var(--accent-color);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
   }
 `;
 
 // Active Round Button (for heat/pump buttons with active state)
 export const ActiveRoundButton = styled(BaseModernButton)<ButtonProps>`
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   font-size: 1rem;
   background: ${(props) =>
     props.isActive
       ? "linear-gradient(135deg, rgba(255, 102, 0, 0.2) 0%, rgba(255, 102, 0, 0.1) 100%)"
       : "var(--secondary-bg)"};
   border: 2px solid
-    ${(props) => (props.isActive ? "#ff6600" : "var(--border-color)")};
-  color: ${(props) => (props.isActive ? "#ff6600" : "var(--text-color)")};
+    ${(props) =>
+      props.isActive ? "var(--heating-color)" : "var(--border-color)"};
+  color: ${(props) =>
+    props.isActive ? "var(--heating-color)" : "var(--text-color)"};
 
   ${(props) =>
     props.isActive
@@ -132,14 +140,30 @@ export const ActiveRoundButton = styled(BaseModernButton)<ButtonProps>`
       `
       : ""}
 
-  &:hover {
-    border-color: var(--accent-color);
-    background: ${(props) =>
-      props.isActive
-        ? "linear-gradient(135deg, rgba(255, 102, 0, 0.3) 0%, rgba(255, 102, 0, 0.2) 100%)"
-        : "var(--bg-color)"};
-    color: var(--accent-color);
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--accent-color);
+      background: ${(props) =>
+        props.isActive
+          ? "linear-gradient(135deg, rgba(255, 102, 0, 0.3) 0%, rgba(255, 102, 0, 0.2) 100%)"
+          : "var(--bg-color)"};
+      color: var(--accent-color);
+    }
   }
+`;
+
+/** Round toggle with a caption underneath (heater, pump) */
+export const ToggleWithLabel = styled("div")<ButtonProps>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: ${(props) =>
+    props.isActive ? "var(--heating-color)" : "var(--secondary-text)"};
 `;
 
 // Modern Small Round Button (for boost controls)
@@ -187,13 +211,15 @@ export const WideButton = styled(BaseModernButton)<HeatingButtonProps>`
       `
       : ""}
 
-  &:hover {
-    border-color: var(--accent-color);
-    background: ${(props) =>
-      props.isHeating
-        ? "linear-gradient(135deg, rgba(255, 102, 0, 0.3) 0%, rgba(255, 102, 0, 0.2) 100%)"
-        : "var(--bg-color)"};
-    color: var(--accent-color);
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--accent-color);
+      background: ${(props) =>
+        props.isHeating
+          ? "linear-gradient(135deg, rgba(255, 102, 0, 0.3) 0%, rgba(255, 102, 0, 0.2) 100%)"
+          : "var(--bg-color)"};
+      color: var(--accent-color);
+    }
   }
 
   .icon {

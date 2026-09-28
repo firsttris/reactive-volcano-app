@@ -1,30 +1,12 @@
-import { Component, Show, createSignal } from "solid-js";
+import { type Component, createSignal, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { Switch } from "../Switch";
-import { Slider } from "../Slider";
-import { Button } from "../Button";
-import { DarkModeSwitch } from "../DarkModeSwitch";
-import { useBluetooth } from "../../provider/BluetoothProvider";
-import { useDeviceStatusContext } from "../../provider/DeviceStatusProvider";
-import { useBrightnessVibration } from "../../hooks/venty-veazy/useBrightnessVibration";
-import { useSettings } from "../../hooks/venty-veazy/useSettings";
 import { useTranslations } from "../../i18n/utils";
-
-const SettingsContainer = styled("div")`
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  background: var(--secondary-bg);
-  border-radius: 8px;
-`;
-
-const SettingsTitle = styled("h2")`
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  text-align: center;
-  font-family: CustomFont;
-`;
+import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
+import { AnalysisSection } from "../AnalysisSection";
+import { Button } from "../Button";
+import { CollapsibleCard } from "../Card";
+import { Slider } from "../Slider";
+import { Switch } from "../Switch";
 
 const SettingItem = styled("div")`
   margin-bottom: 25px;
@@ -45,6 +27,10 @@ const ResetButtonContainer = styled("div")`
   display: flex;
   justify-content: center;
   margin-top: 10px;
+`;
+
+const ActionButton = styled(Button)`
+  width: 200px;
 `;
 
 const ResetButton = styled(Button)`
@@ -81,7 +67,7 @@ const ModalContent = styled("div")`
   border-radius: 8px;
   max-width: 400px;
   text-align: center;
-  border: 2px solid #f60;
+  border: 2px solid var(--accent-color);
 `;
 
 const ModalTitle = styled("h3")`
@@ -114,58 +100,32 @@ const ModalButton = styled(Button)<{ variant?: "danger" | "cancel" }>`
 `;
 
 export const Settings: Component = () => {
-  const { deviceInfo } = useBluetooth();
-  const {
-    status,
-    setIsCelsius,
-    setChargeCurrentOptimization,
-    setChargeVoltageLimit,
-    setPermanentBluetooth,
-  } = useDeviceStatusContext();
-  const {
-    data: brightnessData,
-    setBrightness,
-    setVibration,
-    setBoostTimeout,
-  } = useBrightnessVibration();
+  const { state, actions, model } = useVentyVeazy();
 
   const t = useTranslations();
-  const { factoryReset, setBoostVisualization } = useSettings();
 
   const [showResetModal, setShowResetModal] = createSignal(false);
   const [localBrightness, setLocalBrightness] = createSignal(5);
 
-  const isVeazy = () => deviceInfo().type === "VEAZY";
+  const isVeazy = () => model === "VEAZY";
 
   const handleBrightnessChange = (value: number) => {
     setLocalBrightness(value);
-    setBrightness(value);
-  };
-
-  const handleVibrationToggle = (enabled: boolean) => {
-    // Vibration: 0 = disabled, 1 = enabled
-    setVibration(enabled ? 1 : 0);
-  };
-
-  const handleBoostTimeoutToggle = (enabled: boolean) => {
-    // BoostTimeout: 0 = disabled, 1 = enabled
-    setBoostTimeout(enabled ? 1 : 0);
+    actions.setBrightness(value);
   };
 
   const handleFactoryReset = () => {
-    factoryReset();
+    actions.factoryReset();
     setShowResetModal(false);
   };
 
   return (
-    <SettingsContainer>
-      <SettingsTitle>{t("settings")}</SettingsTitle>
-
+    <CollapsibleCard title={t("settings")} storageKey="venty-veazy-settings">
       {/* LED Brightness - Common for both Venty & Veazy */}
       <SettingItem>
         <SettingLabel>{t("ledBrightness")}</SettingLabel>
         <Slider
-          value={brightnessData()?.brightness ?? localBrightness()}
+          value={state.brightnessVibration?.brightness ?? localBrightness()}
           onInput={handleBrightnessChange}
           min={1}
           max={9}
@@ -173,7 +133,7 @@ export const Settings: Component = () => {
           label={
             <span>
               {t("brightness")}:{" "}
-              {brightnessData()?.brightness ?? localBrightness()}
+              {state.brightnessVibration?.brightness ?? localBrightness()}
             </span>
           }
         />
@@ -183,8 +143,8 @@ export const Settings: Component = () => {
       <SettingItem>
         <SettingLabel>{t("vibration")}</SettingLabel>
         <Switch
-          isOn={brightnessData()?.vibration === 1}
-          onToggle={handleVibrationToggle}
+          isOn={state.brightnessVibration?.vibration ?? false}
+          onToggle={actions.setVibration}
           label={t("enableVibration")}
         />
       </SettingItem>
@@ -194,8 +154,8 @@ export const Settings: Component = () => {
         <SettingItem>
           <SettingLabel>{t("permanentBluetooth")}</SettingLabel>
           <Switch
-            isOn={status()?.permanentBluetooth ?? false}
-            onToggle={(enabled) => setPermanentBluetooth(enabled)}
+            isOn={state.status?.permanentBluetooth ?? false}
+            onToggle={actions.setPermanentBluetooth}
             label={t("keepBluetoothAlwaysOn")}
           />
         </SettingItem>
@@ -205,8 +165,8 @@ export const Settings: Component = () => {
       <SettingItem>
         <SettingLabel>{t("chargeCurrentOptimization")}</SettingLabel>
         <Switch
-          isOn={status()?.chargeCurrentOptimization ?? false}
-          onToggle={(enabled) => setChargeCurrentOptimization(enabled)}
+          isOn={state.status?.chargeCurrentOptimization ?? false}
+          onToggle={actions.setChargeCurrentOptimization}
           label={t("optimizeChargingCurrent")}
         />
       </SettingItem>
@@ -215,8 +175,8 @@ export const Settings: Component = () => {
       <SettingItem>
         <SettingLabel>{t("chargeVoltageLimit")}</SettingLabel>
         <Switch
-          isOn={status()?.chargeVoltageLimit ?? false}
-          onToggle={(enabled) => setChargeVoltageLimit(enabled)}
+          isOn={state.status?.chargeVoltageLimit ?? false}
+          onToggle={actions.setChargeVoltageLimit}
           label={t("limitChargingVoltage")}
         />
       </SettingItem>
@@ -225,8 +185,8 @@ export const Settings: Component = () => {
       <SettingItem>
         <SettingLabel>{t("boostSuperboostVisualization")}</SettingLabel>
         <Switch
-          isOn={status()?.boostVisualization ?? false}
-          onToggle={(enabled) => setBoostVisualization(enabled)}
+          isOn={state.status?.boostVisualization ?? false}
+          onToggle={actions.setBoostVisualization}
           label={t("enableBoostLedVisualization")}
         />
       </SettingItem>
@@ -236,8 +196,8 @@ export const Settings: Component = () => {
       <SettingItem>
         <SettingLabel>{t("permanentBoost")}</SettingLabel>
         <Switch
-          isOn={brightnessData()?.boostTimeout === 1}
-          onToggle={handleBoostTimeoutToggle}
+          isOn={state.brightnessVibration?.boostTimeoutDisabled ?? false}
+          onToggle={actions.setBoostTimeoutDisabled}
           label={t("deactivateBoostTimeout")}
         />
       </SettingItem>
@@ -246,16 +206,28 @@ export const Settings: Component = () => {
       <SettingItem>
         <SettingLabel>{t("temperatureUnit")}</SettingLabel>
         <Switch
-          isOn={status()?.isCelsius ?? true}
-          onToggle={(enabled) => setIsCelsius(enabled)}
-          label={status()?.isCelsius ? t("celsius") : t("fahrenheit")}
+          isOn={state.status?.isCelsius ?? true}
+          onToggle={actions.setIsCelsius}
+          label={state.status?.isCelsius ? t("celsius") : t("fahrenheit")}
         />
       </SettingItem>
 
-      {/* Dark Mode */}
+      {/* Find My Device - only Veazy (like the legacy app) */}
+      <Show when={isVeazy()}>
+        <SettingItem>
+          <SettingLabel>{t("locateDevice")}</SettingLabel>
+          <ResetButtonContainer>
+            <ActionButton type="button" onClick={actions.triggerFindMyDevice}>
+              {t("findMyDevice")}
+            </ActionButton>
+          </ResetButtonContainer>
+        </SettingItem>
+      </Show>
+
+      {/* Analysis */}
       <SettingItem>
-        <SettingLabel>{t("darkMode")}</SettingLabel>
-        <DarkModeSwitch />
+        <SettingLabel>{t("analysis")}</SettingLabel>
+        <AnalysisSection run={actions.runAnalysis} />
       </SettingItem>
 
       {/* Factory Reset Button */}
@@ -286,6 +258,6 @@ export const Settings: Component = () => {
           </ModalButtonGroup>
         </ModalContent>
       </Modal>
-    </SettingsContainer>
+    </CollapsibleCard>
   );
 };

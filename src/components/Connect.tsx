@@ -1,12 +1,12 @@
-import { BsBluetooth } from "solid-icons/bs";
-import { ConnectionState, DeviceType } from "../utils/uuids";
-import { Show, createEffect } from "solid-js";
-import { BlinkingSquares } from "./volcano/BlinkingSquares";
-import { styled } from "solid-styled-components";
-import { useBluetooth } from "../provider/BluetoothProvider";
 import { useNavigate } from "@solidjs/router";
-import { buildRoute } from "../routes";
+import { BsBluetooth } from "solid-icons/bs";
+import { createEffect, Match, Show, Switch } from "solid-js";
+import { styled } from "solid-styled-components";
 import { useTranslations } from "../i18n/utils";
+import { useBluetooth } from "../provider/BluetoothProvider";
+import { buildRoute } from "../routes";
+import { ConnectionState, DeviceType } from "../utils/uuids";
+import { BlinkingSquares } from "./volcano/BlinkingSquares";
 
 const Centered = styled("div")`
   display: flex;
@@ -33,11 +33,13 @@ const ConnectButton = styled("button")`
   transition: all 0.3s ease;
   min-width: 200px;
 
-  &:hover {
-    background-color: var(--accent-color);
-    color: var(--text-color);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(246, 96, 0, 0.3);
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--accent-color);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(246, 96, 0, 0.3);
+    }
   }
 `;
 
@@ -54,6 +56,42 @@ const Subtitle = styled("p")`
   line-height: 1.5;
 `;
 
+const TROUBLESHOOTING_URL =
+  "https://github.com/firsttris/reactive-volcano-app#-no-devices-found-troubleshooting-with-bluetooth-internals";
+
+const Notice = styled("div")`
+  max-width: 400px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--accent-color);
+  background: var(--secondary-bg);
+  color: var(--text-color);
+  line-height: 1.5;
+
+  strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  ul {
+    margin: 8px 0;
+    padding-left: 20px;
+    color: var(--secondary-text);
+  }
+
+  a {
+    color: var(--accent-color);
+  }
+`;
+
+const ErrorDetail = styled("div")`
+  font-size: 0.85rem;
+  color: var(--secondary-text);
+  word-break: break-word;
+`;
+
 const LoadingContainer = styled("div")`
   display: flex;
   flex-direction: column;
@@ -66,7 +104,8 @@ const LoadingSubtitle = styled("p")`
 `;
 
 export const Connect = () => {
-  const { connect, connectionState, deviceInfo } = useBluetooth();
+  const { connect, connectionState, connectionError, deviceInfo } =
+    useBluetooth();
   const navigate = useNavigate();
   const t = useTranslations();
 
@@ -77,6 +116,14 @@ export const Connect = () => {
       connectionState() === ConnectionState.NOT_CONNECTED ||
       connectionState() === ConnectionState.CONNECTION_FAILED
     );
+  };
+
+  const isBluetoothSupported = () =>
+    typeof navigator !== "undefined" && "bluetooth" in navigator;
+
+  const errorMessage = () => {
+    const error = connectionError();
+    return error?.kind === "failed" ? error.message : undefined;
   };
 
   const getDeviceTypeText = () => {
@@ -121,6 +168,36 @@ export const Connect = () => {
         <Centered>
           <Title>{t("connectYourDevice")}</Title>
           <Subtitle>{t("appSupportsDevices")}</Subtitle>
+          <Switch>
+            <Match when={!isBluetoothSupported()}>
+              <Notice role="alert">
+                <strong>{t("bluetoothUnsupported")}</strong>
+                {t("bluetoothUnsupportedHint")}
+              </Notice>
+            </Match>
+            <Match when={connectionError()}>
+              {(error) => (
+                <Notice role="alert">
+                  <strong>
+                    {error().kind === "lost"
+                      ? t("connectionLost")
+                      : t("connectionFailed")}
+                  </strong>
+                  <Show when={errorMessage()}>
+                    <ErrorDetail>{errorMessage()}</ErrorDetail>
+                  </Show>
+                  <ul>
+                    <li>{t("tipDeviceOn")}</li>
+                    <li>{t("tipOtherConnection")}</li>
+                    <li>{t("tipBluetoothEnabled")}</li>
+                  </ul>
+                  <a href={TROUBLESHOOTING_URL} target="_blank" rel="noopener">
+                    {t("moreTroubleshooting")}
+                  </a>
+                </Notice>
+              )}
+            </Match>
+          </Switch>
           <ConnectButton onClick={connect}>
             <BsBluetooth size="64px" />
             {t("connectDevice")}

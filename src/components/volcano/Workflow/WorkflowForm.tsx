@@ -1,12 +1,17 @@
-import { Component, createEffect, createMemo, createSignal } from "solid-js";
-import { Slider } from "../../Slider";
-import { useTranslations } from "../../../i18n/utils";
-import { Button } from "../../Button";
-import { useVolcanoDeviceContext } from "../../../provider/VolcanoDeviceProvider";
 import { useNavigate, useParams } from "@solidjs/router";
-import { buildRoute } from "../../../routes";
-import { styled } from "solid-styled-components";
 import { FiSave, FiX } from "solid-icons/fi";
+import {
+  type Component,
+  createEffect,
+  createMemo,
+  createSignal,
+} from "solid-js";
+import { styled } from "solid-styled-components";
+import { useTranslations } from "../../../i18n/utils";
+import { useWorkflowContext } from "../../../provider/WorkflowProvider";
+import { buildRoute } from "../../../routes";
+import { Button } from "../../Button";
+import { Slider } from "../../Slider";
 
 const Container = styled("div")`
   max-width: 600px;
@@ -60,7 +65,7 @@ const StyledButton = styled(Button)`
 `;
 
 export const WorkflowForm: Component = () => {
-  const { workflow } = useVolcanoDeviceContext();
+  const workflow = useWorkflowContext();
   const { workflowSteps, editWorkflowStepInList } = workflow;
 
   const { workflowStepId, workflowListId } = useParams();
@@ -134,7 +139,10 @@ export const WorkflowForm: Component = () => {
           <ButtonGroup>
             <StyledButton
               type="button"
-              onClick={() => workflowListId && navigate(buildRoute.workflowList(workflowListId))}
+              onClick={() =>
+                workflowListId &&
+                navigate(buildRoute.workflowList(workflowListId))
+              }
             >
               <FiX size={20} />
               {t("cancel")}

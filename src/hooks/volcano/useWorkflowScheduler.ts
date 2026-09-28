@@ -1,9 +1,19 @@
-import { Accessor, createSignal, onCleanup } from "solid-js";
-import { useVolcanoDeviceContext } from "../../provider/VolcanoDeviceProvider";
-import { WorkflowStep } from "../../utils/workflowData";
+import { type Accessor, createSignal, onCleanup } from "solid-js";
+import { useVolcano } from "../../provider/VolcanoProvider";
+import type { WorkflowStep } from "../../utils/workflowData";
 
-const delayFor = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+// Like the legacy app, the pump always runs for at least this long
+const MIN_PUMP_TIME_MS = 500;
+
+export type WorkflowPhase =
+  | { type: "heating"; targetTemp: number }
+  | { type: "holding" | "pumping"; endsAt: number };
+
+class WorkflowCancelledError extends Error {
+  constructor() {
+    super("Workflow cancelled");
+  }
+}
 
 export const useWorkflowScheduler = (
   getWorkflowSteps: Accessor<WorkflowStep[]>
@@ -11,66 +21,87 @@ export const useWorkflowScheduler = (
   const [currentStep, setCurrentStep] = createSignal(0);
   const [isRunning, setIsRunning] = createSignal(false);
   const [isPaused, setIsPaused] = createSignal(false);
+  const [phase, setPhase] = createSignal<WorkflowPhase>();
 
-  const { temperature, deviceStatus } = useVolcanoDeviceContext();
-  const { getCurrentTemperature, getTargetTemperature, setTargetTemperature } =
-    temperature;
-  const {
-    isPumpActive,
-    isHeatingActive,
-    setPumpOn,
-    setPumpOff,
-    setHeatOn,
-    setHeatOff,
-  } = deviceStatus;
+  const { state, actions, derived } = useVolcano();
+  const getCurrentTemperature = () => state.currentTemp;
+  const getTargetTemperature = () => state.targetTemp;
+  const setTargetTemperature = actions.applyTargetTemp;
+  const isPumpActive = derived.isPumpActive;
+  const isHeatingActive = derived.isHeating;
+  const setPumpOn = () => actions.setPump(true);
+  const setPumpOff = () => actions.setPump(false);
+  const setHeatOn = () => actions.setHeater(true);
+  const setHeatOff = () => actions.setHeater(false);
 
-  let monitorInterval: number | null = null;
-  let holdTimeout: number | null = null;
-  let pumpTimeout: number | null = null;
+  // Each run gets its own id; stopping or pausing invalidates the running one
+  let runId = 0;
+  const pendingCancels = new Set<() => void>();
 
-  const clearAllTimers = () => {
-    if (monitorInterval) clearInterval(monitorInterval);
-    if (holdTimeout) clearTimeout(holdTimeout);
-    if (pumpTimeout) clearTimeout(pumpTimeout);
-    monitorInterval = null;
-    holdTimeout = null;
-    pumpTimeout = null;
+  const cancelRun = () => {
+    runId++;
+    for (const cancel of pendingCancels) cancel();
+    pendingCancels.clear();
+  };
+
+  const ensureActive = (id: number) => {
+    if (id !== runId) throw new WorkflowCancelledError();
   };
 
   onCleanup(() => {
-    clearAllTimers();
+    cancelRun();
   });
+
+  const delayFor = (ms: number) =>
+    new Promise<void>((resolve, reject) => {
+      const cancel = () => {
+        clearTimeout(timeout);
+        reject(new WorkflowCancelledError());
+      };
+      const timeout = setTimeout(() => {
+        pendingCancels.delete(cancel);
+        resolve();
+      }, ms);
+      pendingCancels.add(cancel);
+    });
 
   // Monitor temperature until it reaches target (within ±1°C tolerance)
   const monitorTemperatureUntilTarget = () =>
-    new Promise<void>((resolve) => {
+    new Promise<void>((resolve, reject) => {
       const targetTemp = getTargetTemperature();
-
-      monitorInterval = setInterval(() => {
+      const cancel = () => {
+        clearInterval(interval);
+        reject(new WorkflowCancelledError());
+      };
+      const interval = setInterval(() => {
         const currentTemp = getCurrentTemperature();
         // Temperature reached if within ±1°C of target (like legacy app)
         if (currentTemp >= targetTemp - 1 && currentTemp <= targetTemp + 1) {
-          if (monitorInterval) clearInterval(monitorInterval);
-          monitorInterval = null;
+          clearInterval(interval);
+          pendingCancels.delete(cancel);
           console.log(
             `Temperature reached: ${currentTemp}°C (target: ${targetTemp}°C)`
           );
           resolve();
         }
       }, 1500); // Check every 1.5 seconds like legacy app
+      pendingCancels.add(cancel);
     });
 
-  const executeWorkflowStep = async (step: WorkflowStep) => {
+  const executeWorkflowStep = async (step: WorkflowStep, id: number) => {
     console.log(`Executing step ${currentStep() + 1}:`, step);
 
     // Set target temperature and turn on heater
+    setPhase({ type: "heating", targetTemp: step.temperature });
     await setTargetTemperature(step.temperature);
+    ensureActive(id);
 
     // Wait a bit before turning on heat (like legacy app)
     await delayFor(750);
 
     if (!isHeatingActive()) {
       await setHeatOn();
+      ensureActive(id);
     }
 
     // Wait for temperature to be reached
@@ -79,47 +110,46 @@ export const useWorkflowScheduler = (
     // Hold time (wait before activating pump)
     if (step.holdTimeInSeconds > 0) {
       console.log(`Holding for ${step.holdTimeInSeconds} seconds...`);
+      setPhase({
+        type: "holding",
+        endsAt: Date.now() + step.holdTimeInSeconds * 1000,
+      });
       await delayFor(step.holdTimeInSeconds * 1000);
     }
 
     // Activate pump
-    if (step.pumpTimeInSeconds > 0) {
-      console.log(`Activating pump for ${step.pumpTimeInSeconds} seconds...`);
-      if (!isPumpActive()) {
-        await setPumpOn();
-      }
+    const pumpTimeMs = Math.max(
+      MIN_PUMP_TIME_MS,
+      step.pumpTimeInSeconds * 1000
+    );
+    console.log(`Activating pump for ${pumpTimeMs} ms...`);
+    if (!isPumpActive()) {
+      await setPumpOn();
+      ensureActive(id);
+    }
 
-      // Wait for pump time, then turn off
-      await delayFor(step.pumpTimeInSeconds * 1000);
+    // Wait for pump time, then turn off
+    setPhase({ type: "pumping", endsAt: Date.now() + pumpTimeMs });
+    await delayFor(pumpTimeMs);
 
-      if (isPumpActive()) {
-        await setPumpOff();
-      }
+    if (isPumpActive()) {
+      await setPumpOff();
+      ensureActive(id);
     }
   };
 
-  const executeNextStep = async () => {
-    const workflowSteps = getWorkflowSteps();
-    const step = currentStep();
-
-    if (step >= workflowSteps.length) {
-      // Workflow finished
+  const runRemainingSteps = async (id: number) => {
+    try {
+      while (currentStep() < getWorkflowSteps().length) {
+        await executeWorkflowStep(getWorkflowSteps()[currentStep()], id);
+        ensureActive(id);
+        setCurrentStep((prev) => prev + 1);
+      }
       console.log("Workflow completed!");
       await stopWorkflow();
-      return;
-    }
-
-    await executeWorkflowStep(workflowSteps[step]);
-
-    // Move to next step
-    setCurrentStep((prev) => prev + 1);
-
-    // Continue with next step if not at the end
-    if (currentStep() < workflowSteps.length) {
-      await executeNextStep();
-    } else {
-      // Workflow finished after last step
-      console.log("Workflow completed!");
+    } catch (error) {
+      if (error instanceof WorkflowCancelledError) return;
+      console.error("Workflow error:", error);
       await stopWorkflow();
     }
   };
@@ -132,24 +162,21 @@ export const useWorkflowScheduler = (
     }
 
     console.log("Starting workflow with", workflowSteps.length, "steps");
+    cancelRun();
     setIsRunning(true);
     setIsPaused(false);
     setCurrentStep(0);
 
-    try {
-      await executeNextStep();
-    } catch (error) {
-      console.error("Workflow error:", error);
-      await stopWorkflow();
-    }
+    await runRemainingSteps(runId);
   };
 
   const stopWorkflow = async () => {
     console.log("Stopping workflow");
-    clearAllTimers();
+    cancelRun();
     setIsRunning(false);
     setIsPaused(false);
     setCurrentStep(0);
+    setPhase(undefined);
 
     // Turn off heat and pump
     if (isHeatingActive()) {
@@ -160,16 +187,21 @@ export const useWorkflowScheduler = (
     }
   };
 
-  const pauseWorkflow = () => {
+  const pauseWorkflow = async () => {
     console.log("Pausing workflow");
-    clearAllTimers();
+    cancelRun();
     setIsPaused(true);
+    if (isPumpActive()) {
+      await setPumpOff();
+    }
   };
 
   const resumeWorkflow = async () => {
     console.log("Resuming workflow");
+    cancelRun();
     setIsPaused(false);
-    await executeNextStep();
+    // The interrupted step is repeated from its beginning
+    await runRemainingSteps(runId);
   };
 
   return {
@@ -180,5 +212,6 @@ export const useWorkflowScheduler = (
     currentStep,
     isRunning,
     isPaused,
+    phase,
   };
 };

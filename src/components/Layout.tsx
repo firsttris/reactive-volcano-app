@@ -1,6 +1,6 @@
-import { RouteSectionProps } from "@solidjs/router";
-import { ConnectionBar } from "./ConnectionBar";
+import type { RouteSectionProps } from "@solidjs/router";
 import { styled } from "solid-styled-components";
+import { ConnectionBar } from "./ConnectionBar";
 
 const ResponsiveContainer = styled("div")`
   display: flex;

@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { openDB, loadFromDB, saveToDB } from "./useIndexedDB";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockIndexedDB } from "./__mocks__/indexedDB";
+import { loadFromDB, openDB, saveToDB } from "./useIndexedDB";
 
 describe("useIndexedDB", () => {
   let mockControl: ReturnType<typeof createMockIndexedDB>;
@@ -11,7 +11,7 @@ describe("useIndexedDB", () => {
 
     // Setup IndexedDB mock
     mockControl = createMockIndexedDB();
-    globalThis.indexedDB = mockControl.mockIndexedDB as any;
+    globalThis.indexedDB = mockControl.mockIndexedDB as unknown as IDBFactory;
 
     // Clear any stored data
     mockControl.clearStoreData();
@@ -22,7 +22,10 @@ describe("useIndexedDB", () => {
     it("should open IndexedDB successfully", async () => {
       const db = await openDB();
 
-      expect(globalThis.indexedDB.open).toHaveBeenCalledWith("VolcanoWorkflowDB", 3);
+      expect(globalThis.indexedDB.open).toHaveBeenCalledWith(
+        "VolcanoWorkflowDB",
+        3
+      );
       expect(db).toBeDefined();
     });
 
@@ -38,14 +41,19 @@ describe("useIndexedDB", () => {
       await openDB();
 
       // Verify old stores were deleted
-      expect(mockControl.mockDB.deleteObjectStore).toHaveBeenCalledWith("workflows");
-      expect(mockControl.mockDB.deleteObjectStore).toHaveBeenCalledWith("selectedWorkflow");
-      
+      expect(mockControl.mockDB.deleteObjectStore).toHaveBeenCalledWith(
+        "workflows"
+      );
+      expect(mockControl.mockDB.deleteObjectStore).toHaveBeenCalledWith(
+        "selectedWorkflow"
+      );
+
       // Verify new store was created
-      expect(mockControl.mockDB.createObjectStore).toHaveBeenCalledWith("keyValueStore");
+      expect(mockControl.mockDB.createObjectStore).toHaveBeenCalledWith(
+        "keyValueStore"
+      );
     });
   });
-
 
   describe("loadFromDB", () => {
     it("should load value from DB successfully", async () => {
@@ -91,7 +99,6 @@ describe("useIndexedDB", () => {
     });
   });
 
-
   describe("saveToDB", () => {
     it("should save value to DB successfully", async () => {
       const testKey = "testKey";
@@ -136,7 +143,7 @@ describe("useIndexedDB", () => {
 
     it("should overwrite existing values", async () => {
       const testKey = "counter";
-      
+
       await saveToDB(testKey, 10);
       expect(mockControl.getStoreData().get(testKey)).toBe(10);
 

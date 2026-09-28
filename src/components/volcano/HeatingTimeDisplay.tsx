@@ -1,7 +1,7 @@
-import { Component } from "solid-js";
+import type { Component } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useHeatingTime } from "../../hooks/volcano/useHeatingTime";
 import { useTranslations } from "../../i18n/utils";
+import { useVolcano } from "../../provider/VolcanoProvider";
 
 const Container = styled("div")`
   display: flex;
@@ -30,16 +30,16 @@ const TimeValue = styled("span")`
 `;
 
 export const HeatingTimeDisplay: Component = () => {
-  const { getHoursOfHeating, getMinutesOfHeating } = useHeatingTime();
+  const { state } = useVolcano();
   const t = useTranslations();
 
   return (
     <Container>
       <Title>{t("deviceRuntime")}</Title>
       <TimeDisplay>
-        <TimeValue>{getHoursOfHeating()}</TimeValue>
+        <TimeValue>{state.heatingHours}</TimeValue>
         <span>h</span>
-        <TimeValue>{getMinutesOfHeating()}</TimeValue>
+        <TimeValue>{state.heatingMinutes}</TimeValue>
         <span>m</span>
       </TimeDisplay>
     </Container>

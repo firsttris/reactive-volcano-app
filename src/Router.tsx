@@ -1,14 +1,14 @@
-import { Router, Route } from "@solidjs/router";
+import { Route, Router } from "@solidjs/router";
 import { Connect } from "./components/Connect";
-import { WorkflowList } from "./components/volcano/Workflow/WorkflowList";
-import { WorkflowForm } from "./components/volcano/Workflow/WorkflowForm";
-import { WorkflowWrapper } from "./components/volcano/Workflow/WorkflowWrapper";
-import { VolcanoView } from "./Views/VolcanoView";
-import { VentyVeazyView } from "./Views/VentyVeazyView";
-import { CraftyView } from "./Views/CraftyView";
 import { DeviceRouter } from "./components/DeviceRouter";
 import { Layout } from "./components/Layout";
+import { WorkflowForm } from "./components/volcano/Workflow/WorkflowForm";
+import { WorkflowList } from "./components/volcano/Workflow/WorkflowList";
+import { WorkflowWrapper } from "./components/volcano/Workflow/WorkflowWrapper";
 import { ROUTES } from "./routes";
+import { CraftyView } from "./Views/CraftyView";
+import { VentyVeazyView } from "./Views/VentyVeazyView";
+import { VolcanoView } from "./Views/VolcanoView";
 
 export const Routes = () => {
   const base = import.meta.env.BASE_URL;

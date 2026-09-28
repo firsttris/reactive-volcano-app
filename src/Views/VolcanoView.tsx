@@ -1,46 +1,22 @@
-import { Component, createEffect } from "solid-js";
-import { styled } from "solid-styled-components";
 import { useNavigate } from "@solidjs/router";
-import { Temperature } from "../components/volcano/Temperature";
-import { HeatAndPump } from "../components/volcano/HeatAndPump";
-import { ShutdownTime } from "../components/volcano/ShutdownTime";
-import { BrightnessSlider } from "../components/volcano/BrightnessSlider";
+import { type Component, createEffect } from "solid-js";
+import { styled } from "solid-styled-components";
+import { Card, CollapsibleCard } from "../components/Card";
+import { Analysis } from "../components/volcano/Analysis";
 import { AutoShutdownSlider } from "../components/volcano/AutoshutdownSlider";
-import { VibrationSwitch } from "../components/volcano/VibrationSwitch";
-import { DarkModeSwitch } from "../components/DarkModeSwitch";
-import { StandbyDisplaySwitch } from "../components/volcano/StandbyDisplaySwitch";
-import { WorkFlowSection } from "../components/volcano/Workflow/WorkflowSection";
+import { BrightnessSlider } from "../components/volcano/BrightnessSlider";
+import { HeatAndPump } from "../components/volcano/HeatAndPump";
 import { HeatingTimeDisplay } from "../components/volcano/HeatingTimeDisplay";
+import { ShutdownTime } from "../components/volcano/ShutdownTime";
+import { StandbyDisplaySwitch } from "../components/volcano/StandbyDisplaySwitch";
+import { Temperature } from "../components/volcano/Temperature";
+import { TemperatureUnitSwitch } from "../components/volcano/TemperatureUnitSwitch";
+import { VibrationSwitch } from "../components/volcano/VibrationSwitch";
+import { WorkFlowSection } from "../components/volcano/Workflow/WorkflowSection";
 import { useTranslations } from "../i18n/utils";
 import { useBluetooth } from "../provider/BluetoothProvider";
-import { ConnectionState } from "../utils/uuids";
 import { buildRoute } from "../routes";
-
-const MainCard = styled("div")`
-  background: var(--secondary-bg);
-  border-radius: 16px;
-  padding: 24px;
-  margin: 20px auto;
-  border: 1px solid var(--border-color);
-  max-width: 600px;
-`;
-
-const SettingsContainer = styled("div")`
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  background: var(--secondary-bg);
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
-`;
-
-const SettingsTitle = styled("h2")`
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  margin-bottom: 24px;
-  text-align: center;
-  font-family: CustomFont;
-`;
+import { ConnectionState } from "../utils/uuids";
 
 const SettingItem = styled("div")`
   margin-bottom: 20px;
@@ -86,20 +62,18 @@ export const VolcanoView: Component = () => {
     <>
       {/* Main Controls */}
       <ShutdownTime />
-      <MainCard>
+      <Card>
         <div style={{ "margin-bottom": "24px" }}>
           <Temperature />
         </div>
         <HeatAndPump />
-      </MainCard>
+      </Card>
 
       {/* Workflows */}
       <WorkFlowSection />
 
       {/* Settings */}
-      <SettingsContainer>
-        <SettingsTitle>{t("settings")}</SettingsTitle>
-
+      <CollapsibleCard title={t("settings")} storageKey="volcano-settings">
         <SettingItem>
           <AutoShutdownSlider />
         </SettingItem>
@@ -112,13 +86,16 @@ export const VolcanoView: Component = () => {
             <StandbyDisplaySwitch />
           </SwitchContainer>
           <SwitchContainer>
-            <DarkModeSwitch />
+            <TemperatureUnitSwitch />
           </SwitchContainer>
         </SwitchesContainer>
         <SettingItem>
           <HeatingTimeDisplay />
         </SettingItem>
-      </SettingsContainer>
+        <SettingItem>
+          <Analysis />
+        </SettingItem>
+      </CollapsibleCard>
     </>
   );
 };

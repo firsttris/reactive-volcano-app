@@ -1,11 +1,11 @@
-import { For, Show } from "solid-js";
-import { useVolcanoDeviceContext } from "../../../provider/VolcanoDeviceProvider";
-import { Button } from "../../Button";
 import { useNavigate, useParams } from "@solidjs/router";
-import { buildRoute } from "../../../routes";
-import { FiEdit2, FiTrash2, FiPlus, FiSave, FiX } from "solid-icons/fi";
+import { FiEdit2, FiPlus, FiSave, FiTrash2, FiX } from "solid-icons/fi";
+import { For, Show } from "solid-js";
 import { styled } from "solid-styled-components";
 import { useTranslations } from "../../../i18n/utils";
+import { useWorkflowContext } from "../../../provider/WorkflowProvider";
+import { buildRoute } from "../../../routes";
+import { Button } from "../../Button";
 
 const Container = styled("div")`
   max-width: 600px;
@@ -155,7 +155,7 @@ const EmptyState = styled("div")`
 `;
 
 export const WorkflowList = () => {
-  const { workflow } = useVolcanoDeviceContext();
+  const workflow = useWorkflowContext();
   const t = useTranslations();
   const {
     deleteWorkflowStepFromList,
@@ -195,7 +195,8 @@ export const WorkflowList = () => {
                     <StepActions>
                       <IconButton
                         onClick={() =>
-                          workflowListId && navigate(
+                          workflowListId &&
+                          navigate(
                             buildRoute.workflowForm(
                               workflowListId,
                               workflowItem.id
@@ -207,7 +208,8 @@ export const WorkflowList = () => {
                       </IconButton>
                       <IconButton
                         onClick={() =>
-                          workflowListId && deleteWorkflowStepFromList(
+                          workflowListId &&
+                          deleteWorkflowStepFromList(
                             workflowListId,
                             workflowItem.id
                           )

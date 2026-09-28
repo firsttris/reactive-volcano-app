@@ -1,13 +1,14 @@
+import {
+  TbOutlineBluetoothConnected,
+  TbOutlineBluetoothX,
+} from "solid-icons/tb";
+import { VsColorMode, VsLoading } from "solid-icons/vs";
+import { createSignal, onCleanup, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { TbBluetoothConnected } from "solid-icons/tb";
-import { TbBluetoothX } from "solid-icons/tb";
-import { ConnectionState, DeviceType } from "../utils/uuids";
-import { useDarkMode } from "../provider/DarkModeProvider";
 import { useTranslations } from "../i18n/utils";
-import { VsLoading } from "solid-icons/vs";
-import { Show } from "solid-js";
 import { useBluetooth } from "../provider/BluetoothProvider";
-import { useDeviceInformation } from "../hooks/volcano/useDeviceInformation";
+import { useDarkMode } from "../provider/DarkModeProvider";
+import { ConnectionState, DeviceType } from "../utils/uuids";
 
 interface ConnectionBarContainerProps {
   isDarkMode: boolean;
@@ -57,12 +58,17 @@ const DeviceInfoRow = styled("div")`
   }
 `;
 
+const DeviceDetails = styled("div")`
+  display: flex;
+  gap: 12px;
+`;
+
 const FirmwareVersion = styled("div")`
   font-size: 0.8rem;
   opacity: 0.7;
   color: var(--secondary-text);
 
-  @media (max-width: 786px) {
+  @media (max-width: 768px) {
     display: none;
   }
 `;
@@ -108,7 +114,7 @@ const DeviceName = styled("div")`
 
 const DeviceTypeChip = styled("span")`
   background: linear-gradient(135deg, var(--accent-color) 0%, #ff7f39 100%);
-  color: var(--text-color);
+  color: #fff;
   padding: 1px 6px;
   border-radius: 10px;
   font-size: 0.7rem;
@@ -116,6 +122,11 @@ const DeviceTypeChip = styled("span")`
   text-transform: uppercase;
   letter-spacing: 0.3px;
   box-shadow: 0 1px 3px rgba(255, 102, 0, 0.2);
+
+  /* The device name already says which device it is */
+  @media (max-width: 480px) {
+    display: none;
+  }
 `;
 
 const BluetoothIcon = styled("div")`
@@ -123,44 +134,90 @@ const BluetoothIcon = styled("div")`
   border-radius: 50%;
   padding: 6px;
 
-  &:hover {
-    background: rgba(255, 102, 0, 0.1);
-    transform: scale(1.05);
-  }
+`;
 
-  &.clickable {
-    cursor: pointer;
+const IconButton = styled("button")`
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--secondary-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--accent-color);
+      background: var(--secondary-bg);
+    }
+  }
+`;
+
+const DEVICE_TYPE_LABELS: Partial<Record<DeviceType, string>> = {
+  [DeviceType.VOLCANO]: "Volcano",
+  [DeviceType.VENTY]: "Venty",
+  [DeviceType.VEAZY]: "Veazy",
+  [DeviceType.CRAFTY]: "Crafty",
+};
+
+// Resets to the plain "disconnect" label if the second tap doesn't come
+const CONFIRM_TIMEOUT_MS = 4000;
+
+const DisconnectButton = styled("button")<{ confirming: boolean }>`
+  flex-shrink: 0;
+  white-space: nowrap;
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: 18px;
+  border: 1px solid
+    ${(props) =>
+      props.confirming ? "var(--accent-color)" : "var(--border-color)"};
+  background: ${(props) =>
+    props.confirming ? "var(--accent-color)" : "transparent"};
+  color: ${(props) => (props.confirming ? "#fff" : "var(--secondary-text)")};
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--accent-color);
+      color: ${(props) => (props.confirming ? "#fff" : "var(--accent-color)")};
+    }
   }
 `;
 
 export const ConnectionBar = () => {
   const { disconnect, connectionState, deviceInfo } = useBluetooth();
-  const { isDarkMode } = useDarkMode();
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
   const t = useTranslations();
-  const { getSerialNumber: getVolcanoSerialNumber } = useDeviceInformation();
 
   const isAnyDeviceConnected = () =>
     connectionState() === ConnectionState.CONNECTED;
   const isConnecting = () => connectionState() === ConnectionState.CONNECTING;
 
   // Get device-specific information
-  const getSerialNumber = () => {
-    const device = deviceInfo();
-    if (device.type === DeviceType.VOLCANO) {
-      // Use the device information hook for Volcano
-      return getVolcanoSerialNumber();
-    }
-    // For Veazy/Venty, extract from device name (format: "S&B VY123456" or "S&B VZ123456")
-    return device.name ? device.name.split(" ")[1] || "" : "";
-  };
+  const getSerialNumber = () => deviceInfo().serialNumber ?? "";
 
-  const getFirmwareVersion = () => {
-    // This would need device-specific implementation
-    // For now, return empty to avoid errors
-    return "";
-  };
+  const [confirming, setConfirming] = createSignal(false);
+  let confirmTimer: ReturnType<typeof setTimeout> | undefined;
+  onCleanup(() => clearTimeout(confirmTimer));
 
   const handleDisconnect = async () => {
+    clearTimeout(confirmTimer);
+    if (!confirming()) {
+      setConfirming(true);
+      confirmTimer = setTimeout(() => setConfirming(false), CONFIRM_TIMEOUT_MS);
+      return;
+    }
+    setConfirming(false);
     await disconnect();
   };
 
@@ -175,7 +232,10 @@ export const ConnectionBar = () => {
       <Show when={!isAnyDeviceConnected() && !isConnecting()}>
         <ConnectionInfo>
           <BluetoothIcon>
-            <TbBluetoothX size={22} color="#ccc" />
+            <TbOutlineBluetoothX
+              size={22}
+              style={{ color: "var(--secondary-text)" }}
+            />
           </BluetoothIcon>
           <ConnectionDetails>
             <StatusText>{t("deviceNotConnected")}</StatusText>
@@ -186,7 +246,10 @@ export const ConnectionBar = () => {
       <Show when={isConnecting()}>
         <ConnectionInfo>
           <BluetoothIcon>
-            <SpinningVsLoading size={22} color="#f60" />
+            <SpinningVsLoading
+              size={22}
+              style={{ color: "var(--accent-color)" }}
+            />
           </BluetoothIcon>
           <ConnectionDetails>
             <StatusText>{t("connectingToDevice")}</StatusText>
@@ -196,45 +259,52 @@ export const ConnectionBar = () => {
 
       <Show when={isAnyDeviceConnected() && getDeviceInfo()}>
         <ConnectionInfo>
-          <BluetoothIcon class="clickable" onClick={handleDisconnect}>
-            <TbBluetoothConnected
+          <BluetoothIcon>
+            <TbOutlineBluetoothConnected
               size={22}
-              color="#f60"
-              title="Click to disconnect"
+              style={{ color: "var(--accent-color)" }}
             />
           </BluetoothIcon>
           <ConnectionDetails>
             <DeviceInfoRow>
               <DeviceName>
                 {getDeviceInfo()?.name}
-                {getDeviceInfo()?.type === DeviceType.VEAZY && (
-                  <DeviceTypeChip>Veazy</DeviceTypeChip>
-                )}
-                {getDeviceInfo()?.type === DeviceType.VENTY && (
-                  <DeviceTypeChip>Venty</DeviceTypeChip>
-                )}
-                {getDeviceInfo()?.type === DeviceType.VOLCANO && (
-                  <DeviceTypeChip>Volcano</DeviceTypeChip>
-                )}
+                <Show when={DEVICE_TYPE_LABELS[deviceInfo().type]}>
+                  {(label) => <DeviceTypeChip>{label()}</DeviceTypeChip>}
+                </Show>
               </DeviceName>
-              <div style={{ display: "flex", gap: "12px" }}>
-                <Show when={getSerialNumber() && getSerialNumber().length > 0}>
+              <DeviceDetails>
+                <Show when={getSerialNumber()}>
                   <SerialNumber>
                     {t("serialNumber")}: {getSerialNumber()}
                   </SerialNumber>
                 </Show>
-                <Show
-                  when={getFirmwareVersion() && getFirmwareVersion().length > 0}
-                >
+                <Show when={deviceInfo().firmwareVersion}>
                   <FirmwareVersion>
-                    {t("bleFirmwareVersion")}: {getFirmwareVersion()}
+                    {t("firmwareVersion")}: {deviceInfo().firmwareVersion}
                   </FirmwareVersion>
                 </Show>
-              </div>
+              </DeviceDetails>
             </DeviceInfoRow>
           </ConnectionDetails>
+          <DisconnectButton
+            type="button"
+            confirming={confirming()}
+            onClick={handleDisconnect}
+          >
+            {confirming() ? t("confirmDisconnect") : t("disconnect")}
+          </DisconnectButton>
         </ConnectionInfo>
       </Show>
+
+      <IconButton
+        type="button"
+        aria-label={t("darkMode")}
+        aria-pressed={isDarkMode()}
+        onClick={() => toggleDarkMode(!isDarkMode())}
+      >
+        <VsColorMode size={20} />
+      </IconButton>
     </ConnectionBarContainer>
   );
 };

@@ -1,8 +1,8 @@
 import { Navigate } from "@solidjs/router";
-import { useBluetooth } from "../provider/BluetoothProvider";
-import { DeviceType, ConnectionState } from "../utils/uuids";
 import { createMemo } from "solid-js";
+import { useBluetooth } from "../provider/BluetoothProvider";
 import { buildRoute } from "../routes";
+import { ConnectionState, DeviceType } from "../utils/uuids";
 
 /**
  * Component that automatically navigates to the appropriate device view
@@ -27,7 +27,6 @@ export const DeviceRouter = () => {
         return buildRoute.ventyVeazyRoot();
       case DeviceType.CRAFTY:
         return buildRoute.craftyRoot();
-      case DeviceType.UNKNOWN:
       default:
         return buildRoute.connect();
     }

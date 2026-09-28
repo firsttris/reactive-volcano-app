@@ -1,12 +1,12 @@
+import type { Accessor, JSX } from "solid-js";
 import {
-  Component,
+  type Component,
   createContext,
   createEffect,
   createSignal,
   onMount,
   useContext,
 } from "solid-js";
-import type { Accessor, JSX } from "solid-js";
 
 interface DarkModeContextType {
   isDarkMode: Accessor<boolean>;
@@ -27,7 +27,11 @@ export const DarkModeProvider: Component<DarkModeProviderProps> = (props) => {
 
   onMount(() => {
     const stored = localStorage.getItem("isDarkModeVReverse");
-    const isDarkMode = stored === null ? false : stored === "true";
+    // Without a stored choice, follow the system setting
+    const isDarkMode =
+      stored === null
+        ? window.matchMedia("(prefers-color-scheme: dark)").matches
+        : stored === "true";
     toggleDarkMode(isDarkMode);
   });
 

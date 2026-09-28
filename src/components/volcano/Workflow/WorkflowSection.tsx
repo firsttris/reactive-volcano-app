@@ -1,27 +1,11 @@
+import { FiDownload, FiPlus, FiUpload } from "solid-icons/fi";
 import { For } from "solid-js";
-import { WorkflowItem } from "./WorkflowItem";
 import { styled } from "solid-styled-components";
-import { useVolcanoDeviceContext } from "../../../provider/VolcanoDeviceProvider";
-import { Button } from "../../Button";
-import { FiPlus, FiDownload, FiUpload } from "solid-icons/fi";
 import { useTranslations } from "../../../i18n/utils";
-
-const WorkflowContainer = styled("div")`
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  background: var(--secondary-bg);
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
-`;
-
-const WorkflowTitle = styled("h2")`
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  margin-bottom: 24px;
-  text-align: center;
-  font-family: CustomFont;
-`;
+import { useWorkflowContext } from "../../../provider/WorkflowProvider";
+import { Button } from "../../Button";
+import { Card, CardTitle } from "../../Card";
+import { WorkflowItem } from "./WorkflowItem";
 
 const Container = styled("div")`
   display: grid;
@@ -80,7 +64,7 @@ const AddWorkflowButton = styled(Button)`
 `;
 
 export const WorkFlowSection = () => {
-  const { workflow } = useVolcanoDeviceContext();
+  const workflow = useWorkflowContext();
   const t = useTranslations();
   const {
     workflowList,
@@ -135,8 +119,8 @@ export const WorkFlowSection = () => {
   };
 
   return (
-    <WorkflowContainer>
-      <WorkflowTitle>{t("workflows")}</WorkflowTitle>
+    <Card>
+      <CardTitle>{t("workflows")}</CardTitle>
       <Container>
         <For each={workflowList()}>
           {(workflow) => <WorkflowItem workflow={workflow} />}
@@ -169,6 +153,6 @@ export const WorkFlowSection = () => {
           {t("importWorkflow")}
         </BulkOperationButton>
       </BulkOperationsContainer>
-    </WorkflowContainer>
+    </Card>
   );
 };
