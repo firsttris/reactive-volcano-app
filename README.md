@@ -6,6 +6,10 @@
 
 [![Build](https://github.com/firsttris/reactive-volcano-app/actions/workflows/build.yml/badge.svg)](https://github.com/firsttris/reactive-volcano-app/actions/workflows/build.yml)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+[![Docker](https://github.com/firsttris/reactive-volcano-app/actions/workflows/docker.yml/badge.svg)](https://github.com/firsttris/reactive-volcano-app/actions/workflows/docker.yml)
+[![Docker Image Version](https://img.shields.io/docker/v/tristanteu/reactive-volcano-app?sort=semver&logo=docker&logoColor=white&label=Docker%20Hub)](https://hub.docker.com/r/tristanteu/reactive-volcano-app)
+[![Docker Pulls](https://img.shields.io/docker/pulls/tristanteu/reactive-volcano-app?logo=docker&logoColor=white)](https://hub.docker.com/r/tristanteu/reactive-volcano-app)
+[![Docker Image Size](https://img.shields.io/docker/image-size/tristanteu/reactive-volcano-app?sort=semver&logo=docker&logoColor=white)](https://hub.docker.com/r/tristanteu/reactive-volcano-app)
 
 [![SolidJS](https://img.shields.io/badge/SolidJS-2c4f7c?style=for-the-badge&logo=solid&logoColor=c8c8c8)](https://www.solidjs.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -47,6 +51,27 @@ This app supports the following Storz & Bickel devices:
 ## 🎮 Test my App
 
 Access & Test the WebApp here: **[Reactive Vaporizer App](https://firsttris.github.io/reactive-volcano-app/)**
+
+## 🐳 Self-Hosting with Docker
+
+A ready-to-use image (`linux/amd64`, `linux/arm64`) is published on **[Docker Hub](https://hub.docker.com/r/tristanteu/reactive-volcano-app)**.
+
+```bash
+docker run -d --name volcano-app -p 8080:80 --restart unless-stopped tristanteu/reactive-volcano-app:latest
+```
+
+Or with Docker Compose:
+
+```yaml
+services:
+  volcano-app:
+    image: tristanteu/reactive-volcano-app:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+```
+
+Then open `http://localhost:8080`. *Note: Web Bluetooth only works in a secure context — when accessing the app from another device, serve it via HTTPS (e.g. behind a reverse proxy).*
 
 ## 🐧 Prerequisites
 
