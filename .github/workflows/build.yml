@@ -94,7 +94,12 @@ jobs:
       
       - name: Build
         run: npm run build
-      
+
+      # GitHub Pages has no SPA fallback; serve the app for unknown paths so
+      # deep links like /connect survive a reload.
+      - name: Add SPA fallback
+        run: cp dist/index.html dist/404.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

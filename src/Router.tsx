@@ -11,10 +11,12 @@ import { VentyVeazyView } from "./Views/VentyVeazyView";
 import { VolcanoView } from "./Views/VolcanoView";
 
 export const Routes = () => {
-  const base = import.meta.env.BASE_URL;
+  // Vite's BASE_URL has a trailing slash ("/reactive-volcano-app/"), which the
+  // router would turn into "//connect" and then fail to match any route.
+  const base = import.meta.env.BASE_URL.replace(/\/+$/, "");
 
   return (
-    <Router base={base !== "/" ? base : undefined}>
+    <Router base={base || undefined}>
       <Route path={ROUTES.ROOT} component={Layout}>
         {/* Auto-navigation based on connected device */}
         <Route path={ROUTES.ROOT} component={DeviceRouter} />
