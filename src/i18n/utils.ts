@@ -99,6 +99,10 @@ export const ui = {
     bluetoothUnsupported: "Web Bluetooth is not available",
     bluetoothUnsupportedHint:
       "Please use Chrome or Edge on Android, Windows, macOS or Linux. On iOS, use a browser with Web Bluetooth such as WebBLE.",
+    bluetoothFlagHint:
+      "On Linux, Web Bluetooth must be enabled first: paste this address into the address bar, enable the flag and restart the browser.",
+    copyFlagUrl: "Copy address",
+    copied: "Copied!",
     connectionFailed: "Connection failed",
     connectionLost: "Connection lost",
     tipDeviceOn: "Make sure the device is switched on and nearby.",
@@ -251,6 +255,10 @@ export const ui = {
     bluetoothUnsupported: "Web Bluetooth ist nicht verfügbar",
     bluetoothUnsupportedHint:
       "Bitte Chrome oder Edge unter Android, Windows, macOS oder Linux verwenden. Unter iOS einen Browser mit Web Bluetooth wie WebBLE nutzen.",
+    bluetoothFlagHint:
+      "Unter Linux muss Web Bluetooth erst aktiviert werden: Diese Adresse in die Adressleiste einfügen, das Flag aktivieren und den Browser neu starten.",
+    copyFlagUrl: "Adresse kopieren",
+    copied: "Kopiert!",
     connectionFailed: "Verbindung fehlgeschlagen",
     connectionLost: "Verbindung verloren",
     tipDeviceOn: "Prüfen Sie, ob das Gerät eingeschaltet und in der Nähe ist.",

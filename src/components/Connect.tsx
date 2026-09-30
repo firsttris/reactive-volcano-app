@@ -1,6 +1,6 @@
 import { useNavigate } from "@solidjs/router";
 import { BsBluetooth } from "solid-icons/bs";
-import { createEffect, Match, Show, Switch } from "solid-js";
+import { createEffect, createSignal, Match, Show, Switch } from "solid-js";
 import { styled } from "solid-styled-components";
 import { useTranslations } from "../i18n/utils";
 import { useBluetooth } from "../provider/BluetoothProvider";
@@ -86,6 +86,37 @@ const Notice = styled("div")`
   }
 `;
 
+// Browsers refuse to open chrome:// URLs from a web page, so we can only
+// offer to copy it for pasting into the address bar.
+const BLUETOOTH_FLAG_URL = "chrome://flags/#enable-web-bluetooth";
+
+const isChromium = () =>
+  typeof navigator !== "undefined" && /Chrome\//.test(navigator.userAgent);
+
+const FlagHint = styled("div")`
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--secondary-text);
+
+  code {
+    word-break: break-all;
+    color: var(--text-color);
+  }
+`;
+
+const CopyButton = styled("button")`
+  align-self: flex-start;
+  padding: 8px 14px;
+  border: 1px solid var(--accent-color);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--accent-color);
+  font-weight: bold;
+  cursor: pointer;
+`;
+
 const ErrorDetail = styled("div")`
   font-size: 0.85rem;
   color: var(--secondary-text);
@@ -120,6 +151,16 @@ export const Connect = () => {
 
   const isBluetoothSupported = () =>
     typeof navigator !== "undefined" && "bluetooth" in navigator;
+
+  const [flagUrlCopied, setFlagUrlCopied] = createSignal(false);
+  const copyFlagUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(BLUETOOTH_FLAG_URL);
+      setFlagUrlCopied(true);
+    } catch (error) {
+      console.error("Copying flag URL failed:", error);
+    }
+  };
 
   const errorMessage = () => {
     const error = connectionError();
@@ -173,6 +214,15 @@ export const Connect = () => {
               <Notice role="alert">
                 <strong>{t("bluetoothUnsupported")}</strong>
                 {t("bluetoothUnsupportedHint")}
+                <Show when={isChromium()}>
+                  <FlagHint>
+                    {t("bluetoothFlagHint")}
+                    <code>{BLUETOOTH_FLAG_URL}</code>
+                    <CopyButton onClick={copyFlagUrl}>
+                      {flagUrlCopied() ? t("copied") : t("copyFlagUrl")}
+                    </CopyButton>
+                  </FlagHint>
+                </Show>
               </Notice>
             </Match>
             <Match when={connectionError()}>
