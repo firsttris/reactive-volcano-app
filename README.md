@@ -6,7 +6,7 @@
 
 [![Build](https://github.com/firsttris/reactive-volcano-app/actions/workflows/build.yml/badge.svg)](https://github.com/firsttris/reactive-volcano-app/actions/workflows/build.yml)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-[![Docker](https://github.com/firsttris/reactive-volcano-app/actions/workflows/docker.yml/badge.svg)](https://github.com/firsttris/reactive-volcano-app/actions/workflows/docker.yml)
+[![Release](https://github.com/firsttris/reactive-volcano-app/actions/workflows/release.yml/badge.svg)](https://github.com/firsttris/reactive-volcano-app/actions/workflows/release.yml)
 [![Docker Image Version](https://img.shields.io/docker/v/tristanteu/reactive-volcano-app?sort=semver&logo=docker&logoColor=white&label=Docker%20Hub)](https://hub.docker.com/r/tristanteu/reactive-volcano-app)
 [![Docker Pulls](https://img.shields.io/docker/pulls/tristanteu/reactive-volcano-app?logo=docker&logoColor=white)](https://hub.docker.com/r/tristanteu/reactive-volcano-app)
 [![Docker Image Size](https://img.shields.io/docker/image-size/tristanteu/reactive-volcano-app?sort=semver&logo=docker&logoColor=white)](https://hub.docker.com/r/tristanteu/reactive-volcano-app)
