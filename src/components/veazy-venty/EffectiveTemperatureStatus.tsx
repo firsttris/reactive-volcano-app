@@ -1,5 +1,5 @@
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../../i18n/utils";
+import { m } from "../../paraglide/messages";
 import { TemperatureDisplay } from "../TemperatureDisplay";
 
 const StatusBar = styled("div")`
@@ -37,12 +37,10 @@ interface EffectiveTemperatureStatusProps {
 export const EffectiveTemperatureStatus = (
   props: EffectiveTemperatureStatusProps
 ) => {
-  const t = useTranslations();
-
   return (
     <StatusBar>
       <StatusItem highlight={true}>
-        {t("effective")}:{" "}
+        {m.temperature_effective()}:{" "}
         <TempDisplayWrapper>
           <TemperatureDisplay
             value={props.effectiveTemp}

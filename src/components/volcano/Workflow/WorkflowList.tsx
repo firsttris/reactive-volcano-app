@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "@solidjs/router";
 import { FiEdit2, FiPlus, FiSave, FiTrash2, FiX } from "solid-icons/fi";
 import { For, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../../../i18n/utils";
+import { m } from "../../../paraglide/messages";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { buildRoute } from "../../../routes";
 import { Button } from "../../Button";
@@ -156,7 +156,6 @@ const EmptyState = styled("div")`
 
 export const WorkflowList = () => {
   const workflow = useWorkflowContext();
-  const t = useTranslations();
   const {
     deleteWorkflowStepFromList,
     workflowSteps,
@@ -170,10 +169,10 @@ export const WorkflowList = () => {
   return (
     <Container>
       <Card>
-        <Title>{t("editWorkflowSteps")}</Title>
+        <Title>{m.workflow_editSteps()}</Title>
         <Show
           when={workflowSteps().length > 0}
-          fallback={<EmptyState>{t("noStepsYet")}</EmptyState>}
+          fallback={<EmptyState>{m.workflow_noSteps()}</EmptyState>}
         >
           <StepList>
             <For each={workflowSteps()}>
@@ -181,15 +180,15 @@ export const WorkflowList = () => {
                 <StepItem>
                   <StepContent>
                     <StepDetails>
-                      <StepLabel>{t("temperature")}</StepLabel>
+                      <StepLabel>{m.workflow_temperature()}</StepLabel>
                       <StepValue>{workflowItem.temperature}°C</StepValue>
                     </StepDetails>
                     <StepDetails>
-                      <StepLabel>{t("holdTime")}</StepLabel>
+                      <StepLabel>{m.workflow_holdTime()}</StepLabel>
                       <StepValue>{workflowItem.holdTimeInSeconds}</StepValue>
                     </StepDetails>
                     <StepDetails>
-                      <StepLabel>{t("pumpTime")}</StepLabel>
+                      <StepLabel>{m.workflow_pumpTime()}</StepLabel>
                       <StepValue>{workflowItem.pumpTimeInSeconds}</StepValue>
                     </StepDetails>
                     <StepActions>
@@ -227,11 +226,11 @@ export const WorkflowList = () => {
         <ButtonGroup>
           <StyledButton onClick={() => navigate(buildRoute.volcanoRoot())}>
             <FiX size={20} />
-            {t("cancel")}
+            {m.common_cancel()}
           </StyledButton>
           <StyledButton onClick={() => addNewWorkflowStep()}>
             <FiPlus size={20} />
-            {t("add")}
+            {m.common_add()}
           </StyledButton>
           <StyledButton
             onClick={() => {
@@ -242,7 +241,7 @@ export const WorkflowList = () => {
             }}
           >
             <FiSave size={20} />
-            {t("save")}
+            {m.common_save()}
           </StyledButton>
         </ButtonGroup>
       </Card>

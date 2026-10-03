@@ -105,9 +105,9 @@ describe("Volcano analysis", () => {
       brightness: 20,
     });
     expect(result.findings).toEqual([
-      "analysisDisplayOnCoolingDisabled",
-      "analysisVibrationDisabled",
-      "analysisLowBrightness",
+      "analysis_finding_displayOnCoolingDisabled",
+      "analysis_finding_vibrationDisabled",
+      "analysis_finding_lowBrightness",
     ]);
   });
 });

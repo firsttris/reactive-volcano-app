@@ -1,6 +1,6 @@
 import { FaSolidMinus, FaSolidPlus } from "solid-icons/fa";
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../../i18n/utils";
+import { m } from "../../paraglide/messages";
 import { WideButton } from "../Button";
 import { RepeatButton } from "../RepeatButton";
 import { TemperatureDisplay } from "../TemperatureDisplay";
@@ -127,11 +127,10 @@ interface MainTemperatureControlProps {
 }
 
 export const MainTemperatureControl = (props: MainTemperatureControlProps) => {
-  const t = useTranslations();
   return (
     <TemperatureCard>
       <TempDisplay>
-        <TempLabel>{t("targetTemperature")}</TempLabel>
+        <TempLabel>{m.temperature_target()}</TempLabel>
         <DigitalText
           isHeating={props.isHeating}
           setpointReached={props.setpointReached}
@@ -146,7 +145,7 @@ export const MainTemperatureControl = (props: MainTemperatureControlProps) => {
       <TempControls>
         <RepeatButton
           onStep={() => props.onAdjustTemperature(-1)}
-          aria-label={t("decreaseTemperature")}
+          aria-label={m.temperature_decrease()}
         >
           <FaSolidMinus />
         </RepeatButton>
@@ -158,7 +157,7 @@ export const MainTemperatureControl = (props: MainTemperatureControlProps) => {
 
         <RepeatButton
           onStep={() => props.onAdjustTemperature(1)}
-          aria-label={t("increaseTemperature")}
+          aria-label={m.temperature_increase()}
         >
           <FaSolidPlus />
         </RepeatButton>

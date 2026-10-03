@@ -8,7 +8,7 @@ import {
 } from "solid-js";
 import { styled } from "solid-styled-components";
 import type { AnalysisResult } from "../devices/shared/analysis";
-import { useTranslations } from "../i18n/utils";
+import { m } from "../paraglide/messages";
 import { Button } from "./Button";
 
 const Container = styled("div")`
@@ -68,7 +68,6 @@ type AnalysisState =
 export const AnalysisSection: Component<{
   run: () => Promise<AnalysisResult>;
 }> = (props) => {
-  const t = useTranslations();
   const [analysis, setAnalysis] = createSignal<AnalysisState>({
     kind: "idle",
   });
@@ -96,12 +95,12 @@ export const AnalysisSection: Component<{
         onClick={start}
       >
         {analysis().kind === "running"
-          ? t("analysisRunning")
-          : t("startAnalysis")}
+          ? m.analysis_running()
+          : m.analysis_start()}
       </StartButton>
       <Switch>
         <Match when={analysis().kind === "failed"}>
-          <Message>{t("analysisFailed")}</Message>
+          <Message>{m.analysis_failed()}</Message>
         </Match>
         <Match when={result()}>
           {(done) => (
@@ -110,18 +109,18 @@ export const AnalysisSection: Component<{
                 <Match when={done().findings.length > 0}>
                   <FindingList>
                     <For each={done().findings}>
-                      {(finding) => <li>{t(finding)}</li>}
+                      {(finding) => <li>{m[finding]()}</li>}
                     </For>
                   </FindingList>
                 </Match>
                 <Match when={!done().errorReport}>
-                  <Message>{t("analysisOk")}</Message>
+                  <Message>{m.analysis_ok()}</Message>
                 </Match>
               </Switch>
               <Show when={done().errorReport}>
                 {(report) => (
                   <>
-                    <Message>{t("analysisContactSupport")}</Message>
+                    <Message>{m.analysis_contactSupport()}</Message>
                     <Report>{report()}</Report>
                   </>
                 )}

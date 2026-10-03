@@ -5,7 +5,7 @@ import {
 import { VsColorMode, VsLoading } from "solid-icons/vs";
 import { createSignal, onCleanup, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../i18n/utils";
+import { m } from "../paraglide/messages";
 import { useBluetooth } from "../provider/BluetoothProvider";
 import { useDarkMode } from "../provider/DarkModeProvider";
 import { ConnectionState, DeviceType } from "../utils/uuids";
@@ -197,7 +197,6 @@ const DisconnectButton = styled("button")<{ confirming: boolean }>`
 export const ConnectionBar = () => {
   const { disconnect, connectionState, deviceInfo } = useBluetooth();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
-  const t = useTranslations();
 
   const isAnyDeviceConnected = () =>
     connectionState() === ConnectionState.CONNECTED;
@@ -238,7 +237,7 @@ export const ConnectionBar = () => {
             />
           </BluetoothIcon>
           <ConnectionDetails>
-            <StatusText>{t("deviceNotConnected")}</StatusText>
+            <StatusText>{m.connection_notConnected()}</StatusText>
           </ConnectionDetails>
         </ConnectionInfo>
       </Show>
@@ -252,7 +251,7 @@ export const ConnectionBar = () => {
             />
           </BluetoothIcon>
           <ConnectionDetails>
-            <StatusText>{t("connectingToDevice")}</StatusText>
+            <StatusText>{m.connection_connecting()}</StatusText>
           </ConnectionDetails>
         </ConnectionInfo>
       </Show>
@@ -276,12 +275,12 @@ export const ConnectionBar = () => {
               <DeviceDetails>
                 <Show when={getSerialNumber()}>
                   <SerialNumber>
-                    {t("serialNumber")}: {getSerialNumber()}
+                    {m.device_serialNumber()}: {getSerialNumber()}
                   </SerialNumber>
                 </Show>
                 <Show when={deviceInfo().firmwareVersion}>
                   <FirmwareVersion>
-                    {t("firmwareVersion")}: {deviceInfo().firmwareVersion}
+                    {m.device_firmware()}: {deviceInfo().firmwareVersion}
                   </FirmwareVersion>
                 </Show>
               </DeviceDetails>
@@ -292,14 +291,16 @@ export const ConnectionBar = () => {
             confirming={confirming()}
             onClick={handleDisconnect}
           >
-            {confirming() ? t("confirmDisconnect") : t("disconnect")}
+            {confirming()
+              ? m.connection_confirmDisconnect()
+              : m.connection_disconnect()}
           </DisconnectButton>
         </ConnectionInfo>
       </Show>
 
       <IconButton
         type="button"
-        aria-label={t("darkMode")}
+        aria-label={m.settings_darkMode()}
         aria-pressed={isDarkMode()}
         onClick={() => toggleDarkMode(!isDarkMode())}
       >

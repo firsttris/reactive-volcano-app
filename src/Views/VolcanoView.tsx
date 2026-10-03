@@ -13,7 +13,7 @@ import { Temperature } from "../components/volcano/Temperature";
 import { TemperatureUnitSwitch } from "../components/volcano/TemperatureUnitSwitch";
 import { VibrationSwitch } from "../components/volcano/VibrationSwitch";
 import { WorkFlowSection } from "../components/volcano/Workflow/WorkflowSection";
-import { useTranslations } from "../i18n/utils";
+import { m } from "../paraglide/messages";
 import { useBluetooth } from "../provider/BluetoothProvider";
 import { buildRoute } from "../routes";
 import { ConnectionState } from "../utils/uuids";
@@ -43,7 +43,6 @@ const SwitchContainer = styled("div")`
 `;
 
 export const VolcanoView: Component = () => {
-  const t = useTranslations();
   const navigate = useNavigate();
   const { connectionState } = useBluetooth();
 
@@ -73,7 +72,7 @@ export const VolcanoView: Component = () => {
       <WorkFlowSection />
 
       {/* Settings */}
-      <CollapsibleCard title={t("settings")} storageKey="volcano-settings">
+      <CollapsibleCard title={m.settings_title()} storageKey="volcano-settings">
         <SettingItem>
           <AutoShutdownSlider />
         </SettingItem>

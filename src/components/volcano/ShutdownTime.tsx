@@ -1,5 +1,5 @@
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../../i18n/utils";
+import { m } from "../../paraglide/messages";
 import { useVolcano } from "../../provider/VolcanoProvider";
 
 interface StyledDivProps {
@@ -24,13 +24,9 @@ const StyledDiv = styled("div")<StyledDivProps>`
 export const ShutdownTime = () => {
   const { state, derived } = useVolcano();
 
-  const t = useTranslations();
-
   return (
     <StyledDiv isVisible={derived.isAutoShutdownActive()}>
-      <div>
-        {t("deviceWillShutdownIn")} {state.autoOffRemaining} {t("sec")}
-      </div>
+      <div>{m.device_shutdownIn({ seconds: state.autoOffRemaining })}</div>
     </StyledDiv>
   );
 };

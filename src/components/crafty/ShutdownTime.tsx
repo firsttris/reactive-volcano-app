@@ -1,6 +1,6 @@
 import { Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../../i18n/utils";
+import { m } from "../../paraglide/messages";
 import { useCrafty } from "../../provider/CraftyProvider";
 
 const StyledDiv = styled("div")`
@@ -24,7 +24,6 @@ const StyledDiv = styled("div")`
  */
 export const ShutdownTime = () => {
   const { state, derived, isOldFirmware } = useCrafty();
-  const t = useTranslations();
 
   const isVisible = () =>
     !isOldFirmware &&
@@ -36,7 +35,7 @@ export const ShutdownTime = () => {
     <Show when={isVisible()}>
       <StyledDiv>
         <div>
-          {t("deviceWillShutdownIn")} {state.autoOffRemaining} {t("sec")}
+          {m.device_shutdownIn({ seconds: state.autoOffRemaining ?? 0 })}
         </div>
       </StyledDiv>
     </Show>

@@ -1,7 +1,7 @@
 import { type Component, createSignal, Show } from "solid-js";
 import { styled } from "solid-styled-components";
 import { Limits } from "../../devices/crafty/protocol";
-import { useTranslations } from "../../i18n/utils";
+import { m } from "../../paraglide/messages";
 import { useCrafty } from "../../provider/CraftyProvider";
 import { AnalysisSection } from "../AnalysisSection";
 import { Button } from "../Button";
@@ -158,8 +158,6 @@ export const Settings: Component = () => {
     isOldFirmware,
     isCraftyPlus,
   } = useCrafty();
-
-  const t = useTranslations();
   const [showResetModal, setShowResetModal] = createSignal(false);
 
   const handleFactoryReset = () => {
@@ -169,7 +167,7 @@ export const Settings: Component = () => {
 
   return (
     <>
-      <CollapsibleCard title={t("settings")} storageKey="crafty-settings">
+      <CollapsibleCard title={m.settings_title()} storageKey="crafty-settings">
         {/* Boost Temperature */}
         <SettingItem>
           <SettingLabel>Boost Temperature</SettingLabel>
@@ -185,45 +183,45 @@ export const Settings: Component = () => {
 
         {/* LED Brightness */}
         <SettingItem>
-          <SettingLabel>{t("deviceBrightness")}</SettingLabel>
+          <SettingLabel>{m.settings_deviceBrightness()}</SettingLabel>
           <Slider
             min={Limits.MIN_BRIGHTNESS}
             max={Limits.MAX_BRIGHTNESS}
             step={10}
             value={state.ledBrightness}
-            label={`${t("deviceBrightness")}: ${state.ledBrightness} %`}
+            label={`${m.settings_deviceBrightness()}: ${state.ledBrightness} %`}
             onInput={actions.setLedBrightness}
           />
         </SettingItem>
 
         {/* Vibration */}
         <SettingItem>
-          <SettingLabel>{t("vibration")}</SettingLabel>
+          <SettingLabel>{m.settings_vibration()}</SettingLabel>
           <Switch
             isOn={derived.isVibrationOn()}
             onToggle={actions.setVibration}
-            label={t("enableVibration")}
+            label={m.settings_enableVibration()}
           />
         </SettingItem>
 
         {/* Charge Indicator LED */}
         <SettingItem>
-          <SettingLabel>{t("chargeIndicatorLamp")}</SettingLabel>
+          <SettingLabel>{m.settings_chargeIndicatorLamp()}</SettingLabel>
           <Switch
             isOn={derived.isChargeLedOn()}
             onToggle={actions.setChargeLed}
-            label={t("enableChargeLed")}
+            label={m.settings_enableChargeLed()}
           />
         </SettingItem>
 
         {/* Permanent Bluetooth - not on old firmware */}
         <Show when={!isOldFirmware}>
           <SettingItem>
-            <SettingLabel>{t("permanentBluetooth")}</SettingLabel>
+            <SettingLabel>{m.settings_permanentBluetooth()}</SettingLabel>
             <Switch
               isOn={derived.isPermanentBluetooth()}
               onToggle={actions.setPermanentBluetooth}
-              label={t("keepBluetoothAlwaysOn")}
+              label={m.settings_keepBluetoothAlwaysOn()}
             />
           </SettingItem>
         </Show>
@@ -231,18 +229,18 @@ export const Settings: Component = () => {
         {/* Find My Device - only Crafty+ */}
         <Show when={isCraftyPlus}>
           <SettingItem>
-            <SettingLabel>{t("locateDevice")}</SettingLabel>
+            <SettingLabel>{m.settings_locateDevice()}</SettingLabel>
             <ResetButtonContainer>
               <ActionButton
                 type="button"
                 disabled={derived.isFindMyActive()}
                 onClick={actions.findMyDevice}
               >
-                {t("findMyDevice")}
+                {m.settings_findMyDevice()}
               </ActionButton>
             </ResetButtonContainer>
             <Show when={derived.isFindMyActive()}>
-              <HintText>{t("findMyDeviceRunning")}</HintText>
+              <HintText>{m.settings_findMyDeviceRunning()}</HintText>
             </Show>
           </SettingItem>
         </Show>
@@ -251,13 +249,13 @@ export const Settings: Component = () => {
         {!isOldFirmware && (
           <>
             <SettingItem>
-              <SettingLabel>{t("autoMaticShutdownTime")}</SettingLabel>
+              <SettingLabel>{m.settings_autoShutdownTime()}</SettingLabel>
               <Slider
                 min={Limits.MIN_AUTO_OFF}
                 max={Limits.MAX_AUTO_OFF}
                 step={30}
                 value={state.autoOffCountdown ?? Limits.MIN_AUTO_OFF}
-                label={`${t("autoMaticShutdownTime")}: ${state.autoOffCountdown ?? "-"} s`}
+                label={`${m.settings_autoShutdownTime()}: ${state.autoOffCountdown ?? "-"} s`}
                 onInput={actions.setAutoOffCountdown}
               />
             </SettingItem>
@@ -346,7 +344,7 @@ export const Settings: Component = () => {
         {/* Analysis - not on old firmware */}
         <Show when={!isOldFirmware}>
           <SettingItem>
-            <SettingLabel>{t("analysis")}</SettingLabel>
+            <SettingLabel>{m.analysis_title()}</SettingLabel>
             <AnalysisSection run={actions.runAnalysis} />
           </SettingItem>
         </Show>

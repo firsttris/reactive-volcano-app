@@ -187,29 +187,29 @@ export const analyzeCrafty = (input: CraftyAnalysisInput): AnalysisResult => {
 
   const findings: AnalysisFinding[] = [];
   if (hasBit(input.akkuStatus, AnalysisMask.AKKU_TOO_HOT)) {
-    findings.push("analysisCoolDown");
+    findings.push("analysis_finding_coolDown");
   } else if (hasBit(input.akkuStatus, AnalysisMask.AKKU_EMPTY)) {
-    findings.push("analysisChargeDevice");
+    findings.push("analysis_finding_chargeDevice");
   } else if (hasBit(input.akkuStatus2, AnalysisMask.AKKU2_BAD_CHARGER)) {
-    findings.push("analysisUseOtherCharger");
+    findings.push("analysis_finding_useOtherCharger");
   }
   const register2 = input.statusRegister2;
   if (hasBit(register2, StatusRegister2Bit.DISABLE_VIBRATION)) {
-    findings.push("analysisVibrationDisabled");
+    findings.push("analysis_finding_vibrationDisabled");
   }
   if (hasBit(register2, StatusRegister2Bit.DISABLE_CHARGE_LED)) {
-    findings.push("analysisLedDisabled");
+    findings.push("analysis_finding_ledDisabled");
   }
   if (hasBit(register2, StatusRegister2Bit.ENABLE_AUTO_BLE_SHUTDOWN)) {
-    findings.push("analysisBluetoothAlwaysOn");
+    findings.push("analysis_finding_bluetoothAlwaysOn");
   }
   if (
     hasBit(input.projectRegister, ProjectRegisterBit.FACTORY_RESET_REQUIRED)
   ) {
-    findings.push("analysisFactoryResetNeeded");
+    findings.push("analysis_finding_factoryResetNeeded");
   }
   if (input.ledBrightness < LOW_BRIGHTNESS) {
-    findings.push("analysisLowBrightness");
+    findings.push("analysis_finding_lowBrightness");
   }
   return { errorReport: null, findings };
 };

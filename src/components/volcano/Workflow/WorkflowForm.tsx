@@ -7,7 +7,7 @@ import {
   createSignal,
 } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../../../i18n/utils";
+import { m } from "../../../paraglide/messages";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { buildRoute } from "../../../routes";
 import { Button } from "../../Button";
@@ -87,8 +87,6 @@ export const WorkflowForm: Component = () => {
     setPumpTime(step.pumpTimeInSeconds);
   });
 
-  const t = useTranslations();
-
   const handleSubmit = (event: Event) => {
     event.preventDefault();
     if (!workflowListId || !workflowStepId) return;
@@ -104,12 +102,12 @@ export const WorkflowForm: Component = () => {
   return (
     <Container>
       <Card>
-        <Title>{t("editStep")}</Title>
+        <Title>{m.workflow_editStep()}</Title>
         <Form onSubmit={handleSubmit}>
           <SliderSection>
             <Slider
               value={temperature()}
-              label={`${t("temperature")}: ${temperature()} °C`}
+              label={`${m.workflow_temperature()}: ${temperature()} °C`}
               min={150}
               step={5}
               max={230}
@@ -119,7 +117,7 @@ export const WorkflowForm: Component = () => {
           <SliderSection>
             <Slider
               value={holdTime()}
-              label={`${t("holdTime")}: ${holdTime()} ${t("sec")}`}
+              label={m.workflow_holdTimeSeconds({ seconds: holdTime() })}
               min={0}
               step={5}
               max={60}
@@ -129,7 +127,7 @@ export const WorkflowForm: Component = () => {
           <SliderSection>
             <Slider
               value={pumpTime()}
-              label={`${t("pumpTime")}: ${pumpTime()} ${t("sec")}`}
+              label={m.workflow_pumpTimeSeconds({ seconds: pumpTime() })}
               min={0}
               step={5}
               max={60}
@@ -145,11 +143,11 @@ export const WorkflowForm: Component = () => {
               }
             >
               <FiX size={20} />
-              {t("cancel")}
+              {m.common_cancel()}
             </StyledButton>
             <StyledButton type="submit">
               <FiSave size={20} />
-              {t("save")}
+              {m.common_save()}
             </StyledButton>
           </ButtonGroup>
         </Form>
