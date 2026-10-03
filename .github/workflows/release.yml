@@ -1,0 +1,22 @@
+name: Release
+
+# Pushing a tag vX.Y.Z (npm run release:minor) publishes that version through the shared Docker
+# release from firsttris/workflows: the tag must match package.json, the image is pushed as :x.y.z,
+# :x.y and :latest, the Docker Hub description is updated, then the GitHub release is created.
+# Run by hand on main: the image as :edge, nothing is released.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  docker:
+    uses: firsttris/workflows/.github/workflows/docker-release.yml@v1
+    with:
+      image: tristanteu/reactive-volcano-app
+      description: Control Storz & Bickel vaporizers (Volcano, Crafty, Venty, Veazy) via Web Bluetooth
+      dockerfile: Dockerfile
+    secrets: inherit
+    permissions:
+      contents: write
+      packages: write
