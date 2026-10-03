@@ -6,7 +6,7 @@ import { Card } from "../components/Card";
 import { DeviceInfo } from "../components/veazy-venty/DeviceInfo";
 import { Settings } from "../components/veazy-venty/Settings";
 import { Temperature } from "../components/veazy-venty/Temperature";
-import { useTranslations } from "../i18n/utils";
+import { m } from "../paraglide/messages";
 import { useBluetooth } from "../provider/BluetoothProvider";
 import {
   useVentyVeazy,
@@ -125,16 +125,15 @@ const FindMyButton = styled(Button)`
  */
 const FindMyDeviceBanner: Component = () => {
   const { actions } = useVentyVeazy();
-  const t = useTranslations();
 
   return (
     <Card>
       <FindMyContainer>
-        <FindMyTitle>{t("findMyDeviceEnabled")}</FindMyTitle>
+        <FindMyTitle>{m.device_findMyDeviceEnabled()}</FindMyTitle>
         <FindMyButton type="button" onClick={actions.triggerFindMyDevice}>
-          {t("findMyDevice")}
+          {m.settings_findMyDevice()}
         </FindMyButton>
-        <FindMyHint>{t("findMyDeviceSwitchOnHint")}</FindMyHint>
+        <FindMyHint>{m.device_findMyDeviceSwitchOnHint()}</FindMyHint>
       </FindMyContainer>
     </Card>
   );
@@ -142,7 +141,6 @@ const FindMyDeviceBanner: Component = () => {
 
 const VentyVeazyViewContent: Component = () => {
   const { state } = useVentyVeazy();
-  const t = useTranslations();
 
   return (
     <Show when={!state.findMyDeviceActive} fallback={<FindMyDeviceBanner />}>
@@ -155,8 +153,8 @@ const VentyVeazyViewContent: Component = () => {
         {/* Battery Level Display */}
         <BatteryContainer>
           <BatteryLabel>
-            {t("battery")}: {state.status?.batteryLevel ?? 0}%{" "}
-            {state.status?.isCharging ? t("charging") : ""}
+            {m.device_battery()}: {state.status?.batteryLevel ?? 0}%{" "}
+            {state.status?.isCharging ? m.device_charging() : ""}
           </BatteryLabel>
           <BatteryBar charging={state.status?.isCharging ?? false}>
             <BatteryFill

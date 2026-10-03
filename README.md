@@ -203,6 +203,14 @@ npm test             # Unit tests (Vitest)
 npm run test:e2e     # End-to-end tests (Playwright)
 ```
 
+**Translations:** the texts live in `messages/en.json` and `messages/de.json`
+([Paraglide JS](https://inlang.com/m/gerre34r/library-inlang-paraglideJs)).
+Components call them as typed functions (`m.settings_title()`), keys follow
+`area_group_name`. `npm run i18n` compiles them to `src/paraglide` (dev, build,
+typecheck and test do that on their own). The browser language decides,
+English otherwise. `tests/i18n.test.ts` checks that both files have the same
+keys and placeholders and that every message is used.
+
 </details>
 
 ### 🐛 Remote Debugging on Android

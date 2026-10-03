@@ -148,13 +148,13 @@ export const analyzeVolcano = (input: VolcanoAnalysisInput): AnalysisResult => {
 
   const findings: AnalysisFinding[] = [];
   if (hasBit(input.register2, Register2Bit.DISPLAY_ON_COOLING_DISABLED)) {
-    findings.push("analysisDisplayOnCoolingDisabled");
+    findings.push("analysis_finding_displayOnCoolingDisabled");
   }
   if (hasBit(input.register3, Register3Bit.VIBRATION_DISABLED)) {
-    findings.push("analysisVibrationDisabled");
+    findings.push("analysis_finding_vibrationDisabled");
   }
   if (input.brightness < LOW_BRIGHTNESS) {
-    findings.push("analysisLowBrightness");
+    findings.push("analysis_finding_lowBrightness");
   }
   return { errorReport: null, findings };
 };

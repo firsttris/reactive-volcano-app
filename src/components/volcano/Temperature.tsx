@@ -1,7 +1,7 @@
 import { FaSolidMinus, FaSolidPlus } from "solid-icons/fa";
 import { styled } from "solid-styled-components";
 import { Limits } from "../../devices/volcano/protocol";
-import { useTranslations } from "../../i18n/utils";
+import { m } from "../../paraglide/messages";
 import { useVolcano } from "../../provider/VolcanoProvider";
 import { convertCelsiusToFahrenheit } from "../../utils/bluetoothUtils";
 import { HeatProgress } from "../HeatProgress";
@@ -69,8 +69,6 @@ export const Temperature = () => {
   const toDisplayUnit = (celsius: number) =>
     isCelsius() ? celsius : convertCelsiusToFahrenheit(celsius);
 
-  const t = useTranslations();
-
   const increaseTemperature = () => {
     actions.setTargetTemp(state.targetTemp + 1);
   };
@@ -82,7 +80,7 @@ export const Temperature = () => {
   return (
     <FlexContainer>
       <TempDisplay>
-        <TempLabel>{t("currentTemperature")}</TempLabel>
+        <TempLabel>{m.temperature_current()}</TempLabel>
         <DigitalText>
           <TemperatureDisplay
             value={toDisplayUnit(state.currentTemp)}
@@ -99,7 +97,7 @@ export const Temperature = () => {
         <RepeatButton
           onStep={decreaseTemperature}
           disabled={state.targetTemp <= Limits.MIN_TEMP}
-          aria-label={t("decreaseTemperature")}
+          aria-label={m.temperature_decrease()}
         >
           <FaSolidMinus size="24px" />
         </RepeatButton>
@@ -112,7 +110,7 @@ export const Temperature = () => {
         <RepeatButton
           onStep={increaseTemperature}
           disabled={state.targetTemp >= Limits.MAX_TEMP}
-          aria-label={t("increaseTemperature")}
+          aria-label={m.temperature_increase()}
         >
           <FaSolidPlus size="24px" />
         </RepeatButton>

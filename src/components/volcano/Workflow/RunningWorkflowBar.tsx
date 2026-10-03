@@ -1,7 +1,7 @@
 import { FiSquare } from "solid-icons/fi";
 import { createSignal, onCleanup, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../../../i18n/utils";
+import { m } from "../../../paraglide/messages";
 import { useVolcano } from "../../../provider/VolcanoProvider";
 import { useWorkflowRunner } from "../../../provider/WorkflowRunnerProvider";
 import { convertCelsiusToFahrenheit } from "../../../utils/bluetoothUtils";
@@ -89,7 +89,6 @@ const Progress = styled("div")`
 export const RunningWorkflowBar = () => {
   const runner = useWorkflowRunner();
   const { derived } = useVolcano();
-  const t = useTranslations();
 
   const [now, setNow] = createSignal(Date.now());
   const timer = setInterval(() => setNow(Date.now()), 500);
@@ -108,10 +107,11 @@ export const RunningWorkflowBar = () => {
     const phase = runner.phase();
     if (!phase) return "";
     if (phase.type === "heating") {
-      return `${t("heatingTo")} ${formatTemp(phase.targetTemp)}`;
+      return `${m.workflow_heatingTo()} ${formatTemp(phase.targetTemp)}`;
     }
     const seconds = Math.max(0, Math.ceil((phase.endsAt - now()) / 1000));
-    const label = phase.type === "holding" ? t("holding") : t("pumping");
+    const label =
+      phase.type === "holding" ? m.workflow_holding() : m.workflow_pumping();
     return `${label} ${formatDuration(seconds)}`;
   };
 
@@ -124,7 +124,10 @@ export const RunningWorkflowBar = () => {
           <Info>
             <Name>{runner.runningWorkflow()?.name}</Name>
             <Detail>
-              {t("step")} {runner.currentStep() + 1}/{totalSteps()}
+              {m.workflow_stepOf({
+                current: runner.currentStep() + 1,
+                total: totalSteps(),
+              })}
               <Show when={phaseText()}>
                 {" · "}
                 <PhaseText>{phaseText()}</PhaseText>
@@ -133,7 +136,7 @@ export const RunningWorkflowBar = () => {
           </Info>
           <StopButton type="button" onClick={() => runner.stop()}>
             <FiSquare size={16} />
-            {t("stop")}
+            {m.common_stop()}
           </StopButton>
         </Content>
       </Bar>

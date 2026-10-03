@@ -1,6 +1,6 @@
 import { type Component, createSignal, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../../i18n/utils";
+import { m } from "../../paraglide/messages";
 import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
 import { AnalysisSection } from "../AnalysisSection";
 import { Button } from "../Button";
@@ -102,8 +102,6 @@ const ModalButton = styled(Button)<{ variant?: "danger" | "cancel" }>`
 export const Settings: Component = () => {
   const { state, actions, model } = useVentyVeazy();
 
-  const t = useTranslations();
-
   const [showResetModal, setShowResetModal] = createSignal(false);
   const [localBrightness, setLocalBrightness] = createSignal(5);
 
@@ -120,10 +118,13 @@ export const Settings: Component = () => {
   };
 
   return (
-    <CollapsibleCard title={t("settings")} storageKey="venty-veazy-settings">
+    <CollapsibleCard
+      title={m.settings_title()}
+      storageKey="venty-veazy-settings"
+    >
       {/* LED Brightness - Common for both Venty & Veazy */}
       <SettingItem>
-        <SettingLabel>{t("ledBrightness")}</SettingLabel>
+        <SettingLabel>{m.settings_ledBrightness()}</SettingLabel>
         <Slider
           value={state.brightnessVibration?.brightness ?? localBrightness()}
           onInput={handleBrightnessChange}
@@ -132,7 +133,7 @@ export const Settings: Component = () => {
           step={1}
           label={
             <span>
-              {t("brightness")}:{" "}
+              {m.settings_brightness()}:{" "}
               {state.brightnessVibration?.brightness ?? localBrightness()}
             </span>
           }
@@ -141,84 +142,88 @@ export const Settings: Component = () => {
 
       {/* Vibration - Common for both Venty & Veazy */}
       <SettingItem>
-        <SettingLabel>{t("vibration")}</SettingLabel>
+        <SettingLabel>{m.settings_vibration()}</SettingLabel>
         <Switch
           isOn={state.brightnessVibration?.vibration ?? false}
           onToggle={actions.setVibration}
-          label={t("enableVibration")}
+          label={m.settings_enableVibration()}
         />
       </SettingItem>
 
       {/* Permanent Bluetooth - Only Veazy */}
       <Show when={isVeazy()}>
         <SettingItem>
-          <SettingLabel>{t("permanentBluetooth")}</SettingLabel>
+          <SettingLabel>{m.settings_permanentBluetooth()}</SettingLabel>
           <Switch
             isOn={state.status?.permanentBluetooth ?? false}
             onToggle={actions.setPermanentBluetooth}
-            label={t("keepBluetoothAlwaysOn")}
+            label={m.settings_keepBluetoothAlwaysOn()}
           />
         </SettingItem>
       </Show>
 
       {/* Charge Current Optimization - Common but primarily Venty */}
       <SettingItem>
-        <SettingLabel>{t("chargeCurrentOptimization")}</SettingLabel>
+        <SettingLabel>{m.settings_chargeCurrentOptimization()}</SettingLabel>
         <Switch
           isOn={state.status?.chargeCurrentOptimization ?? false}
           onToggle={actions.setChargeCurrentOptimization}
-          label={t("optimizeChargingCurrent")}
+          label={m.settings_optimizeChargingCurrent()}
         />
       </SettingItem>
 
       {/* Charge Voltage Limit - Common but primarily Venty */}
       <SettingItem>
-        <SettingLabel>{t("chargeVoltageLimit")}</SettingLabel>
+        <SettingLabel>{m.settings_chargeVoltageLimit()}</SettingLabel>
         <Switch
           isOn={state.status?.chargeVoltageLimit ?? false}
           onToggle={actions.setChargeVoltageLimit}
-          label={t("limitChargingVoltage")}
+          label={m.settings_limitChargingVoltage()}
         />
       </SettingItem>
 
       {/* Boost & Superboost Visualization - Common for both */}
       <SettingItem>
-        <SettingLabel>{t("boostSuperboostVisualization")}</SettingLabel>
+        <SettingLabel>{m.settings_boostSuperboostVisualization()}</SettingLabel>
         <Switch
           isOn={state.status?.boostVisualization ?? false}
           onToggle={actions.setBoostVisualization}
-          label={t("enableBoostLedVisualization")}
+          label={m.settings_enableBoostLedVisualization()}
         />
       </SettingItem>
 
       {/* Boost/Superboost Timeout - Both Venty (FW 8+) and Veazy */}
 
       <SettingItem>
-        <SettingLabel>{t("permanentBoost")}</SettingLabel>
+        <SettingLabel>{m.settings_permanentBoost()}</SettingLabel>
         <Switch
           isOn={state.brightnessVibration?.boostTimeoutDisabled ?? false}
           onToggle={actions.setBoostTimeoutDisabled}
-          label={t("deactivateBoostTimeout")}
+          label={m.settings_deactivateBoostTimeout()}
         />
       </SettingItem>
 
       {/* Temperature Unit - Common for both */}
       <SettingItem>
-        <SettingLabel>{t("temperatureUnit")}</SettingLabel>
+        <SettingLabel>{m.settings_temperatureUnit()}</SettingLabel>
         <Switch
           isOn={state.status?.isCelsius ?? true}
           onToggle={actions.setIsCelsius}
-          label={state.status?.isCelsius ? t("celsius") : t("fahrenheit")}
+          label={
+            state.status?.isCelsius
+              ? m.settings_celsius()
+              : m.settings_fahrenheit()
+          }
         />
       </SettingItem>
 
       {/* Find My Device - only Veazy (like the legacy app) */}
       <Show when={isVeazy()}>
         <SettingItem>
-          <SettingLabel>{t("locateDevice")}</SettingLabel>
+          <SettingLabel>{m.settings_locateDevice()}</SettingLabel>
           <ResetButtonContainer>
             <ActionButton type="button" onClick={actions.triggerFindMyDevice}>
-              {t("findMyDevice")}
+              {m.settings_findMyDevice()}
             </ActionButton>
           </ResetButtonContainer>
         </SettingItem>
@@ -226,16 +231,16 @@ export const Settings: Component = () => {
 
       {/* Analysis */}
       <SettingItem>
-        <SettingLabel>{t("analysis")}</SettingLabel>
+        <SettingLabel>{m.analysis_title()}</SettingLabel>
         <AnalysisSection run={actions.runAnalysis} />
       </SettingItem>
 
       {/* Factory Reset Button */}
       <SettingItem>
-        <SettingLabel>{t("factoryReset")}</SettingLabel>
+        <SettingLabel>{m.settings_factoryReset()}</SettingLabel>
         <ResetButtonContainer>
           <ResetButton onClick={() => setShowResetModal(true)}>
-            {t("reset")}
+            {m.common_reset()}
           </ResetButton>
         </ResetButtonContainer>
       </SettingItem>
@@ -243,17 +248,17 @@ export const Settings: Component = () => {
       {/* Factory Reset Confirmation Modal */}
       <Modal isOpen={showResetModal()}>
         <ModalContent>
-          <ModalTitle>{t("factoryReset")}</ModalTitle>
-          <ModalText>{t("factoryResetConfirm")}</ModalText>
+          <ModalTitle>{m.settings_factoryReset()}</ModalTitle>
+          <ModalText>{m.settings_factoryResetConfirm()}</ModalText>
           <ModalButtonGroup>
             <ModalButton
               variant="cancel"
               onClick={() => setShowResetModal(false)}
             >
-              {t("cancel")}
+              {m.common_cancel()}
             </ModalButton>
             <ModalButton variant="danger" onClick={handleFactoryReset}>
-              {t("reset")}
+              {m.common_reset()}
             </ModalButton>
           </ModalButtonGroup>
         </ModalContent>

@@ -1,7 +1,7 @@
 import { FaSolidWind } from "solid-icons/fa";
 import { SiFireship } from "solid-icons/si";
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../../i18n/utils";
+import { m } from "../../paraglide/messages";
 import { useVolcano } from "../../provider/VolcanoProvider";
 import { ActiveRoundButton, ToggleWithLabel } from "../Button";
 
@@ -32,7 +32,6 @@ const TextContainer = styled("div")`
 
 export const HeatAndPump = () => {
   const { actions, derived } = useVolcano();
-  const t = useTranslations();
 
   const toggleHeat = () => actions.setHeater(!derived.isHeating());
   const togglePump = () => actions.setPump(!derived.isPumpActive());
@@ -44,25 +43,25 @@ export const HeatAndPump = () => {
           type="button"
           isActive={derived.isHeating()}
           aria-pressed={derived.isHeating()}
-          aria-label={t("heater")}
+          aria-label={m.heat_heater()}
           onClick={toggleHeat}
         >
           <SiFireship size="30px" />
         </ActiveRoundButton>
-        {t("heater")}
+        {m.heat_heater()}
       </ToggleWithLabel>
-      <TextContainer>{t("hybrid")}</TextContainer>
+      <TextContainer>{m.heat_hybrid()}</TextContainer>
       <ToggleWithLabel isActive={derived.isPumpActive()}>
         <ActiveRoundButton
           type="button"
           isActive={derived.isPumpActive()}
           aria-pressed={derived.isPumpActive()}
-          aria-label={t("pump")}
+          aria-label={m.heat_pump()}
           onClick={togglePump}
         >
           <FaSolidWind size="30px" style={{ transform: "rotate(270deg)" }} />
         </ActiveRoundButton>
-        {t("pump")}
+        {m.heat_pump()}
       </ToggleWithLabel>
     </Container>
   );

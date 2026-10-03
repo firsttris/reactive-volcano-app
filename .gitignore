@@ -28,3 +28,6 @@ coverage
 playwright-report/
 test-results/
 .playwright/
+
+# Paraglide (generated from messages/*.json)
+src/paraglide

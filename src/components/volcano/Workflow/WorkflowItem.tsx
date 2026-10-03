@@ -10,7 +10,7 @@ import {
 } from "solid-icons/fi";
 import { type Component, createSignal, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../../../i18n/utils";
+import { m } from "../../../paraglide/messages";
 import { useToast } from "../../../provider/ToastProvider";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { useWorkflowRunner } from "../../../provider/WorkflowRunnerProvider";
@@ -191,7 +191,6 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
     exportWorkflow,
   } = workflow;
   const navigate = useNavigate();
-  const t = useTranslations();
 
   const [isEditingName, setIsEditingName] = createSignal(false);
   const [editedName, setEditedName] = createSignal(props.workflow.name);
@@ -234,8 +233,8 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
     const undo = deleteWorkflowFromList(props.workflow.id);
     if (!undo) return;
     showToast({
-      message: `„${name}“ ${t("workflowDeleted")}`,
-      actionLabel: t("undo"),
+      message: `„${name}“ ${m.workflow_deleted()}`,
+      actionLabel: m.common_undo(),
       onAction: undo,
     });
   };
@@ -299,11 +298,13 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
         </NameContainer>
       </WorkflowHeader>
       <StepCount>
-        {workflowSteps().length}{" "}
-        {workflowSteps().length === 1 ? t("step") : t("steps")}
+        {m.workflow_stepCount({ count: workflowSteps().length })}
         <Show when={schedulerIsRunning()}>
           {" · "}
-          {t("step")} {currentStep() + 1}/{workflowSteps().length}
+          {m.workflow_stepOf({
+            current: currentStep() + 1,
+            total: workflowSteps().length,
+          })}
         </Show>
       </StepCount>
       <ActionButtons>
@@ -313,7 +314,7 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
             <IconButton
               variant="stop"
               onClick={handleStop}
-              aria-label={t("stop")}
+              aria-label={m.common_stop()}
             >
               <FiSquare size={18} />
             </IconButton>
@@ -322,7 +323,7 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
           <IconButton
             variant="play"
             onClick={handlePlay}
-            aria-label={t("start")}
+            aria-label={m.common_start()}
           >
             <FiPlay size={18} />
           </IconButton>
@@ -330,22 +331,22 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
         <IconButton
           variant="edit"
           onClick={handleEdit}
-          aria-label={t("editWorkflowSteps")}
+          aria-label={m.workflow_editSteps()}
         >
           <FiEdit2 size={18} />
         </IconButton>
         <IconButton
           variant="export"
           onClick={handleExport}
-          title={t("exportWorkflowDescription")}
-          aria-label={t("exportWorkflow")}
+          title={m.workflow_exportDescription()}
+          aria-label={m.workflow_export()}
         >
           <FiDownload size={18} />
         </IconButton>
         <IconButton
           variant="delete"
           onClick={handleDelete}
-          aria-label={t("deleteWorkflow")}
+          aria-label={m.workflow_delete()}
         >
           <FiTrash2 size={18} />
         </IconButton>

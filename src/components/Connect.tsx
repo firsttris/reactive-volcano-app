@@ -2,7 +2,7 @@ import { useNavigate } from "@solidjs/router";
 import { BsBluetooth } from "solid-icons/bs";
 import { createEffect, createSignal, Match, Show, Switch } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../i18n/utils";
+import { m } from "../paraglide/messages";
 import { useBluetooth } from "../provider/BluetoothProvider";
 import { buildRoute } from "../routes";
 import { ConnectionState, DeviceType } from "../utils/uuids";
@@ -138,7 +138,6 @@ export const Connect = () => {
   const { connect, connectionState, connectionError, deviceInfo } =
     useBluetooth();
   const navigate = useNavigate();
-  const t = useTranslations();
 
   const isConnecting = () => connectionState() === ConnectionState.CONNECTING;
   const isConnected = () => connectionState() === ConnectionState.CONNECTED;
@@ -207,19 +206,21 @@ export const Connect = () => {
     <>
       <Show when={isNotConnected()}>
         <Centered>
-          <Title>{t("connectYourDevice")}</Title>
-          <Subtitle>{t("appSupportsDevices")}</Subtitle>
+          <Title>{m.connect_title()}</Title>
+          <Subtitle>{m.connect_intro()}</Subtitle>
           <Switch>
             <Match when={!isBluetoothSupported()}>
               <Notice role="alert">
-                <strong>{t("bluetoothUnsupported")}</strong>
-                {t("bluetoothUnsupportedHint")}
+                <strong>{m.connect_unsupported()}</strong>
+                {m.connect_unsupportedHint()}
                 <Show when={isChromium()}>
                   <FlagHint>
-                    {t("bluetoothFlagHint")}
+                    {m.connect_flagHint()}
                     <code>{BLUETOOTH_FLAG_URL}</code>
                     <CopyButton onClick={copyFlagUrl}>
-                      {flagUrlCopied() ? t("copied") : t("copyFlagUrl")}
+                      {flagUrlCopied()
+                        ? m.common_copied()
+                        : m.connect_copyFlagUrl()}
                     </CopyButton>
                   </FlagHint>
                 </Show>
@@ -230,19 +231,19 @@ export const Connect = () => {
                 <Notice role="alert">
                   <strong>
                     {error().kind === "lost"
-                      ? t("connectionLost")
-                      : t("connectionFailed")}
+                      ? m.connect_lost()
+                      : m.connect_failed()}
                   </strong>
                   <Show when={errorMessage()}>
                     <ErrorDetail>{errorMessage()}</ErrorDetail>
                   </Show>
                   <ul>
-                    <li>{t("tipDeviceOn")}</li>
-                    <li>{t("tipOtherConnection")}</li>
-                    <li>{t("tipBluetoothEnabled")}</li>
+                    <li>{m.connect_tips_deviceOn()}</li>
+                    <li>{m.connect_tips_otherConnection()}</li>
+                    <li>{m.connect_tips_bluetoothEnabled()}</li>
                   </ul>
                   <a href={TROUBLESHOOTING_URL} target="_blank" rel="noopener">
-                    {t("moreTroubleshooting")}
+                    {m.connect_tips_more()}
                   </a>
                 </Notice>
               )}
@@ -250,7 +251,7 @@ export const Connect = () => {
           </Switch>
           <ConnectButton onClick={connect}>
             <BsBluetooth size="64px" />
-            {t("connectDevice")}
+            {m.connect_button()}
           </ConnectButton>
         </Centered>
       </Show>
@@ -260,7 +261,7 @@ export const Connect = () => {
           <LoadingContainer>
             <BlinkingSquares />
             <LoadingSubtitle>
-              {t("connectingTo")} {getDeviceTypeText()}...
+              {m.connect_connectingTo({ device: getDeviceTypeText() })}
             </LoadingSubtitle>
           </LoadingContainer>
         </Centered>

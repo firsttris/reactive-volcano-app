@@ -1,5 +1,5 @@
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../../i18n/utils";
+import { m } from "../../paraglide/messages";
 import { useVolcano } from "../../provider/VolcanoProvider";
 import { AnalysisSection } from "../AnalysisSection";
 
@@ -13,11 +13,10 @@ const Title = styled("h3")`
 
 export const Analysis = () => {
   const { actions } = useVolcano();
-  const t = useTranslations();
 
   return (
     <div>
-      <Title>{t("analysis")}</Title>
+      <Title>{m.analysis_title()}</Title>
       <AnalysisSection run={actions.runAnalysis} />
     </div>
   );

@@ -325,7 +325,7 @@ describe("Venty/Veazy analysis", () => {
       ...input,
       analysis: { errorCode: 0x12, errorCategory: 4 },
     });
-    expect(result.findings).toEqual(["analysisIssueDetected"]);
+    expect(result.findings).toEqual(["analysis_finding_issueDetected"]);
     expect(result.errorReport).toBe(
       [
         "SN   :   VY123456",
@@ -356,12 +356,12 @@ describe("Venty/Veazy analysis", () => {
       },
     });
     expect(result.findings).toEqual([
-      "analysisLowBrightness",
-      "analysisChargeLimit",
-      "analysisBoostVisualizationDisabled",
-      "analysisBoostTimeoutDisabled",
-      "analysisChargeOptimization",
-      "analysisVibrationDisabled",
+      "analysis_finding_lowBrightness",
+      "analysis_finding_chargeLimit",
+      "analysis_finding_boostVisualizationDisabled",
+      "analysis_finding_boostTimeoutDisabled",
+      "analysis_finding_chargeOptimization",
+      "analysis_finding_vibrationDisabled",
     ]);
   });
 });

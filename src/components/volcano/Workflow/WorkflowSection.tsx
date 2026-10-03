@@ -1,7 +1,7 @@
 import { FiDownload, FiPlus, FiUpload } from "solid-icons/fi";
 import { For } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../../../i18n/utils";
+import { m } from "../../../paraglide/messages";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { Button } from "../../Button";
 import { Card, CardTitle } from "../../Card";
@@ -65,7 +65,6 @@ const AddWorkflowButton = styled(Button)`
 
 export const WorkFlowSection = () => {
   const workflow = useWorkflowContext();
-  const t = useTranslations();
   const {
     workflowList,
     addWorkflowToList,
@@ -85,12 +84,12 @@ export const WorkFlowSection = () => {
     input.onchange = async (event) => {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (file) {
-        if (confirm(t("confirmImportAll"))) {
+        if (confirm(m.workflow_confirmImportAll())) {
           try {
             await importAllWorkflows(file);
           } catch (error) {
             console.error(
-              `${t("invalidWorkflowFile")}: ${(error as Error).message}`
+              `${m.workflow_invalidFile()}: ${(error as Error).message}`
             );
           }
         }
@@ -110,7 +109,7 @@ export const WorkFlowSection = () => {
           await importWorkflow(file);
         } catch (error) {
           console.error(
-            `${t("invalidWorkflowFile")}: ${(error as Error).message}`
+            `${m.workflow_invalidFile()}: ${(error as Error).message}`
           );
         }
       }
@@ -120,7 +119,7 @@ export const WorkFlowSection = () => {
 
   return (
     <Card>
-      <CardTitle>{t("workflows")}</CardTitle>
+      <CardTitle>{m.workflow_title()}</CardTitle>
       <Container>
         <For each={workflowList()}>
           {(workflow) => <WorkflowItem workflow={workflow} />}
@@ -128,29 +127,29 @@ export const WorkFlowSection = () => {
       </Container>
       <AddWorkflowButton onClick={addWorkflowToList}>
         <FiPlus size={24} />
-        <span>{t("addWorkflow")}</span>
+        <span>{m.workflow_add()}</span>
       </AddWorkflowButton>
       <BulkOperationsContainer>
         <BulkOperationButton
           onClick={handleExportAll}
-          title={t("exportAllWorkflowsDescription")}
+          title={m.workflow_exportAllDescription()}
         >
           <FiDownload size={24} />
-          {t("exportAllWorkflows")}
+          {m.workflow_exportAll()}
         </BulkOperationButton>
         <BulkOperationButton
           onClick={handleImportAll}
-          title={t("importAllWorkflowsDescription")}
+          title={m.workflow_importAllDescription()}
         >
           <FiUpload size={24} />
-          {t("importAllWorkflows")}
+          {m.workflow_importAll()}
         </BulkOperationButton>
         <BulkOperationButton
           onClick={handleImportWorkflow}
-          title={t("importWorkflowDescription")}
+          title={m.workflow_importDescription()}
         >
           <FiUpload size={24} />
-          {t("importWorkflow")}
+          {m.workflow_import()}
         </BulkOperationButton>
       </BulkOperationsContainer>
     </Card>

@@ -1,6 +1,6 @@
 import type { Component } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../../i18n/utils";
+import { m } from "../../paraglide/messages";
 import { useVolcano } from "../../provider/VolcanoProvider";
 
 const Container = styled("div")`
@@ -31,11 +31,10 @@ const TimeValue = styled("span")`
 
 export const HeatingTimeDisplay: Component = () => {
   const { state } = useVolcano();
-  const t = useTranslations();
 
   return (
     <Container>
-      <Title>{t("deviceRuntime")}</Title>
+      <Title>{m.device_runtime()}</Title>
       <TimeDisplay>
         <TimeValue>{state.heatingHours}</TimeValue>
         <span>h</span>

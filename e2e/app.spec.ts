@@ -77,3 +77,15 @@ test.describe("App - Responsive Design", () => {
     });
   });
 });
+
+test.describe("App - Sprache", () => {
+  test.use({ locale: "de-DE" });
+
+  test("sollte bei deutschem Browser auf Deutsch erscheinen", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("lang", "de");
+    await expect(page.getByText("Gerät verbinden").first()).toBeVisible();
+  });
+});

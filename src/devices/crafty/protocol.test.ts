@@ -135,18 +135,18 @@ describe("Crafty analysis", () => {
       ledBrightness: 5,
     });
     expect(result.findings).toEqual([
-      "analysisCoolDown",
-      "analysisVibrationDisabled",
-      "analysisLedDisabled",
-      "analysisBluetoothAlwaysOn",
-      "analysisFactoryResetNeeded",
-      "analysisLowBrightness",
+      "analysis_finding_coolDown",
+      "analysis_finding_vibrationDisabled",
+      "analysis_finding_ledDisabled",
+      "analysis_finding_bluetoothAlwaysOn",
+      "analysis_finding_factoryResetNeeded",
+      "analysis_finding_lowBrightness",
     ]);
   });
 
   it("asks for another charger when only that bit is set", () => {
     expect(analyzeCrafty({ ...healthy, akkuStatus2: 0x8000 }).findings).toEqual(
-      ["analysisUseOtherCharger"]
+      ["analysis_finding_useOtherCharger"]
     );
   });
 });

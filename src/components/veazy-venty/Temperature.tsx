@@ -2,7 +2,7 @@ import { Show } from "solid-js";
 import { styled } from "solid-styled-components";
 import { HeaterMode } from "../../devices/ventyVeazy/protocol";
 import { useWakeLock } from "../../hooks/utils/useWakeLock";
-import { useTranslations } from "../../i18n/utils";
+import { m } from "../../paraglide/messages";
 import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
 import { BoostControl } from "./BoostControl";
 import { EffectiveTemperatureStatus } from "./EffectiveTemperatureStatus";
@@ -55,7 +55,6 @@ const StatusItem = styled("div")<{ highlight?: boolean }>`
 
 export const Temperature = () => {
   const { state, actions, display } = useVentyVeazy();
-  const t = useTranslations();
 
   const isCelsius = () => state.status?.isCelsius ?? true;
   const isHeating = () =>
@@ -102,7 +101,7 @@ export const Temperature = () => {
   return (
     <Container>
       <Header>
-        <h2>{t("ventyVeazyTemperatureControl")}</h2>
+        <h2>{m.temperature_ventyVeazyControl()}</h2>
       </Header>
 
       <EffectiveTemperatureStatus

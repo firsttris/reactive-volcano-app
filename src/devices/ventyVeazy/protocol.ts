@@ -443,7 +443,7 @@ export const analyzeVentyVeazy = (
         ["code ", `0x${toHex(analysis.errorCode, 2)}`],
         ["cat  ", `0x${toHex(analysis.errorCategory, 2)}`],
       ]),
-      findings: ["analysisIssueDetected"],
+      findings: ["analysis_finding_issueDetected"],
     };
   }
 
@@ -453,20 +453,20 @@ export const analyzeVentyVeazy = (
     brightnessVibration &&
     brightnessVibration.brightness < Limits.MAX_BRIGHTNESS
   ) {
-    findings.push("analysisLowBrightness");
+    findings.push("analysis_finding_lowBrightness");
   }
-  if (status?.chargeVoltageLimit) findings.push("analysisChargeLimit");
+  if (status?.chargeVoltageLimit) findings.push("analysis_finding_chargeLimit");
   if (status && !status.boostVisualization) {
-    findings.push("analysisBoostVisualizationDisabled");
+    findings.push("analysis_finding_boostVisualizationDisabled");
   }
   if (brightnessVibration?.boostTimeoutDisabled) {
-    findings.push("analysisBoostTimeoutDisabled");
+    findings.push("analysis_finding_boostTimeoutDisabled");
   }
   if (status?.chargeCurrentOptimization) {
-    findings.push("analysisChargeOptimization");
+    findings.push("analysis_finding_chargeOptimization");
   }
   if (brightnessVibration && !brightnessVibration.vibration) {
-    findings.push("analysisVibrationDisabled");
+    findings.push("analysis_finding_vibrationDisabled");
   }
   return { errorReport: null, findings };
 };

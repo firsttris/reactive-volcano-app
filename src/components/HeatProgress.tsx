@@ -1,6 +1,6 @@
 import { createEffect, createSignal, on, onCleanup, Show } from "solid-js";
 import { styled } from "solid-styled-components";
-import { useTranslations } from "../i18n/utils";
+import { m } from "../paraglide/messages";
 import {
   estimateSecondsRemaining,
   formatDuration,
@@ -66,7 +66,6 @@ const StatusText = styled("span")<{ status: HeatStatus }>`
 `;
 
 export const HeatProgress = (props: HeatProgressProps) => {
-  const t = useTranslations();
   const [samples, setSamples] = createSignal<TemperatureSample[]>([]);
   const [now, setNow] = createSignal(Date.now());
 
@@ -125,13 +124,13 @@ export const HeatProgress = (props: HeatProgressProps) => {
   const label = () => {
     switch (status()) {
       case "off":
-        return t("heaterOff");
+        return m.heat_off();
       case "reached":
-        return t("temperatureReached");
+        return m.heat_reached();
       case "cooling":
-        return t("coolingDown");
+        return m.heat_coolingDown();
       default:
-        return t("heatingUp");
+        return m.heat_heatingUp();
     }
   };
 
@@ -151,7 +150,7 @@ export const HeatProgress = (props: HeatProgressProps) => {
         <Show when={eta()}>
           {(seconds) => (
             <span>
-              {t("remaining")} ~{formatDuration(seconds())}
+              {m.heat_remaining()} ~{formatDuration(seconds())}
             </span>
           )}
         </Show>
