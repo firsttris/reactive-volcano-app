@@ -1,138 +1,73 @@
 import { useNavigate } from "@solidjs/router";
-import { BsBluetooth } from "solid-icons/bs";
-import { createEffect, createSignal, Match, Show, Switch } from "solid-js";
-import { styled } from "solid-styled-components";
+import Bluetooth from "lucide-solid/icons/bluetooth";
+import ChevronDown from "lucide-solid/icons/chevron-down";
+import CircleHelp from "lucide-solid/icons/circle-question-mark";
+import Copy from "lucide-solid/icons/copy";
+import ExternalLink from "lucide-solid/icons/external-link";
+import TriangleAlert from "lucide-solid/icons/triangle-alert";
+import { createEffect, createSignal, For, Match, Show, Switch } from "solid-js";
+import { cn } from "../lib/utils";
 import { m } from "../paraglide/messages";
 import { useBluetooth } from "../provider/BluetoothProvider";
 import { buildRoute } from "../routes";
 import { ConnectionState, DeviceType } from "../utils/uuids";
-import { BlinkingSquares } from "./volcano/BlinkingSquares";
-
-const Centered = styled("div")`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  padding: 20px;
-`;
-
-const ConnectButton = styled("button")`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  padding: 30px;
-  border: 3px solid var(--accent-color);
-  background: transparent;
-  border-radius: 20px;
-  cursor: pointer;
-  color: var(--accent-color);
-  font-size: 18px;
-  font-weight: bold;
-  transition: all 0.3s ease;
-  min-width: 200px;
-
-  @media (hover: hover) {
-    &:hover {
-      background-color: var(--accent-color);
-      color: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px rgba(246, 96, 0, 0.3);
-    }
-  }
-`;
-
-const Title = styled("h2")`
-  color: var(--text-color);
-  margin-bottom: 10px;
-  text-align: center;
-`;
-
-const Subtitle = styled("p")`
-  color: var(--secondary-text);
-  text-align: center;
-  max-width: 400px;
-  line-height: 1.5;
-`;
+import { ThemeToggle } from "./AppHeader";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./ui/collapsible";
 
 const TROUBLESHOOTING_URL =
   "https://github.com/firsttris/reactive-volcano-app#-no-devices-found-troubleshooting-with-bluetooth-internals";
-
-const Notice = styled("div")`
-  max-width: 400px;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid var(--accent-color);
-  background: var(--secondary-bg);
-  color: var(--text-color);
-  line-height: 1.5;
-
-  strong {
-    display: block;
-    margin-bottom: 4px;
-  }
-
-  ul {
-    margin: 8px 0;
-    padding-left: 20px;
-    color: var(--secondary-text);
-  }
-
-  a {
-    color: var(--accent-color);
-  }
-`;
 
 // Browsers refuse to open chrome:// URLs from a web page, so we can only
 // offer to copy it for pasting into the address bar.
 const BLUETOOTH_FLAG_URL = "chrome://flags/#enable-web-bluetooth";
 
+const SUPPORTED_DEVICES = ["Volcano Hybrid", "Venty", "Veazy", "Crafty+"];
+
 const isChromium = () =>
   typeof navigator !== "undefined" && /Chrome\//.test(navigator.userAgent);
 
-const FlagHint = styled("div")`
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  color: var(--secondary-text);
+const Tips = () => (
+  <ul class="list-disc space-y-1.5 pl-4">
+    <li>{m.connect_tips_deviceOn()}</li>
+    <li>{m.connect_tips_otherConnection()}</li>
+    <li>{m.connect_tips_bluetoothEnabled()}</li>
+  </ul>
+);
 
-  code {
-    word-break: break-all;
-    color: var(--text-color);
-  }
-`;
+const TroubleshootingLink = () => (
+  <a
+    href={TROUBLESHOOTING_URL}
+    target="_blank"
+    rel="noopener"
+    class="inline-flex items-center gap-1.5 font-medium text-primary underline-offset-4 hover:underline"
+  >
+    {m.connect_tips_more()}
+    <ExternalLink class="size-3.5" />
+  </a>
+);
 
-const CopyButton = styled("button")`
-  align-self: flex-start;
-  padding: 8px 14px;
-  border: 1px solid var(--accent-color);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--accent-color);
-  font-weight: bold;
-  cursor: pointer;
-`;
-
-const ErrorDetail = styled("div")`
-  font-size: 0.85rem;
-  color: var(--secondary-text);
-  word-break: break-word;
-`;
-
-const LoadingContainer = styled("div")`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 40px;
-`;
-
-const LoadingSubtitle = styled("p")`
-  margin-top: 35px;
-`;
+/** Bluetooth glyph with rings that ripple while connecting */
+const BluetoothBeacon = (props: { active: boolean }) => (
+  <div class="relative flex size-[120px] items-center justify-center">
+    <span
+      class={cn(
+        "absolute inset-0 rounded-full border border-primary/25",
+        props.active && "motion-safe:animate-ping"
+      )}
+    />
+    <span class="absolute inset-4 rounded-full border border-primary/40" />
+    <span class="flex size-16 items-center justify-center rounded-[22px] bg-primary text-primary-foreground shadow-[0_10px_40px_-8px_var(--glow)]">
+      <Bluetooth class="size-[30px]" stroke-width={2.25} />
+    </span>
+  </div>
+);
 
 export const Connect = () => {
   const { connect, connectionState, connectionError, deviceInfo } =
@@ -203,69 +138,112 @@ export const Connect = () => {
   });
 
   return (
-    <>
-      <Show when={isNotConnected()}>
-        <Centered>
-          <Title>{m.connect_title()}</Title>
-          <Subtitle>{m.connect_intro()}</Subtitle>
+    <div class="relative flex min-h-dvh flex-col overflow-hidden">
+      <div
+        aria-hidden="true"
+        class="pointer-events-none absolute top-24 left-1/2 size-[440px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,var(--glow),transparent)] opacity-50"
+      />
+      <div class="relative flex justify-end px-5 pt-[max(1.125rem,env(safe-area-inset-top))]">
+        <ThemeToggle />
+      </div>
+
+      <main class="relative mx-auto flex w-full max-w-sm flex-1 flex-col items-center gap-7 px-6 pt-10 pb-10">
+        <BluetoothBeacon active={isConnecting()} />
+
+        <Show when={isNotConnected()}>
+          <div class="flex flex-col items-center gap-2.5 text-center">
+            <h1 class="font-semibold text-[30px] leading-tight tracking-tight">
+              {m.connect_title()}
+            </h1>
+            <p class="text-[15px] text-muted-foreground leading-relaxed">
+              {m.connect_intro()}
+            </p>
+          </div>
+
+          <div class="flex flex-wrap justify-center gap-2">
+            <For each={SUPPORTED_DEVICES}>
+              {(device) => (
+                <Badge variant="outline" class="h-7 px-3">
+                  {device}
+                </Badge>
+              )}
+            </For>
+          </div>
+
           <Switch>
             <Match when={!isBluetoothSupported()}>
-              <Notice role="alert">
-                <strong>{m.connect_unsupported()}</strong>
-                {m.connect_unsupportedHint()}
-                <Show when={isChromium()}>
-                  <FlagHint>
-                    {m.connect_flagHint()}
-                    <code>{BLUETOOTH_FLAG_URL}</code>
-                    <CopyButton onClick={copyFlagUrl}>
+              <Alert variant="destructive" role="alert">
+                <TriangleAlert />
+                <AlertTitle>{m.connect_unsupported()}</AlertTitle>
+                <AlertDescription>
+                  <p>{m.connect_unsupportedHint()}</p>
+                  <Show when={isChromium()}>
+                    <p>{m.connect_flagHint()}</p>
+                    <code class="select-text break-all rounded-md bg-muted px-2 py-1 font-mono text-foreground text-xs">
+                      {BLUETOOTH_FLAG_URL}
+                    </code>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      class="justify-self-start"
+                      onClick={copyFlagUrl}
+                    >
+                      <Copy />
                       {flagUrlCopied()
                         ? m.common_copied()
                         : m.connect_copyFlagUrl()}
-                    </CopyButton>
-                  </FlagHint>
-                </Show>
-              </Notice>
+                    </Button>
+                  </Show>
+                </AlertDescription>
+              </Alert>
             </Match>
             <Match when={connectionError()}>
               {(error) => (
-                <Notice role="alert">
-                  <strong>
+                <Alert variant="destructive" role="alert">
+                  <TriangleAlert />
+                  <AlertTitle>
                     {error().kind === "lost"
                       ? m.connect_lost()
                       : m.connect_failed()}
-                  </strong>
-                  <Show when={errorMessage()}>
-                    <ErrorDetail>{errorMessage()}</ErrorDetail>
-                  </Show>
-                  <ul>
-                    <li>{m.connect_tips_deviceOn()}</li>
-                    <li>{m.connect_tips_otherConnection()}</li>
-                    <li>{m.connect_tips_bluetoothEnabled()}</li>
-                  </ul>
-                  <a href={TROUBLESHOOTING_URL} target="_blank" rel="noopener">
-                    {m.connect_tips_more()}
-                  </a>
-                </Notice>
+                  </AlertTitle>
+                  <AlertDescription>
+                    <Show when={errorMessage()}>
+                      <p class="break-words text-xs">{errorMessage()}</p>
+                    </Show>
+                    <Tips />
+                    <TroubleshootingLink />
+                  </AlertDescription>
+                </Alert>
               )}
             </Match>
           </Switch>
-          <ConnectButton onClick={connect}>
-            <BsBluetooth size="64px" />
-            {m.connect_button()}
-          </ConnectButton>
-        </Centered>
-      </Show>
 
-      <Show when={isConnecting()}>
-        <Centered>
-          <LoadingContainer>
-            <BlinkingSquares />
-            <LoadingSubtitle>
-              {m.connect_connectingTo({ device: getDeviceTypeText() })}
-            </LoadingSubtitle>
-          </LoadingContainer>
-        </Centered>
-      </Show>
-    </>
+          <Button size="lg" class="w-full" onClick={connect}>
+            <Bluetooth />
+            {m.connect_button()}
+          </Button>
+
+          <Show when={isBluetoothSupported() && !connectionError()}>
+            <Collapsible class="w-full rounded-2xl border bg-card">
+              <CollapsibleTrigger class="group flex w-full items-center gap-2.5 rounded-2xl px-4 py-3.5 text-left font-medium text-sm">
+                <CircleHelp class="size-4 text-muted-foreground" />
+                <span class="flex-1">{m.connect_help()}</span>
+                <ChevronDown class="size-4 text-muted-foreground transition-transform group-data-[expanded]:rotate-180" />
+              </CollapsibleTrigger>
+              <CollapsibleContent class="grid gap-3 px-4 pb-4 pl-[42px] text-[13px] text-muted-foreground leading-relaxed">
+                <Tips />
+                <TroubleshootingLink />
+              </CollapsibleContent>
+            </Collapsible>
+          </Show>
+        </Show>
+
+        <Show when={isConnecting()}>
+          <p class="text-center text-muted-foreground" role="status">
+            {m.connect_connectingTo({ device: getDeviceTypeText() })}
+          </p>
+        </Show>
+      </main>
+    </div>
   );
 };

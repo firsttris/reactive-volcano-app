@@ -1,186 +1,38 @@
 import { useNavigate } from "@solidjs/router";
-import {
-  FiCheck,
-  FiDownload,
-  FiEdit2,
-  FiPlay,
-  FiSquare,
-  FiTrash2,
-  FiX,
-} from "solid-icons/fi";
-import { type Component, createSignal, Show } from "solid-js";
-import { styled } from "solid-styled-components";
+import Check from "lucide-solid/icons/check";
+import Download from "lucide-solid/icons/download";
+import Ellipsis from "lucide-solid/icons/ellipsis";
+import ListOrdered from "lucide-solid/icons/list-ordered";
+import Pencil from "lucide-solid/icons/pencil";
+import Play from "lucide-solid/icons/play";
+import Square from "lucide-solid/icons/square";
+import Trash2 from "lucide-solid/icons/trash";
+import X from "lucide-solid/icons/x";
+import { type Component, createSignal, For, Index, Show } from "solid-js";
+import { cn } from "../../../lib/utils";
 import { m } from "../../../paraglide/messages";
 import { useToast } from "../../../provider/ToastProvider";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { useWorkflowRunner } from "../../../provider/WorkflowRunnerProvider";
 import { buildRoute } from "../../../routes";
 import type { Workflow } from "../../../utils/workflowData";
+import { Button } from "../../ui/button";
+import { Card } from "../../ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../ui/dropdown-menu";
+import { TextField, TextFieldInput } from "../../ui/text-field";
 
 interface WorkflowItemProps {
   workflow: Workflow;
 }
 
-const Card = styled("div")<{ isActive?: boolean }>`
-  background: ${(props) =>
-    props.isActive ? "rgba(255, 102, 0, 0.1)" : "var(--bg-color)"};
-  border: 2px solid
-    ${(props) =>
-      props.isActive ? "var(--accent-color)" : "var(--border-color)"};
-  border-radius: 12px;
-  padding: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-
-  @media (hover: hover) {
-    &:hover {
-      border-color: var(--accent-color);
-      background: rgba(255, 102, 0, 0.05);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255, 102, 0, 0.2);
-    }
-  }
-`;
-
-const WorkflowHeader = styled("div")`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-`;
-
-const NameContainer = styled("div")`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-`;
-
-const NameInput = styled("input")`
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 4px 8px;
-  color: var(--text-color);
-  font-size: 1.1rem;
-  font-weight: 600;
-  font-family: CustomFont;
-  flex: 1;
-
-  &:focus {
-    outline: none;
-    border-color: var(--accent-color);
-  }
-`;
-
-const SmallIconButton = styled("button")`
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--secondary-text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-
-  @media (hover: hover) {
-    &:hover {
-      color: var(--accent-color);
-      background: var(--secondary-bg);
-    }
-  }
-`;
-
-const WorkflowName = styled("div")`
-  color: var(--text-color);
-  font-size: 1.1rem;
-  font-weight: 600;
-  font-family: CustomFont;
-`;
-
-const StepCount = styled("div")`
-  color: var(--tertiary-text);
-  font-size: 0.9rem;
-  margin-bottom: 12px;
-`;
-
-const ActionButtons = styled("div")`
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-`;
-
-const IconButton = styled("button")<{
-  variant?: "play" | "stop" | "edit" | "delete" | "export";
-}>`
-  background: ${(props) => {
-    if (props.variant === "play")
-      return "linear-gradient(135deg, var(--accent-color) 0%, #ff7700 100%)";
-    if (props.variant === "stop")
-      return "linear-gradient(135deg, #d32f2f 0%, #f44336 100%)";
-    return "transparent";
-  }};
-  border: ${(props) =>
-    props.variant === "play" || props.variant === "stop"
-      ? "none"
-      : "1px solid var(--border-color)"};
-  border-radius: 8px;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: ${(props) =>
-    props.variant === "play" || props.variant === "stop"
-      ? "white"
-      : "var(--secondary-text)"};
-  transition: all 0.2s ease;
-
-  @media (hover: hover) {
-    &:hover {
-      background: ${(props) => {
-        if (props.variant === "play")
-          return "linear-gradient(135deg, #ff7700 0%, #ff8800 100%)";
-        if (props.variant === "stop")
-          return "linear-gradient(135deg, #f44336 0%, #e57373 100%)";
-        return "var(--secondary-bg)";
-      }};
-      color: ${(props) =>
-        props.variant === "edit" || props.variant === "delete"
-          ? "var(--accent-color)"
-          : "white"};
-      transform: scale(1.05);
-      box-shadow: ${(props) =>
-        props.variant === "play" || props.variant === "stop"
-          ? "0 2px 8px rgba(255, 102, 0, 0.4)"
-          : "0 2px 8px rgba(0, 0, 0, 0.1)"};
-    }
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-`;
-
-const ProgressBar = styled("div")`
-  width: 100%;
-  height: 4px;
-  background: var(--border-color);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 12px;
-`;
-
-const ProgressFill = styled("div")<{ progress: number }>`
-  width: ${(props) => props.progress}%;
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent-color), #ff7700);
-  transition: width 0.3s ease;
-`;
+/** How many step temperatures fit on the card before "+n" */
+const VISIBLE_STEPS = 5;
 
 export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
   const workflow = useWorkflowContext();
@@ -191,43 +43,27 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
     exportWorkflow,
   } = workflow;
   const navigate = useNavigate();
-
   const [isEditingName, setIsEditingName] = createSignal(false);
   const [editedName, setEditedName] = createSignal(props.workflow.name);
-
   const runner = useWorkflowRunner();
   const showToast = useToast();
 
   const workflowSteps = () => props.workflow.workflowSteps;
   const schedulerIsRunning = () => runner.isRunningWorkflow(props.workflow.id);
   const currentStep = runner.currentStep;
+  const hiddenSteps = () => workflowSteps().length - VISIBLE_STEPS;
 
-  const progress = () => {
-    if (!schedulerIsRunning()) return 0;
-    const total = workflowSteps().length;
-    if (total === 0) return 0;
-    return (currentStep() / total) * 100;
-  };
-
-  const handlePlay = async (e: MouseEvent) => {
-    e.stopPropagation();
+  const handlePlay = async () => {
     setSelectedWorkflowId(props.workflow.id);
     await runner.start(props.workflow.id);
   };
 
-  const handleStop = async (e: MouseEvent) => {
-    e.stopPropagation();
-    await runner.stop();
-  };
-
-  const handleEdit = (e: MouseEvent) => {
-    e.stopPropagation();
+  const handleEdit = () => {
     setSelectedWorkflowId(props.workflow.id);
     navigate(buildRoute.workflowList(props.workflow.id));
   };
 
-  const handleDelete = async (e: MouseEvent) => {
-    e.stopPropagation();
+  const handleDelete = async () => {
     const name = props.workflow.name;
     if (schedulerIsRunning()) await runner.stop();
     const undo = deleteWorkflowFromList(props.workflow.id);
@@ -239,19 +75,12 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
     });
   };
 
-  const handleExport = (e: MouseEvent) => {
-    e.stopPropagation();
-    exportWorkflow(props.workflow.id);
-  };
-
-  const handleStartEditName = (e: Event) => {
-    e.stopPropagation();
+  const handleStartEditName = () => {
     setEditedName(props.workflow.name);
     setIsEditingName(true);
   };
 
-  const handleSaveName = (e: Event) => {
-    e.stopPropagation();
+  const handleSaveName = () => {
     const newName = editedName().trim();
     if (newName && newName !== props.workflow.name) {
       renameWorkflow(props.workflow.id, newName);
@@ -259,102 +88,173 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
     setIsEditingName(false);
   };
 
-  const handleCancelEditName = (e: Event) => {
-    e.stopPropagation();
+  const handleCancelEditName = () => {
     setIsEditingName(false);
     setEditedName(props.workflow.name);
   };
 
   return (
-    <Card isActive={schedulerIsRunning()}>
-      <WorkflowHeader>
-        <NameContainer>
-          <Show
-            when={isEditingName()}
-            fallback={
-              <>
-                <WorkflowName>{props.workflow.name}</WorkflowName>
-                <SmallIconButton onClick={handleStartEditName}>
-                  <FiEdit2 size={14} />
-                </SmallIconButton>
-              </>
-            }
-          >
-            <NameInput
-              value={editedName()}
-              onInput={(e) => setEditedName(e.currentTarget.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSaveName(e);
-                if (e.key === "Escape") handleCancelEditName(e);
-              }}
-            />
-            <SmallIconButton onClick={handleSaveName}>
-              <FiCheck size={14} />
-            </SmallIconButton>
-            <SmallIconButton onClick={handleCancelEditName}>
-              <FiX size={14} />
-            </SmallIconButton>
-          </Show>
-        </NameContainer>
-      </WorkflowHeader>
-      <StepCount>
-        {m.workflow_stepCount({ count: workflowSteps().length })}
-        <Show when={schedulerIsRunning()}>
-          {" · "}
-          {m.workflow_stepOf({
-            current: currentStep() + 1,
-            total: workflowSteps().length,
-          })}
-        </Show>
-      </StepCount>
-      <ActionButtons>
+    <Card
+      class={cn(
+        "flex flex-col gap-3 p-4 transition-colors",
+        schedulerIsRunning() && "border-primary/50 bg-primary-soft"
+      )}
+    >
+      <div class="flex items-center gap-2">
         <Show
-          when={!schedulerIsRunning()}
+          when={isEditingName()}
           fallback={
-            <IconButton
-              variant="stop"
-              onClick={handleStop}
-              aria-label={m.common_stop()}
-            >
-              <FiSquare size={18} />
-            </IconButton>
+            <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+              <div class="truncate font-semibold text-[15px]">
+                {props.workflow.name}
+              </div>
+              <div class="text-muted-foreground text-xs">
+                {m.workflow_stepCount({ count: workflowSteps().length })}
+                <Show when={schedulerIsRunning()}>
+                  {" · "}
+                  <span class="font-medium text-primary">
+                    {m.workflow_stepOf({
+                      current: currentStep() + 1,
+                      total: workflowSteps().length,
+                    })}
+                  </span>
+                </Show>
+              </div>
+            </div>
           }
         >
-          <IconButton
-            variant="play"
-            onClick={handlePlay}
-            aria-label={m.common_start()}
+          <TextField
+            class="flex-1"
+            value={editedName()}
+            onChange={setEditedName}
           >
-            <FiPlay size={18} />
-          </IconButton>
+            <TextFieldInput
+              aria-label={m.workflow_rename()}
+              ref={(el: HTMLInputElement) => queueMicrotask(() => el.focus())}
+              onKeyDown={(e: KeyboardEvent) => {
+                if (e.key === "Enter") handleSaveName();
+                if (e.key === "Escape") handleCancelEditName();
+              }}
+            />
+          </TextField>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={m.common_save()}
+            onClick={handleSaveName}
+          >
+            <Check />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={m.common_cancel()}
+            onClick={handleCancelEditName}
+          >
+            <X />
+          </Button>
         </Show>
-        <IconButton
-          variant="edit"
-          onClick={handleEdit}
-          aria-label={m.workflow_editSteps()}
+
+        <Show when={!isEditingName()}>
+          <DropdownMenu placement="bottom-end">
+            <DropdownMenuTrigger
+              as={Button}
+              variant="ghost"
+              size="icon-sm"
+              aria-label={m.workflow_moreActions()}
+            >
+              <Ellipsis />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onSelect={handleEdit}>
+                <ListOrdered />
+                {m.workflow_editSteps()}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleStartEditName}>
+                <Pencil />
+                {m.workflow_rename()}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                title={m.workflow_exportDescription()}
+                onSelect={() => exportWorkflow(props.workflow.id)}
+              >
+                <Download />
+                {m.workflow_export()}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                class="text-destructive data-[highlighted]:text-destructive [&_svg]:text-destructive"
+                onSelect={handleDelete}
+              >
+                <Trash2 />
+                {m.workflow_delete()}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Show
+            when={!schedulerIsRunning()}
+            fallback={
+              <Button
+                variant="destructive"
+                size="icon"
+                class="rounded-full"
+                aria-label={m.common_stop()}
+                onClick={() => runner.stop()}
+              >
+                <Square class="fill-current" />
+              </Button>
+            }
+          >
+            <Button
+              size="icon"
+              class="rounded-full bg-foreground text-background shadow-none hover:bg-foreground/85"
+              aria-label={m.common_start()}
+              onClick={handlePlay}
+            >
+              <Play class="translate-x-px fill-current" />
+            </Button>
+          </Show>
+        </Show>
+      </div>
+
+      <Show
+        when={schedulerIsRunning()}
+        fallback={
+          <div class="flex flex-wrap gap-1.5">
+            <For each={workflowSteps().slice(0, VISIBLE_STEPS)}>
+              {(step) => (
+                <span class="inline-flex h-6 items-center rounded-full border bg-muted px-2 font-mono text-[11px] text-muted-foreground tabular-nums">
+                  {step.temperature}°
+                </span>
+              )}
+            </For>
+            <Show when={hiddenSteps() > 0}>
+              <span class="inline-flex h-6 items-center rounded-full px-1.5 font-mono text-[11px] text-muted-foreground">
+                +{hiddenSteps()}
+              </span>
+            </Show>
+          </div>
+        }
+      >
+        <div
+          class="grid gap-1"
+          style={{
+            "grid-template-columns": `repeat(${workflowSteps().length}, minmax(0, 1fr))`,
+          }}
         >
-          <FiEdit2 size={18} />
-        </IconButton>
-        <IconButton
-          variant="export"
-          onClick={handleExport}
-          title={m.workflow_exportDescription()}
-          aria-label={m.workflow_export()}
-        >
-          <FiDownload size={18} />
-        </IconButton>
-        <IconButton
-          variant="delete"
-          onClick={handleDelete}
-          aria-label={m.workflow_delete()}
-        >
-          <FiTrash2 size={18} />
-        </IconButton>
-      </ActionButtons>
-      <Show when={schedulerIsRunning()}>
-        <ProgressBar>
-          <ProgressFill progress={progress()} />
-        </ProgressBar>
+          <Index each={workflowSteps()}>
+            {(_, index) => (
+              <span
+                class={cn(
+                  "h-1 rounded-full bg-primary/25 transition-colors",
+                  index < currentStep() && "bg-primary",
+                  index === currentStep() &&
+                    "bg-primary/70 motion-safe:animate-pulse"
+                )}
+              />
+            )}
+          </Index>
+        </div>
       </Show>
     </Card>
   );

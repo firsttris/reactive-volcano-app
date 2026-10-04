@@ -1,67 +1,49 @@
-import { FiDownload, FiPlus, FiUpload } from "solid-icons/fi";
-import { For } from "solid-js";
-import { styled } from "solid-styled-components";
+import Download from "lucide-solid/icons/download";
+import FileUp from "lucide-solid/icons/file-up";
+import Plus from "lucide-solid/icons/plus";
+import Upload from "lucide-solid/icons/upload";
+import { createSignal, For, Show } from "solid-js";
 import { m } from "../../../paraglide/messages";
+import { useToast } from "../../../provider/ToastProvider";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
-import { Button } from "../../Button";
-import { Card, CardTitle } from "../../Card";
+import { PageTitle } from "../../DeviceShell";
+import {
+  AlertDialog,
+  AlertDialogClose,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../ui/alert-dialog";
+import { Button } from "../../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../ui/dropdown-menu";
 import { WorkflowItem } from "./WorkflowItem";
 
-const Container = styled("div")`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
+const MenuItemText = (props: { title: string; description: string }) => (
+  <span class="flex flex-col gap-0.5">
+    <span>{props.title}</span>
+    <span class="text-muted-foreground text-xs">{props.description}</span>
+  </span>
+);
 
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const BulkOperationsContainer = styled("div")`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
-`;
-
-const BulkOperationButton = styled(Button)`
-  width: 100%;
-  height: 50px;
-  background: var(--secondary-bg);
-  border: 2px dashed var(--border-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 1rem;
-  color: var(--text-color);
-
-  &:hover {
-    border-color: var(--accent-color);
-    background: var(--bg-color);
-    color: var(--accent-color);
-  }
-`;
-
-const AddWorkflowButton = styled(Button)`
-  width: 100%;
-  height: 50px;
-  background: var(--secondary-bg);
-  border: 2px dashed var(--border-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 1rem;
-  color: var(--text-color);
-
-  &:hover {
-    border-color: var(--accent-color);
-    background: var(--bg-color);
-    color: var(--accent-color);
-  }
-`;
+/** Lets the user pick a JSON file */
+const pickJsonFile = (onPick: (file: File) => void) => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".json";
+  input.onchange = (event) => {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) onPick(file);
+  };
+  input.click();
+};
 
 export const WorkFlowSection = () => {
   const workflow = useWorkflowContext();
@@ -72,86 +54,129 @@ export const WorkFlowSection = () => {
     importAllWorkflows,
     importWorkflow,
   } = workflow;
+  const showToast = useToast();
 
-  const handleExportAll = () => {
-    exportAllWorkflows();
+  // Replacing every workflow needs a confirmation first
+  const [pendingImportAll, setPendingImportAll] = createSignal<File>();
+
+  const reportInvalidFile = (error: unknown) => {
+    console.error(`${m.workflow_invalidFile()}: ${(error as Error).message}`);
+    showToast({ message: m.workflow_invalidFile() });
   };
 
-  const handleImportAll = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
-    input.onchange = async (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (file) {
-        if (confirm(m.workflow_confirmImportAll())) {
-          try {
-            await importAllWorkflows(file);
-          } catch (error) {
-            console.error(
-              `${m.workflow_invalidFile()}: ${(error as Error).message}`
-            );
-          }
-        }
+  const confirmImportAll = async () => {
+    const file = pendingImportAll();
+    setPendingImportAll(undefined);
+    if (!file) return;
+    try {
+      await importAllWorkflows(file);
+    } catch (error) {
+      reportInvalidFile(error);
+    }
+  };
+
+  const handleImportWorkflow = () =>
+    pickJsonFile(async (file) => {
+      try {
+        await importWorkflow(file);
+      } catch (error) {
+        reportInvalidFile(error);
       }
-    };
-    input.click();
-  };
-
-  const handleImportWorkflow = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
-    input.onchange = async (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (file) {
-        try {
-          await importWorkflow(file);
-        } catch (error) {
-          console.error(
-            `${m.workflow_invalidFile()}: ${(error as Error).message}`
-          );
-        }
-      }
-    };
-    input.click();
-  };
+    });
 
   return (
-    <Card>
-      <CardTitle>{m.workflow_title()}</CardTitle>
-      <Container>
-        <For each={workflowList()}>
-          {(workflow) => <WorkflowItem workflow={workflow} />}
-        </For>
-      </Container>
-      <AddWorkflowButton onClick={addWorkflowToList}>
-        <FiPlus size={24} />
-        <span>{m.workflow_add()}</span>
-      </AddWorkflowButton>
-      <BulkOperationsContainer>
-        <BulkOperationButton
-          onClick={handleExportAll}
-          title={m.workflow_exportAllDescription()}
-        >
-          <FiDownload size={24} />
-          {m.workflow_exportAll()}
-        </BulkOperationButton>
-        <BulkOperationButton
-          onClick={handleImportAll}
-          title={m.workflow_importAllDescription()}
-        >
-          <FiUpload size={24} />
-          {m.workflow_importAll()}
-        </BulkOperationButton>
-        <BulkOperationButton
-          onClick={handleImportWorkflow}
-          title={m.workflow_importDescription()}
-        >
-          <FiUpload size={24} />
-          {m.workflow_import()}
-        </BulkOperationButton>
-      </BulkOperationsContainer>
-    </Card>
+    <>
+      <PageTitle
+        actions={
+          <div class="flex gap-2">
+            <DropdownMenu placement="bottom-end">
+              <DropdownMenuTrigger
+                as={Button}
+                variant="outline"
+                size="icon"
+                class="text-muted-foreground"
+                aria-label={m.workflow_importExport()}
+              >
+                <Download />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent class="max-w-72">
+                <DropdownMenuItem onSelect={exportAllWorkflows}>
+                  <Download />
+                  <MenuItemText
+                    title={m.workflow_exportAll()}
+                    description={m.workflow_exportAllDescription()}
+                  />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleImportWorkflow}>
+                  <FileUp />
+                  <MenuItemText
+                    title={m.workflow_import()}
+                    description={m.workflow_importDescription()}
+                  />
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => pickJsonFile(setPendingImportAll)}
+                >
+                  <Upload />
+                  <MenuItemText
+                    title={m.workflow_importAll()}
+                    description={m.workflow_importAllDescription()}
+                  />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button onClick={addWorkflowToList}>
+              <Plus />
+              {m.workflow_new()}
+            </Button>
+          </div>
+        }
+      >
+        {m.workflow_title()}
+      </PageTitle>
+
+      <Show
+        when={workflowList().length > 0}
+        fallback={
+          <div class="flex flex-col items-center gap-4 rounded-card border border-dashed px-6 py-12 text-center text-muted-foreground text-sm">
+            {m.workflow_empty()}
+            <Button variant="secondary" onClick={addWorkflowToList}>
+              <Plus />
+              {m.workflow_add()}
+            </Button>
+          </div>
+        }
+      >
+        <div class="grid gap-3">
+          <For each={workflowList()}>
+            {(workflow) => <WorkflowItem workflow={workflow} />}
+          </For>
+        </div>
+      </Show>
+
+      <AlertDialog
+        open={!!pendingImportAll()}
+        onOpenChange={(open) => !open && setPendingImportAll(undefined)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{m.workflow_importAll()}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {m.workflow_confirmImportAll()}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogClose as={Button} variant="outline">
+              {m.common_cancel()}
+            </AlertDialogClose>
+            <Button onClick={confirmImportAll}>
+              <Upload />
+              {m.workflow_importAll()}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };

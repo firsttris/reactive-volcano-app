@@ -6,7 +6,6 @@ import {
   Show,
   useContext,
 } from "solid-js";
-import { styled } from "solid-styled-components";
 
 const TOAST_DURATION_MS = 5000;
 
@@ -17,35 +16,6 @@ interface ToastOptions {
 }
 
 const ToastContext = createContext<(options: ToastOptions) => void>();
-
-const ToastBox = styled("div")`
-  position: fixed;
-  left: 50%;
-  bottom: calc(88px + env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  max-width: calc(100vw - 32px);
-  box-sizing: border-box;
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: #323232;
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-`;
-
-const ActionButton = styled("button")`
-  flex-shrink: 0;
-  border: none;
-  background: transparent;
-  color: var(--accent-color);
-  font-weight: 700;
-  text-transform: uppercase;
-  cursor: pointer;
-  padding: 4px;
-`;
 
 /** Shows one short message at a time, optionally with an action (e.g. undo) */
 export const ToastProvider = (props: { children: JSX.Element }) => {
@@ -71,14 +41,21 @@ export const ToastProvider = (props: { children: JSX.Element }) => {
       {props.children}
       <Show when={toast()}>
         {(current) => (
-          <ToastBox role="status">
+          <div
+            role="status"
+            class="fade-in-0 slide-in-from-bottom-4 fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] left-1/2 z-40 flex w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 animate-in items-center gap-4 rounded-2xl border bg-popover py-3 pr-3 pl-4 text-popover-foreground text-sm shadow-2xl"
+          >
             <span>{current().message}</span>
             <Show when={current().actionLabel}>
-              <ActionButton type="button" onClick={runAction}>
+              <button
+                type="button"
+                class="h-8 shrink-0 rounded-lg px-3 font-semibold text-primary transition-colors hover:bg-primary-soft"
+                onClick={runAction}
+              >
                 {current().actionLabel}
-              </ActionButton>
+              </button>
             </Show>
-          </ToastBox>
+          </div>
         )}
       </Show>
     </ToastContext.Provider>

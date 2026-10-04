@@ -1,74 +1,38 @@
-import { Show } from "solid-js";
-import { styled } from "solid-styled-components";
-import { HeaterMode } from "../../devices/ventyVeazy/protocol";
+import { For, Show } from "solid-js";
+import {
+  HeaterMode,
+  Limits,
+  toDisplayTemperature,
+} from "../../devices/ventyVeazy/protocol";
 import { useWakeLock } from "../../hooks/utils/useWakeLock";
 import { m } from "../../paraglide/messages";
 import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
-import { BoostControl } from "./BoostControl";
-import { EffectiveTemperatureStatus } from "./EffectiveTemperatureStatus";
-import { MainTemperatureControl } from "./MainTemperatureControl";
-
-// Styled Components
-const Container = styled("div")`
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-`;
-
-const Header = styled("div")`
-  text-align: center;
-  margin-bottom: 32px;
-
-  h2 {
-    margin: 0 0 16px 0;
-    color: var(--text-color);
-    font-size: 1.5rem;
-    font-weight: 700;
-  }
-`;
-
-const BoostSection = styled("div")`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-top: 20px;
-
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const StatusItem = styled("div")<{ highlight?: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 0.95rem;
-  color: ${(props) => (props.highlight ? "var(--accent-color)" : "var(--secondary-text)")};
-  padding: 8px 16px;
-  background: ${(props) =>
-    props.highlight ? "rgba(255, 102, 0, 0.1)" : "#1a1a1a"};
-  border-radius: 8px;
-  border: 1px solid ${(props) => (props.highlight ? "var(--accent-color)" : "var(--border-color)")};
-  font-weight: ${(props) => (props.highlight ? "600" : "normal")};
-`;
+import { OffsetStepper, TargetStepper } from "../TemperatureControls";
+import { TemperatureDisplay } from "../TemperatureDisplay";
+import { TemperatureGauge } from "../TemperatureGauge";
+import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 
 export const Temperature = () => {
   const { state, actions, display } = useVentyVeazy();
-
   const isCelsius = () => state.status?.isCelsius ?? true;
-  const isHeating = () =>
-    (state.status?.heaterMode ?? HeaterMode.OFF) !== HeaterMode.OFF;
+  const unit = () => (isCelsius() ? "C" : "F");
+  const heaterMode = () => state.status?.heaterMode ?? HeaterMode.OFF;
+  const isHeating = () => heaterMode() !== HeaterMode.OFF;
 
   // Keep the screen on while the device heats
   useWakeLock(isHeating);
 
-  // Verwende heaterMode vom Gerät anstatt lokalen State
-  const getCurrentBoostMode = () => {
-    const mode = state.status?.heaterMode;
-    if (mode === HeaterMode.BOOST) return "boost";
-    if (mode === HeaterMode.SUPERBOOST) return "superboost";
-    return "none";
+  /** The temperature the device heats to, in °C, including boost */
+  const effectiveCelsius = () => {
+    const status = state.status;
+    if (!status) return 0;
+    if (status.heaterMode === HeaterMode.BOOST) {
+      return status.targetTemp + status.boostTemp;
+    }
+    if (status.heaterMode === HeaterMode.SUPERBOOST) {
+      return status.targetTemp + status.superBoostTemp;
+    }
+    return status.targetTemp;
   };
 
   // All adjustments are in °C; the store clamps to the device limits
@@ -87,69 +51,109 @@ export const Temperature = () => {
     actions.setSuperBoostTemp(state.status.superBoostTemp + change);
   };
 
-  const activateBoost = (type: "boost" | "superboost") => {
-    if (getCurrentBoostMode() === type) {
-      // Deaktiviere aktuellen Boost → zurück zu normalem Heater-Modus
-      actions.setHeaterMode(HeaterMode.NORMAL);
-    } else {
-      actions.setHeaterMode(
-        type === "boost" ? HeaterMode.BOOST : HeaterMode.SUPERBOOST
-      );
-    }
-  };
+  const modes = () => [
+    { value: HeaterMode.OFF, label: m.common_off(), detail: "" },
+    {
+      value: HeaterMode.NORMAL,
+      label: m.heat_normal(),
+      detail: `${display.targetTemp()}°`,
+    },
+    {
+      value: HeaterMode.BOOST,
+      label: m.heat_boost(),
+      detail: `+${display.boostTemp()}°`,
+    },
+    {
+      value: HeaterMode.SUPERBOOST,
+      label: m.heat_superboost(),
+      detail: `+${display.superBoostTemp()}°`,
+    },
+  ];
 
   return (
-    <Container>
-      <Header>
-        <h2>{m.temperature_ventyVeazyControl()}</h2>
-      </Header>
-
-      <EffectiveTemperatureStatus
-        effectiveTemp={display.effectiveTemp()}
-        isCelsius={isCelsius()}
-      />
-
-      <MainTemperatureControl
-        targetTemp={display.targetTemp()}
-        isCelsius={isCelsius()}
-        isHeating={isHeating()}
-        setpointReached={
-          isHeating() && (state.status?.setpointReached ?? false)
-        }
-        onAdjustTemperature={adjustTemperature}
-        onToggleHeater={actions.toggleHeater}
-      />
-
-      {/* Boost Controls */}
-      <BoostSection>
-        <BoostControl
-          title="Boost Temperature"
-          temp={display.boostTemp()}
-          isCelsius={isCelsius()}
-          active={getCurrentBoostMode() === "boost"}
-          onActivate={() => activateBoost("boost")}
-          onAdjustTemp={adjustBoostTemp}
+    <>
+      <TemperatureGauge
+        current={state.status?.currentTemp ?? 0}
+        target={effectiveCelsius()}
+        min={Limits.MIN_TEMP}
+        max={Limits.MAX_TEMP}
+        heating={isHeating()}
+        reached={isHeating() && (state.status?.setpointReached ?? false)}
+        minLabel={`${toDisplayTemperature(Limits.MIN_TEMP, isCelsius())}°`}
+        maxLabel={`${toDisplayTemperature(Limits.MAX_TEMP, isCelsius())}°`}
+      >
+        <TemperatureDisplay
+          value={toDisplayTemperature(
+            state.status?.currentTemp ?? 0,
+            isCelsius()
+          )}
+          unit={unit()}
+          unitClass="text-[0.33em]"
         />
+      </TemperatureGauge>
 
-        <BoostControl
-          title="Super Boost"
-          temp={display.superBoostTemp()}
-          isCelsius={isCelsius()}
-          active={getCurrentBoostMode() === "superboost"}
-          onActivate={() => activateBoost("superboost")}
-          onAdjustTemp={adjustSuperBoostTemp}
-        />
-      </BoostSection>
-
-      <Show when={getCurrentBoostMode() !== "none"}>
-        <StatusItem
-          highlight={true}
-          style={{ "margin-top": "16px", "text-align": "center" }}
+      <section class="flex flex-col gap-2">
+        <div class="mx-1 flex items-baseline justify-between text-xs">
+          <h2 class="font-medium text-muted-foreground uppercase tracking-[0.08em]">
+            {m.heat_mode()}
+          </h2>
+          <Show when={isHeating()}>
+            <span class="text-muted-foreground">
+              {m.temperature_effective()}{" "}
+              <span class="font-semibold text-foreground tabular-nums">
+                {display.effectiveTemp()} °{unit()}
+              </span>
+            </span>
+          </Show>
+        </div>
+        <ToggleGroup
+          aria-label={m.heat_mode()}
+          class="rounded-2xl border bg-card"
+          value={String(heaterMode())}
+          onChange={(value) => value && actions.setHeaterMode(Number(value))}
         >
-          {getCurrentBoostMode() === "boost" ? "Boost" : "Super Boost"} Mode
-          Active
-        </StatusItem>
-      </Show>
-    </Container>
+          <For each={modes()}>
+            {(mode) => (
+              <ToggleGroupItem
+                value={String(mode.value)}
+                class="h-[52px] flex-col gap-0.5 rounded-xl px-1 data-[pressed]:bg-primary data-[pressed]:text-primary-foreground data-[pressed]:shadow-[0_8px_20px_-8px_var(--glow)]"
+              >
+                <span class="text-[13px] leading-none">{mode.label}</span>
+                <Show when={mode.detail}>
+                  <span class="font-mono font-normal text-[11px] leading-none opacity-80">
+                    {mode.detail}
+                  </span>
+                </Show>
+              </ToggleGroupItem>
+            )}
+          </For>
+        </ToggleGroup>
+      </section>
+
+      <TargetStepper
+        label={m.temperature_base()}
+        onDecrease={() => adjustTemperature(-1)}
+        onIncrease={() => adjustTemperature(1)}
+      >
+        <TemperatureDisplay value={display.targetTemp()} unit={unit()} />
+      </TargetStepper>
+
+      <div class="grid grid-cols-2 gap-3">
+        <OffsetStepper
+          label={m.temperature_boostOffset()}
+          value={`+${display.boostTemp()}°`}
+          active={heaterMode() === HeaterMode.BOOST}
+          onDecrease={() => adjustBoostTemp(-1)}
+          onIncrease={() => adjustBoostTemp(1)}
+        />
+        <OffsetStepper
+          label={m.temperature_superBoostOffset()}
+          value={`+${display.superBoostTemp()}°`}
+          active={heaterMode() === HeaterMode.SUPERBOOST}
+          onDecrease={() => adjustSuperBoostTemp(-1)}
+          onIncrease={() => adjustSuperBoostTemp(1)}
+        />
+      </div>
+    </>
   );
 };

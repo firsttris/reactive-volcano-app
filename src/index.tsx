@@ -2,8 +2,9 @@ import { render } from "solid-js/web";
 import { BluetoothProvider } from "./provider/BluetoothProvider";
 import { DarkModeProvider } from "./provider/DarkModeProvider";
 import { ToastProvider } from "./provider/ToastProvider";
+import "@fontsource-variable/geist";
+import "@fontsource-variable/geist-mono";
 import "./css/main.css";
-import "@fontsource/roboto";
 import { getLocale } from "./paraglide/runtime";
 import { Routes } from "./Router";
 

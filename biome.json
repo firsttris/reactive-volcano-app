@@ -1,7 +1,13 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
-  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
-  "files": { "includes": ["**", "!**/package-lock.json", "!**/.github"] },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "includes": ["**", "!**/package-lock.json", "!**/.github"]
+  },
   "formatter": {
     "indentStyle": "space",
     "indentWidth": 2,
@@ -19,11 +25,24 @@
   },
   "linter": {
     "enabled": true,
-    "rules": { "preset": "recommended" },
-    "domains": { "solid": "recommended" }
+    "rules": {
+      "preset": "recommended"
+    },
+    "domains": {
+      "solid": "recommended"
+    }
   },
   "assist": {
     "enabled": true,
-    "actions": { "source": { "organizeImports": "on" } }
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
   }
 }
