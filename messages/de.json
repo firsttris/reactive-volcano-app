@@ -194,5 +194,12 @@
   "connect_pendingWorkflow": "Verbinde deinen Volcano, um den geteilten Workflow „{name}“ zu importieren.",
   "history_sessions": "Sessions",
   "history_heatingTime": "Heizzeit",
-  "history_lastWeek": "Letzte 7 Tage"
+  "history_lastWeek": "Letzte 7 Tage",
+  "connect_reconnectTitle": "Verbindung unterbrochen",
+  "connect_reconnecting": "Verbinde erneut mit {device} …",
+  "connect_reconnectAttempt": "Versuch {current} von {total}",
+  "connect_reconnectHint": "Lass das Gerät eingeschaltet und in der Nähe.",
+  "connect_knownDevice": "{device} verbinden",
+  "connect_lastUsed": "Zuletzt verwendet",
+  "connect_otherDevice": "Anderes Gerät wählen"
 }

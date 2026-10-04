@@ -29,6 +29,37 @@ export type ConnectionError =
 
 const NO_DEVICE: DeviceInfo = { type: DeviceType.UNKNOWN, name: "" };
 
+/** Waits between reconnect attempts; the device may need a moment */
+export const RECONNECT_DELAYS_MS = [1_000, 2_000, 4_000, 8_000, 8_000];
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** The last connected device, to offer it again without the chooser */
+export interface RememberedDevice {
+  id: string;
+  name: string;
+  type: DeviceType;
+}
+
+const LAST_DEVICE_KEY = "lastBluetoothDevice";
+
+const readRememberedDevice = (): RememberedDevice | undefined => {
+  try {
+    const stored = localStorage.getItem(LAST_DEVICE_KEY);
+    return stored ? JSON.parse(stored) : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+const storeRememberedDevice = (device: RememberedDevice) => {
+  try {
+    localStorage.setItem(LAST_DEVICE_KEY, JSON.stringify(device));
+  } catch {
+    // Without storage the chooser is simply shown every time
+  }
+};
+
 const isIOS = () =>
   navigator.userAgent.includes("iPhone") ||
   navigator.userAgent.includes("iPad") ||
@@ -70,6 +101,29 @@ const createBluetoothMethods = () => {
   );
   const [deviceInfo, setDeviceInfo] = createSignal<DeviceInfo>(NO_DEVICE);
   const [connectionError, setConnectionError] = createSignal<ConnectionError>();
+  const [reconnectAttempt, setReconnectAttempt] = createSignal(0);
+  // Bumped to cancel a running reconnect loop
+  let reconnectToken = 0;
+
+  // A device the browser still has permission for (getDevices, Chrome only)
+  const [knownDevice, setKnownDevice] = createSignal<BluetoothDevice>();
+  const [rememberedDevice, setRememberedDevice] = createSignal(
+    readRememberedDevice()
+  );
+
+  const findKnownDevice = async () => {
+    const remembered = rememberedDevice();
+    if (!remembered || typeof navigator.bluetooth?.getDevices !== "function") {
+      return;
+    }
+    try {
+      const devices = await navigator.bluetooth.getDevices();
+      setKnownDevice(devices.find((d) => d.id === remembered.id));
+    } catch (error) {
+      console.warn("Looking up permitted devices failed:", error);
+    }
+  };
+  findKnownDevice();
 
   // One driver per device type; the device providers subscribe to them
   const [volcanoDriver, setVolcanoDriver] = createSignal<VolcanoDriver>();
@@ -100,13 +154,59 @@ const createBluetoothMethods = () => {
 
   function handleDisconnect(event: Event) {
     console.log("🔌 Device disconnected unexpectedly:", event);
+    // A drop while connecting is handled by the connect attempt itself
+    if (connectionState() !== ConnectionState.CONNECTED) return;
+    const lostDevice = device();
     disposeDrivers();
+    if (lostDevice) {
+      reconnect(lostDevice);
+    } else {
+      releaseDevice();
+      setConnectionState(ConnectionState.NOT_CONNECTED);
+      setConnectionError({ kind: "lost" });
+    }
+  }
+
+  /** Tries to get the link back with the same device, no chooser needed */
+  const reconnect = async (bluetoothDevice: BluetoothDevice) => {
+    const token = ++reconnectToken;
+    bluetoothDevice.removeEventListener(
+      "gattserverdisconnected",
+      handleDisconnect
+    );
+    setConnectionError(undefined);
+    setConnectionState(ConnectionState.RECONNECTING);
+
+    for (const [index, delay] of RECONNECT_DELAYS_MS.entries()) {
+      setReconnectAttempt(index + 1);
+      await sleep(delay);
+      if (token !== reconnectToken) return;
+      try {
+        await connectToDevice(bluetoothDevice);
+        if (token !== reconnectToken) return;
+        setReconnectAttempt(0);
+        setConnectionState(ConnectionState.CONNECTED);
+        return;
+      } catch (error) {
+        console.warn(`Reconnect attempt ${index + 1} failed:`, error);
+        bluetoothDevice.removeEventListener(
+          "gattserverdisconnected",
+          handleDisconnect
+        );
+        await disposeDrivers();
+      }
+    }
+
+    if (token !== reconnectToken) return;
+    setReconnectAttempt(0);
     releaseDevice();
     setConnectionState(ConnectionState.NOT_CONNECTED);
     setConnectionError({ kind: "lost" });
-  }
+  };
 
   const disconnect = async () => {
+    reconnectToken++;
+    setReconnectAttempt(0);
     setConnectionError(undefined);
     await disposeDrivers();
     releaseDevice();
@@ -165,16 +265,25 @@ const createBluetoothMethods = () => {
     }
   };
 
-  const connect = async () => {
+  const rememberDevice = (bluetoothDevice: BluetoothDevice) => {
+    const remembered = {
+      id: bluetoothDevice.id,
+      name: bluetoothDevice.name || "",
+      type: deviceInfo().type,
+    };
+    storeRememberedDevice(remembered);
+    setRememberedDevice(remembered);
+    setKnownDevice(bluetoothDevice);
+  };
+
+  const runConnect = async (pickDevice: () => Promise<BluetoothDevice>) => {
+    reconnectToken++;
     setConnectionState(ConnectionState.CONNECTING);
     setConnectionError(undefined);
     try {
-      const bluetoothDevice = await navigator.bluetooth.requestDevice({
-        filters: getDeviceFilters(),
-        acceptAllDevices: false,
-        optionalServices: ["generic_access", ServiceUUIDs.GenericAccess],
-      });
+      const bluetoothDevice = await pickDevice();
       await connectToDevice(bluetoothDevice);
+      rememberDevice(bluetoothDevice);
       setConnectionState(ConnectionState.CONNECTED);
     } catch (error) {
       console.error("Connection failed:", error);
@@ -194,8 +303,28 @@ const createBluetoothMethods = () => {
     }
   };
 
+  /** Shows the browser's device chooser */
+  const connect = () =>
+    runConnect(() =>
+      navigator.bluetooth.requestDevice({
+        filters: getDeviceFilters(),
+        acceptAllDevices: false,
+        optionalServices: ["generic_access", ServiceUUIDs.GenericAccess],
+      })
+    );
+
+  /** Connects the last used device directly, if the browser still knows it */
+  const connectKnownDevice = async () => {
+    const known = knownDevice();
+    if (known) await runConnect(async () => known);
+  };
+
   return {
     connect,
+    connectKnownDevice,
+    knownDevice,
+    rememberedDevice,
+    reconnectAttempt,
     disconnect,
     connectionState,
     connectionError,

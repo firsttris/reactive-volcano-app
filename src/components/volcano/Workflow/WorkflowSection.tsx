@@ -206,7 +206,7 @@ export const WorkFlowSection = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose as={Button} variant="outline">
+            <AlertDialogClose variant="outline">
               {m.common_cancel()}
             </AlertDialogClose>
             <Button onClick={importShared}>
@@ -229,7 +229,7 @@ export const WorkFlowSection = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose as={Button} variant="outline">
+            <AlertDialogClose variant="outline">
               {m.common_cancel()}
             </AlertDialogClose>
             <Button onClick={confirmImportAll}>

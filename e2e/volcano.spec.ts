@@ -82,30 +82,61 @@ test.describe("Volcano Gerät - Disconnect", () => {
   test.beforeEach(async ({ page, bluetoothDevice }) => {
     await bluetoothDevice("VOLCANO");
     await page.goto("/");
-
     const connectButton = page.locator('button:has-text("Connect")').first();
     await connectButton.click();
     await page.waitForURL(/.*volcano.*/i, { timeout: 10000 });
   });
 
+  const dropConnection = (page: import("@playwright/test").Page) =>
+    page.evaluate(() => {
+      const { bluetooth } = window.navigator as unknown as {
+        bluetooth: MockBluetooth;
+      };
+      bluetooth._currentDevice?.gatt?.disconnect();
+    });
+
   test("sollte Verbindung trennen können", async ({ page }) => {
-    // Simuliere Disconnect über die gemockte API
+    await page.getByRole("button", { name: "Disconnect" }).click();
+    await page
+      .getByRole("alertdialog")
+      .getByRole("button", { name: "Disconnect" })
+      .click();
+
+    await expect(
+      page.locator('button:has-text("Connect")').first()
+    ).toBeVisible({ timeout: 5000 });
+  });
+
+  test("sollte nach Verbindungsabbruch automatisch neu verbinden", async ({
+    page,
+  }) => {
+    await dropConnection(page);
+
+    await expect(
+      page.getByText("Reconnecting to Volcano Hybrid")
+    ).toBeVisible();
+    await page.waitForURL(/.*volcano.*/i, { timeout: 10000 });
+    await expect(page.locator("text=/200/i").first()).toBeVisible({
+      timeout: 5000,
+    });
+  });
+
+  test("sollte nach erfolglosen Versuchen aufgeben", async ({ page }) => {
+    await page.clock.install();
     await page.evaluate(() => {
       const { bluetooth } = window.navigator as unknown as {
         bluetooth: MockBluetooth;
       };
-      const device = bluetooth._currentDevice;
-      if (device?.gatt?.connected) {
-        device.gatt.disconnect();
-      }
+      bluetooth._failConnect = true;
     });
+    await dropConnection(page);
+    await expect(page.getByText("Attempt 1 of 5")).toBeVisible();
 
-    // Warte kurz für die React-Effekte
-    await page.waitForTimeout(1000);
+    await page.clock.runFor(30_000);
 
-    // Prüfe, ob zur Startseite navigiert wurde (Connect-Button ist wieder da)
+    await expect(page.getByRole("alert")).toContainText("Connection lost");
     await expect(
       page.locator('button:has-text("Connect")').first()
-    ).toBeVisible({ timeout: 5000 });
+    ).toBeVisible();
   });
 });

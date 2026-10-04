@@ -1,14 +1,33 @@
 import * as AlertDialogPrimitive from "@kobalte/core/alert-dialog";
+import { useDialogContext } from "@kobalte/core/dialog";
 import type { PolymorphicProps } from "@kobalte/core/polymorphic";
 import type { Component, ComponentProps, JSX, ValidComponent } from "solid-js";
 import { splitProps } from "solid-js";
 import { cn } from "../../lib/utils";
+import { Button, type ButtonProps } from "./button";
 
 const AlertDialog = AlertDialogPrimitive.Root;
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
 const AlertDialogPortal = AlertDialogPrimitive.Portal;
-/** Closes the dialog; render as a Button via `as={Button}` */
-const AlertDialogClose = AlertDialogPrimitive.CloseButton;
+/**
+ * Button that closes the dialog. Kobalte's CloseButton would label every
+ * such button "Dismiss" for screen readers, hiding "Cancel" or "Reset".
+ */
+const AlertDialogClose = (
+  props: ButtonProps & { onClick?: (event: MouseEvent) => void }
+) => {
+  const dialog = useDialogContext();
+  const [local, others] = splitProps(props, ["onClick"]);
+  return (
+    <Button
+      {...others}
+      onClick={(event: MouseEvent) => {
+        local.onClick?.(event);
+        dialog.close();
+      }}
+    />
+  );
+};
 
 type AlertDialogContentProps<T extends ValidComponent = "div"> =
   AlertDialogPrimitive.AlertDialogContentProps<T> & {

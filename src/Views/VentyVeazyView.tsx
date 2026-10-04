@@ -99,6 +99,7 @@ export const VentyVeazyShell = (props: RouteSectionProps) => {
     const state = connectionState();
     if (
       state === ConnectionState.NOT_CONNECTED ||
+      state === ConnectionState.RECONNECTING ||
       state === ConnectionState.CONNECTION_FAILED
     ) {
       navigate(buildRoute.root());

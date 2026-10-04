@@ -270,11 +270,10 @@ export const HistoryView = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose as={Button} variant="outline">
+            <AlertDialogClose variant="outline">
               {m.common_cancel()}
             </AlertDialogClose>
             <AlertDialogClose
-              as={Button}
               variant="destructive"
               onClick={() => history.clear()}
             >

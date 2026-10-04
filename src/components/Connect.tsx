@@ -9,11 +9,14 @@ import TriangleAlert from "lucide-solid/icons/triangle-alert";
 import { createEffect, createSignal, For, Match, Show, Switch } from "solid-js";
 import { cn } from "../lib/utils";
 import { m } from "../paraglide/messages";
-import { useBluetooth } from "../provider/BluetoothProvider";
+import {
+  RECONNECT_DELAYS_MS,
+  useBluetooth,
+} from "../provider/BluetoothProvider";
 import { buildRoute } from "../routes";
 import { ConnectionState, DeviceType } from "../utils/uuids";
 import { decodeWorkflow, getPendingWorkflowCode } from "../utils/workflowShare";
-import { ThemeToggle } from "./AppHeader";
+import { deviceLabel, ThemeToggle } from "./AppHeader";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -72,12 +75,29 @@ const BluetoothBeacon = (props: { active: boolean }) => (
 );
 
 export const Connect = () => {
-  const { connect, connectionState, connectionError, deviceInfo } =
-    useBluetooth();
+  const {
+    connect,
+    connectKnownDevice,
+    knownDevice,
+    rememberedDevice,
+    reconnectAttempt,
+    connectionState,
+    connectionError,
+    deviceInfo,
+    disconnect,
+  } = useBluetooth();
   const navigate = useNavigate();
 
   const isConnecting = () => connectionState() === ConnectionState.CONNECTING;
   const isConnected = () => connectionState() === ConnectionState.CONNECTED;
+  const isReconnecting = () =>
+    connectionState() === ConnectionState.RECONNECTING;
+
+  /** The last device, if the browser can connect it without the chooser */
+  const knownDeviceLabel = () => {
+    const remembered = rememberedDevice();
+    return knownDevice() && remembered ? deviceLabel(remembered) : undefined;
+  };
   const isNotConnected = () => {
     return (
       connectionState() === ConnectionState.NOT_CONNECTED ||
@@ -155,7 +175,7 @@ export const Connect = () => {
       </div>
 
       <main class="relative mx-auto flex w-full max-w-sm flex-1 flex-col items-center gap-7 px-6 pt-10 pb-10">
-        <BluetoothBeacon active={isConnecting()} />
+        <BluetoothBeacon active={isConnecting() || isReconnecting()} />
 
         <Show when={isNotConnected()}>
           <div class="flex flex-col items-center gap-2.5 text-center">
@@ -236,10 +256,36 @@ export const Connect = () => {
             </Match>
           </Switch>
 
-          <Button size="lg" class="w-full" onClick={connect}>
-            <Bluetooth />
-            {m.connect_button()}
-          </Button>
+          <Show
+            when={knownDeviceLabel()}
+            fallback={
+              <Button size="lg" class="w-full" onClick={connect}>
+                <Bluetooth />
+                {m.connect_button()}
+              </Button>
+            }
+          >
+            {(label) => (
+              <div class="flex w-full flex-col gap-2">
+                <Button
+                  size="lg"
+                  class="h-auto w-full flex-col gap-0.5 py-3"
+                  onClick={connectKnownDevice}
+                >
+                  <span class="flex items-center gap-2">
+                    <Bluetooth />
+                    {m.connect_knownDevice({ device: label() })}
+                  </span>
+                  <span class="font-normal text-xs opacity-75">
+                    {m.connect_lastUsed()}
+                  </span>
+                </Button>
+                <Button variant="ghost" class="w-full" onClick={connect}>
+                  {m.connect_otherDevice()}
+                </Button>
+              </div>
+            )}
+          </Show>
 
           <Show when={isBluetoothSupported() && !connectionError()}>
             <Collapsible class="w-full rounded-2xl border bg-card">
@@ -254,6 +300,31 @@ export const Connect = () => {
               </CollapsibleContent>
             </Collapsible>
           </Show>
+        </Show>
+
+        <Show when={isReconnecting()}>
+          <div
+            class="flex flex-col items-center gap-2.5 text-center"
+            role="status"
+          >
+            <h1 class="font-semibold text-[26px] leading-tight tracking-tight">
+              {m.connect_reconnectTitle()}
+            </h1>
+            <p class="text-[15px] text-muted-foreground leading-relaxed">
+              {m.connect_reconnecting({ device: deviceLabel(deviceInfo()) })}
+              <br />
+              {m.connect_reconnectHint()}
+            </p>
+            <Badge variant="soft" class="mt-1 py-1 tabular-nums">
+              {m.connect_reconnectAttempt({
+                current: reconnectAttempt(),
+                total: RECONNECT_DELAYS_MS.length,
+              })}
+            </Badge>
+          </div>
+          <Button variant="outline" class="w-full" onClick={disconnect}>
+            {m.common_cancel()}
+          </Button>
         </Show>
 
         <Show when={isConnecting()}>

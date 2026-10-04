@@ -194,5 +194,12 @@
   "connect_pendingWorkflow": "Connect your Volcano to import the shared workflow „{name}“.",
   "history_sessions": "Sessions",
   "history_heatingTime": "Heating time",
-  "history_lastWeek": "Last 7 days"
+  "history_lastWeek": "Last 7 days",
+  "connect_reconnectTitle": "Connection lost",
+  "connect_reconnecting": "Reconnecting to {device}…",
+  "connect_reconnectAttempt": "Attempt {current} of {total}",
+  "connect_reconnectHint": "Keep the device switched on and nearby.",
+  "connect_knownDevice": "Connect {device}",
+  "connect_lastUsed": "Last used",
+  "connect_otherDevice": "Choose another device"
 }

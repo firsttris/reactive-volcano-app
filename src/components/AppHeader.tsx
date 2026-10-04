@@ -28,7 +28,7 @@ const DEVICE_TYPE_LABELS: Partial<Record<DeviceType, string>> = {
 };
 
 /** Friendly device name, e.g. "Volcano Hybrid" instead of "S&B VOLCANO H" */
-export const deviceLabel = (device: DeviceInfo) =>
+export const deviceLabel = (device: Pick<DeviceInfo, "type" | "name">) =>
   DEVICE_TYPE_LABELS[device.type] ?? device.name;
 
 export const ThemeToggle = () => {
@@ -69,14 +69,10 @@ const DisconnectButton = () => {
           </AlertDialogTitle>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogClose as={Button} variant="outline">
+          <AlertDialogClose variant="outline">
             {m.common_cancel()}
           </AlertDialogClose>
-          <AlertDialogClose
-            as={Button}
-            variant="destructive"
-            onClick={() => disconnect()}
-          >
+          <AlertDialogClose variant="destructive" onClick={() => disconnect()}>
             <Power />
             {m.connection_disconnect()}
           </AlertDialogClose>
