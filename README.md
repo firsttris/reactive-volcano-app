@@ -1,262 +1,214 @@
 <div align="center">
 
-# Reactive Vaporizer App
+<img src="docs/banner.png" alt="Reactive Vaporizer App: Web Bluetooth control with live temperature, workflows, device settings and self-diagnosis" width="900">
 
-<img src="./docs/ui-1.png" alt="User Interface" height="500" />
+**Control your vaporizer from the browser.**<br>
+Live temperature, heater and pump, heat-up workflows, device settings and self-diagnosis over Web Bluetooth.<br>
+No app store, no account, no server: open the page, connect, done.
 
 [![Build](https://github.com/firsttris/reactive-volcano-app/actions/workflows/build.yml/badge.svg)](https://github.com/firsttris/reactive-volcano-app/actions/workflows/build.yml)
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 [![Release](https://github.com/firsttris/reactive-volcano-app/actions/workflows/release.yml/badge.svg)](https://github.com/firsttris/reactive-volcano-app/actions/workflows/release.yml)
 [![Docker Image Version](https://img.shields.io/docker/v/tristanteu/reactive-volcano-app?sort=semver&logo=docker&logoColor=white&label=Docker%20Hub)](https://hub.docker.com/r/tristanteu/reactive-volcano-app)
 [![Docker Pulls](https://img.shields.io/docker/pulls/tristanteu/reactive-volcano-app?logo=docker&logoColor=white)](https://hub.docker.com/r/tristanteu/reactive-volcano-app)
-[![Docker Image Size](https://img.shields.io/docker/image-size/tristanteu/reactive-volcano-app?sort=semver&logo=docker&logoColor=white)](https://hub.docker.com/r/tristanteu/reactive-volcano-app)
+[![Platforms](https://img.shields.io/badge/platform-amd64%20%7C%20arm64-lightgrey)](https://hub.docker.com/r/tristanteu/reactive-volcano-app/tags)
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/license-CC%20BY--NC%204.0-lightgrey)](LICENSE)
+<br>
+[![SolidJS](https://img.shields.io/badge/SolidJS-1.9-2c4f7c?logo=solid&logoColor=white)](https://www.solidjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)](https://vite.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![PWA](https://img.shields.io/badge/PWA-installable-5a0fc8?logo=pwa&logoColor=white)](docs/getting-started.md#install-as-an-app)
 
-[![SolidJS](https://img.shields.io/badge/SolidJS-2c4f7c?style=for-the-badge&logo=solid&logoColor=c8c8c8)](https://www.solidjs.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![solid-ui](https://img.shields.io/badge/solid--ui-000000?style=for-the-badge&logo=shadcnui&logoColor=white)](https://www.solid-ui.com)
+[**▶ Open the app**](https://firsttris.github.io/reactive-volcano-app/) •
+[Why?](#-why) •
+[Features](#-features) •
+[Get started](#-get-started) •
+[Self-hosting](#-self-hosting) •
+[Documentation](docs/README.md) •
+[Development](#️-development)
 
-**Control your Storz & Bickel devices with cutting-edge Web Bluetooth technology.**
+<img src="docs/hero.png" alt="The control screens for a desktop vaporizer, a portable with boost modes and a portable with battery display" width="900">
 
-[German Version](README_de.md)
+<sub>Deutsch: [README_de.md](README_de.md)</sub>
 
 </div>
 
+> [!IMPORTANT]
+> **Unofficial, independent project.** Not affiliated with, endorsed, sponsored or authorized by
+> Storz & Bickel GmbH. *VOLCANO*, *VENTY*, *VEAZY*, *CRAFTY* and *STORZ & BICKEL* are trademarks of
+> their respective owner and are used here only to name the devices this app is compatible with.
+> For the official app, firmware and support, go to the manufacturer. See [Legal notice](docs/legal.md).
 
-## 📖 Introduction
+## 💡 Why?
 
-The Volcano, Venty, Veazy, and Crafty, made by Storz & Bickel in Tuttlingen, Germany, are well-known high-quality vaporizers. These devices can be controlled using the Bluetooth Web API.
+Compatible vaporizers speak Bluetooth Low Energy, and modern browsers can talk to it directly through
+the [Web Bluetooth API](https://developer.mozilla.org/docs/Web/API/Web_Bluetooth_API). This project
+turns that into a fast, polished control app that runs anywhere Chrome or Edge runs:
 
-This project showcases how to use **cutting-edge technology** to control these devices via the Web Bluetooth API.
+- **Nothing to install**: a web page that becomes an app on your home screen if you want it to.
+  Works on Android, Windows, macOS, ChromeOS and Linux, and on iOS through a Web Bluetooth browser.
+- **Live**: temperature and state arrive as Bluetooth notifications the moment the device sends them
+  (portables with a single control channel are queried twice a second), and every change you make is
+  written within a fraction of a second.
+- **Workflows**: automate a session on a desktop vaporizer: heat to 170 °C, hold, run the pump, step up
+  to 175 °C, and so on. Build your own, share them as JSON.
+- **Private by design**: there is no backend. The app talks to your device and nothing else, keeps its
+  data in your browser and has no tracking, analytics or accounts.
+- **Open and self-hostable**: one small nginx container for amd64 and arm64, or any static web server.
 
-## 📱 Device Support
+## ✨ Features
 
-This app supports the following Storz & Bickel devices:
+| | Desktop · *Volcano Hybrid* | Portable · *Venty* / *Veazy* | Portable · *Crafty / Crafty+* |
+|---|:---:|:---:|:---:|
+| 🌡️ Live current and target temperature with heat-up progress | ✅ | ✅ | ✅ |
+| 🔥 Heater on/off | ✅ | ✅ | ✅ |
+| 💨 Air pump on/off | ✅ | | |
+| 🚀 Boost and Superboost offsets, heater modes | | ✅ | Boost |
+| 🔁 Workflows: multi-step heat / hold / pump, JSON import & export | ✅ | | |
+| 🔋 Battery level and charging state | | ✅ | ✅ |
+| 🔆 Brightness, vibration, °C / °F | ✅ | ✅ | ✅ |
+| ⏱️ Auto-shutdown time | ✅ | | ✅ |
+| 🔌 Eco charging (current optimization, voltage limit), permanent boost | | ✅ | |
+| 📶 Permanent Bluetooth | | Veazy | ✅ |
+| 💡 Charge indicator LED | | | ✅ |
+| 📍 Find my device | | Veazy | Crafty+ |
+| 🩺 Self-diagnosis with plain-language advice | ✅ | ✅ | ✅ |
+| ℹ️ Serial number, firmware, runtime | ✅ | ✅ | ✅ |
+| ♻️ Factory reset | | ✅ | ✅ |
 
-- **Volcano**
-- **Venty**
-- **Veazy**
-- **Crafty** (both new and old firmware versions)
+Crafty units with firmware older than 2.51 expose fewer values: target and current temperature, boost,
+brightness and battery work, the rest is hidden.
 
-*Note: Available features may vary depending on the device model.*
+**Across the app**: light and dark mode (follows the system), English and German (follows the
+browser), installable PWA with offline start, the screen stays on while heating or running a workflow,
+clear error messages when the connection drops. Every screen is described in [Usage](docs/usage.md).
 
-## 🚀 Features
+## 📸 Screenshots
 
-### Volcano
-- 🌡️ **Temperature control** with live current/target temperature and heat-up progress
-- 💨 **Heater & air pump** control
-- 🔁 **Workflows**: create, edit and run multi-step heat/hold/pump sequences, with JSON import & export
-- ⚙️ **Settings**: brightness, vibration, standby light, auto-shutdown time, °C/°F
-- 🩺 **Device analysis** (self-check with recommendations)
+<table>
+  <tr>
+    <td width="33%"><img src="docs/screenshot-connect.png" alt="Connect screen with the supported devices and help for devices that are not found"><br><sub><b>Connect</b>: one tap, with help if nothing is found</sub></td>
+    <td width="33%"><img src="docs/screenshot-volcano-workflows.png" alt="Workflow list with four workflows and their temperature steps"><br><sub><b>Workflows</b>: run, edit, import, export · <a href="docs/workflows.md">docs →</a></sub></td>
+    <td width="33%"><img src="docs/screenshot-volcano-settings.png" alt="Settings for the desktop vaporizer: shutdown time, brightness, vibration, standby light, unit and device info"><br><sub><b>Settings</b>: device options, info and diagnosis</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshot-venty-settings.png" alt="Settings for the portable: LED brightness, vibration, boost options and eco charging"><br><sub><b>Portable settings</b>: boost and eco charging</sub></td>
+    <td><img src="docs/screenshot-crafty-settings.png" alt="Settings for the Crafty: brightness, shutdown time, permanent Bluetooth, charge LED"><br><sub><b>Crafty settings</b>: shutdown, LED, Bluetooth</sub></td>
+    <td><img src="docs/screenshot-volcano-light.png" alt="The control screen in light mode"><br><sub><b>Light mode</b>: follows your system</sub></td>
+  </tr>
+</table>
 
-### Venty & Veazy
-- 🌡️ **Temperature control** incl. **Boost** and **Superboost**
-- 🔋 **Battery** status and charging info
-- ⚙️ **Settings**: brightness, vibration, permanent Bluetooth, charge current optimization, charge voltage limit, boost visualization, permanent boost
-- 📍 **Find my device**, device info, factory reset
-- 🩺 **Device analysis**
+## 🚀 Get started
 
-### Crafty
-- 🌡️ **Temperature & heater** control, auto-shutdown time
-- 🔋 **Battery** status, charge indicator LED
-- 📍 **Find my device**, device info, factory reset
-- 🩺 **Device analysis**
+1. Open **[firsttris.github.io/reactive-volcano-app](https://firsttris.github.io/reactive-volcano-app/)**
+   in Chrome, Edge or Opera.
+2. Switch on your device and make sure it is **not connected to another phone or app**.
+3. Tap **Connect Device** and pick it from the browser's Bluetooth dialog.
 
-### App Features
-- 🌑 **Dark mode**
-- 📱 **Responsive UI** (Desktop & Mobile)
-- 🌍 **Localization** (German & English)
-- 💾 **PWA** (Progressive Web App)
+### 🌐 Browser support
 
-## 🎮 Test my App
+| Platform | Works with | Notes |
+|---|---|---|
+| Android, Windows, macOS, ChromeOS | Chrome, Edge, Opera | Web Bluetooth is on by default |
+| Linux | Chrome, Chromium | enable `chrome://flags/#enable-web-bluetooth` once, see [Getting started](docs/getting-started.md#linux) |
+| iOS, iPadOS | [Bluefy](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055) | Safari has no Web Bluetooth |
+| Firefox, Safari | ❌ | no Web Bluetooth support |
 
-Access & Test the WebApp here: **[Reactive Vaporizer App](https://firsttris.github.io/reactive-volcano-app/)**
+Device not found? Work through [Troubleshooting](docs/troubleshooting.md): it starts with Chrome's
+built-in `chrome://bluetooth-internals` page and tells you in three steps whether the adapter, the
+browser or the device is the problem.
 
-## 🐳 Self-Hosting with Docker
+## 🐳 Self-hosting
 
-A ready-to-use image (`linux/amd64`, `linux/arm64`) is published on **[Docker Hub](https://hub.docker.com/r/tristanteu/reactive-volcano-app)**.
+A ready-made image for `linux/amd64` and `linux/arm64` is on
+[Docker Hub](https://hub.docker.com/r/tristanteu/reactive-volcano-app):
 
 ```bash
-docker run -d --name volcano-app -p 8080:80 --restart unless-stopped tristanteu/reactive-volcano-app:latest
+docker run -d --name vaporizer-app -p 8080:80 --restart unless-stopped tristanteu/reactive-volcano-app:latest
 ```
 
-Or with Docker Compose:
+<details>
+<summary><b>Docker Compose</b></summary>
 
 ```yaml
 services:
-  volcano-app:
+  vaporizer-app:
     image: tristanteu/reactive-volcano-app:latest
     ports:
       - "8080:80"
     restart: unless-stopped
 ```
 
-Then open `http://localhost:8080`. *Note: Web Bluetooth only works in a secure context — when accessing the app from another device, serve it via HTTPS (e.g. behind a reverse proxy).*
-
-## 🐧 Prerequisites
-
-The app requires a browser that supports the **[Web Bluetooth API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API#browser_compatibility)**:
-
-| Platform | Supported browsers |
-| --- | --- |
-| Windows, macOS, ChromeOS, Android | Chrome, Edge, Opera (enabled by default) |
-| Linux | Chrome / Chromium (flag must be enabled, see below) |
-| iOS / iPadOS | Not supported by Safari. Use a Web Bluetooth browser such as [Bluefy](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055) |
-| Firefox, Safari (all platforms) | ❌ Not supported |
-
-**Linux only:** enable Web Bluetooth manually:
-
-1. Open Chrome and navigate to `chrome://flags/#enable-web-bluetooth`.
-2. Enable the flag as shown in the image below and restart Chrome.
-
-![Enabling Web Bluetooth API in Chrome](/docs/web-bluetooth-api.png)
-
-## 🖼️ User Interface Overview
-
-<details>
-<summary><b>Click to view User Interface screenshots</b></summary>
-<br>
-
-The user interface is responsive and designed to work well on both desktop and mobile devices.
-
-### Click on the Bluetooth icon to initiate Bluetooth discovery
-<div align="center">
-
-![Bluetooth Discovery](/docs/bluetooth-connect.png)
-
-</div>
-
-### Effortlessly control your Storz & Bickel device
-<div align="center">
-
-![User Interface](/docs/ui-1.png)
-![User Interface](/docs/ui-2.png)
-
-</div>
-
-### Veazy Venty
-<div align="center">
-
-![User Interface](/docs/veazy1.png)
-![User Interface](/docs/veazy2.png)
-
-</div>
-
 </details>
 
-## 📲 Adding the PWA to Your Home Screen
-
 <details>
-<summary><b>Click to see PWA installation steps</b></summary>
-<br>
-
-Progressive Web Apps can be installed on your device like native apps.
-
-### On Android:
-1. Open the PWA in Chrome.
-2. Tap on the browser's menu (usually three dots in the top right corner).
-3. Tap on "Add to Home screen".
-
-### On iOS:
-Safari does not support Web Bluetooth, so an app installed from Safari cannot connect to your device. Open the app in a Web Bluetooth browser such as [Bluefy](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055) instead.
-
-</details>
-
-
-
-## 🛠️ Development and Build
-
-<details>
-<summary><b>Click to see Development and Build steps</b></summary>
-<br>
-
-**Requirements:** Node.js 22 or newer.
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/firsttris/reactive-volcano-app.git
-   ```
-2. Navigate into the project directory:
-   ```bash
-   cd reactive-volcano-app
-   ```
-3. Install the dependencies:
-   ```bash
-   npm install
-   ```
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-5. To build the project:
-   ```bash
-   npm run build        # for GitHub Pages (served under /reactive-volcano-app/)
-   npm run build:root   # for hosting at the domain root (/), e.g. Docker
-   ```
-
-**Quality checks:**
+<summary><b>Podman Quadlet</b></summary>
 
 ```bash
-npm run typecheck    # TypeScript
-npm run lint         # Biome (npm run lint:fix to auto-fix)
-npm test             # Unit tests (Vitest)
-npm run test:e2e     # End-to-end tests (Playwright)
+curl -o ~/.config/containers/systemd/volcano-app.container \
+  https://raw.githubusercontent.com/firsttris/reactive-volcano-app/main/volcano-app.container
+systemctl --user daemon-reload && systemctl --user start volcano-app
 ```
 
-**Translations:** the texts live in `messages/en.json` and `messages/de.json`
-([Paraglide JS](https://inlang.com/m/gerre34r/library-inlang-paraglideJs)).
-Components call them as typed functions (`m.settings_title()`), keys follow
-`area_group_name`. `npm run i18n` compiles them to `src/paraglide` (dev, build,
-typecheck and test do that on their own). The browser language decides,
-English otherwise. `tests/i18n.test.ts` checks that both files have the same
-keys and placeholders and that every message is used.
-
 </details>
 
-### 🐛 Remote Debugging on Android
+> [!NOTE]
+> Browsers only allow Bluetooth on **secure origins**: `https://…` or `http://localhost`. To use your
+> instance from another device, put it behind a reverse proxy with HTTPS. Examples for Caddy, nginx and
+> Traefik, and how to serve the app under a sub-path, are in [Self-hosting](docs/self-hosting.md).
 
-<details>
-<summary><b>Click to see Remote Debugging steps</b></summary>
-<br>
+## 📚 Documentation
 
-1. **Enable USB Debugging** on your Android device.
-2. **Connect Your Device** via USB.
-3. **Enable Bluetooth Web API for HTTP**: Go to `chrome://flags/#unsafely-treat-insecure-origin-as-secure` in Chrome on your PC.
-4. **Enter Your Local IP Address**: Add your local dev machine IP, enable, and restart.
-   ![unsafely-treat-insecure-origin-as-secure](docs/chrome-insecure-origins.png)
-5. **Open Local Server URL**: Open `http://<YOUR_IP>:5173/` on your Android device.
-6. **Enable Remote Debugging**: On your PC, go to `chrome://inspect/#devices`.
-   ![inspect](docs/inspect.png)
-7. **Debug**: Click "inspect" to open the DevTools.
+| | |
+|---|---|
+| [Getting started](docs/getting-started.md) | browsers, Linux flag, iOS, connecting, installing as an app, updates |
+| [Usage](docs/usage.md) | every screen for each device: control, boost, settings, diagnosis, find my device |
+| [Workflows](docs/workflows.md) | how a workflow runs, editing, the JSON format for import and export |
+| [Self-hosting](docs/self-hosting.md) | Docker, Compose, Podman, HTTPS with Caddy / nginx / Traefik, sub-paths, static hosting |
+| [Troubleshooting & FAQ](docs/troubleshooting.md) | device not found, connection drops, Linux, iOS, common questions |
+| [Privacy & security](docs/privacy-security.md) | what the app stores, what it sends (nothing), permissions, secure context |
+| [Architecture](docs/architecture.md) | layers, data flow, Bluetooth queue, stores, routing, PWA, design decisions |
+| [Bluetooth protocol](docs/protocol.md) | services, characteristics and encodings for each device family |
+| [Development](docs/development.md) | setup, scripts, project structure, conventions, translations, adding a device, debugging on Android |
+| [Testing](docs/testing.md) | unit tests, the Bluetooth mock, end-to-end tests, screenshots, CI |
+| [Releases & deployment](docs/releases.md) | GitHub Pages, versioning, Docker images, the release workflow |
+| [Legal notice](docs/legal.md) | trademarks, no affiliation, no warranty, safety, license |
 
-</details>
+## 🛠️ Development
 
-## ⚠️ Connection Issues and Pitfalls
+Requires Node.js 22 or newer.
 
-- **Single Connection**: The Volcano can maintain a Bluetooth connection with only one device at a time. Disconnect existing connections before pairing a new device.
+```bash
+git clone https://github.com/firsttris/reactive-volcano-app.git && cd reactive-volcano-app
+npm install
+npm run dev        # http://localhost:5173
+```
 
-### 🔍 No Devices Found? Troubleshooting with Bluetooth Internals
+No device at hand? The end-to-end tests run the whole app against a simulated Web Bluetooth stack;
+`npm run test:e2e:ui` lets you click through it.
 
-Chrome ships a built-in diagnostics page that helps you figure out whether the problem is your adapter, the browser, or the device.
+**Stack**: SolidJS with `@solidjs/router` · Tailwind CSS 4 and [solid-ui](https://www.solid-ui.com)
+(Kobalte) · Paraglide JS for English and German · `p-queue` to serialize every GATT operation ·
+`vite-plugin-pwa` · Vitest, Playwright and Biome. Details in [Development](docs/development.md) and
+[Architecture](docs/architecture.md).
 
-1. **Check the adapter**: Open `chrome://bluetooth-internals` and select **Adapter**. *Present* and *Powered* must both show a green check. *Discoverable* and *Discovering* showing a red cross is normal while no scan is running.
-   - If the adapter is missing, Chrome can't access Bluetooth. On Linux, check `bluetoothctl show` (it must say `Powered: yes`). A Chrome installed as a Flatpak may not be able to reach BlueZ, so use the native package instead.
-2. **Scan for your device**: Turn your device on, go to **Devices** and click **Start Scan**.
-   - **Device shows up**: Bluetooth works, and the problem is in the browser. Make sure you use a supported browser (see [Prerequisites](#-prerequisites)). On Linux, enable the Web Bluetooth flag and also `chrome://flags/#enable-experimental-web-platform-features` and restart Chrome.
-   - **Device doesn't show up**: The device isn't advertising. It's most likely still connected to another device (e.g. your phone with the official app). Disconnect it there or turn off Bluetooth on your phone, then restart the device.
-3. **Linux CLI check** (optional): `bluetoothctl scan le` should list your device (e.g. `STORZ&BICKEL…` or `S&B…`).
+```bash
+npm run typecheck && npm run lint && npm test && npm run test:e2e
+```
 
 ## 🤝 Contributing
 
-Want to contribute?
-- Visit our [issues page](https://github.com/firsttris/reactive-volcano-app/issues).
-- Submit pull requests or open issues for bugs and feature suggestions.
+Bug reports, ideas and pull requests are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md). Reports
+from real devices help most: please include the device, its firmware version (shown under *Settings*),
+your browser and operating system.
 
-## ⚖️ Code Ownership & License
+---
 
-**Code Ownership**:
-This project has been developed with utmost care to respect Storz & Bickel's rights. All code was written from scratch using different technologies. Assets are open source. If existing concerns arise, please contact me before taking legal action.
-
-**License**:
-This work is licensed under a [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/).
+<div align="center">
+<sub>
+<a href="LICENSE">CC BY-NC 4.0</a> · © Tristan Teufel and contributors · <a href="README_de.md">Deutsche Version</a><br>
+This is an independent, unofficial open-source project. It is not affiliated with, endorsed, sponsored or authorized by Storz &amp; Bickel GmbH.<br>
+STORZ &amp; BICKEL, VOLCANO, VOLCANO HYBRID, VENTY, VEAZY and CRAFTY are trademarks of Storz &amp; Bickel GmbH, used only to describe compatibility.<br>
+Provided “as is”, without warranty. Use at your own risk. <a href="docs/legal.md">Legal notice</a>
+</sub>
+</div>

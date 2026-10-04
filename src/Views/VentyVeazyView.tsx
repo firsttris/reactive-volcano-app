@@ -22,7 +22,7 @@ import { ConnectionState } from "../utils/uuids";
 
 /**
  * Shown while the device is switched off in find-my mode: it can only be
- * made to beep until it is switched on again (like the legacy app).
+ * made to beep until it is switched on again.
  */
 const FindMyDeviceBanner: Component = () => {
   const { actions } = useVentyVeazy();

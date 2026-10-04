@@ -122,7 +122,7 @@ export const VentyVeazySettingsView: Component = () => {
       </SettingsSection>
 
       <SettingsSection title={m.settings_sectionInfo()}>
-        {/* Find My Device - only Veazy (like the legacy app) */}
+        {/* Find My Device - only Veazy */}
         <Show when={isVeazy()}>
           <SettingRow label={m.settings_locateDevice()}>
             <Button

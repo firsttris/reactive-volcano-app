@@ -153,14 +153,14 @@ export const createCraftyStore = (driver: CraftyDriver) => {
       );
     },
     setPermanentBluetooth(enabled: boolean) {
-      // The legacy app maps "Permanent Bluetooth" directly to this bit
+      // "Permanent Bluetooth" maps directly to this bit
       return setStatusRegister2Bit(
         StatusRegister2Bit.ENABLE_AUTO_BLE_SHUTDOWN,
         enabled,
         "permanent bluetooth"
       );
     },
-    /** Self-check like the legacy analysis (Crafty+ firmware only) */
+    /** Reads the registers and runs the self-check (not on old firmware) */
     async runAnalysis(): Promise<AnalysisResult> {
       await driver.readDiagnostics();
       return analyzeCrafty({

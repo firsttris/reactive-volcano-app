@@ -95,7 +95,7 @@ const readers: Partial<Record<keyof Characteristics, Reader<CraftyValues>>> = {
   akkuStatus2: (v) => ({ akkuStatus2: parseUint16(v) }),
 };
 
-// Characteristics the device pushes changes for (like the legacy app)
+// Characteristics the device pushes changes for
 const NOTIFYING: (keyof Characteristics)[] = [
   "currentTemp",
   "battery",
@@ -196,7 +196,7 @@ export const createCraftyDriver = (
       ]),
     async setStatusRegister2(value) {
       await device.write("statusRegister2", encodeUint16(value));
-      // Like the legacy app: read back what the device accepted
+      // Read back what the device accepted
       await device.read("statusRegister2");
     },
     heaterOn: () => device.write("heaterOn", encodeHeaterCommand()),

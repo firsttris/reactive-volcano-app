@@ -44,7 +44,7 @@ describe("Volcano protocol", () => {
     expect(bytes(encodeCommand())).toEqual([0]);
   });
 
-  // Same values as volcano.js: MASK clears the bit, 65536 + MASK sets it
+  // MASK clears the bit, 65536 + MASK sets it
   it("encodes register bit changes", () => {
     expect(
       bytes(encodeRegisterBit(Register3Bit.VIBRATION_DISABLED, false))

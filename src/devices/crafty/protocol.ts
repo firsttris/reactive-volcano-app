@@ -1,5 +1,5 @@
 /**
- * Crafty / Crafty+ BLE protocol (derived from crafty.js).
+ * Crafty / Crafty+ BLE protocol.
  *
  * Unlike the Venty/Veazy, every value has its own characteristic. Values are
  * little-endian uint16, temperatures in 1/10 °C.
@@ -22,7 +22,7 @@ export const ProjectRegisterBit = {
   FACTORY_RESET_REQUIRED: 1 << 15,
 } as const;
 
-// Masks the legacy analysis checks (their meaning is not documented)
+// Masks checked by the self-check (their exact meaning is unknown)
 const AnalysisMask = {
   PROJECT_ERROR: 0x2008,
   AKKU_ERROR: 0x0600,
@@ -97,8 +97,8 @@ export const parseBleFirmwareVersion = (value: DataView) =>
     : String(parseUint16(value));
 
 /**
- * Old Crafty firmware (before 2.51) lacks most characteristics. Same check
- * as the legacy app: the version looks like "V02.51".
+ * Old Crafty firmware (before 2.51) lacks most characteristics. The version
+ * looks like "V02.51".
  */
 export const isOldFirmware = (version: string) => {
   const trimmed = version.trim();
@@ -108,7 +108,7 @@ export const isOldFirmware = (version: string) => {
   return minor < 51 && major <= 2;
 };
 
-/** Crafty+ ships with firmware 3.x or newer (same check as the legacy app) */
+/** Crafty+ ships with firmware 3.x or newer */
 export const isCraftyPlus = (version: string) => {
   const major = parseInt(version.trim().substring(1, 3), 10);
   return !Number.isNaN(major) && major >= 3;
@@ -146,7 +146,7 @@ export const encodeTargetTemperature = (celsius: number) =>
 export const encodeBoostTemperature = (celsius: number) =>
   encodeUint16(clamp(celsius, Limits.MIN_BOOST, Limits.MAX_BOOST) * 10);
 
-/** Heater on/off take a 2-byte zero value (like the legacy app) */
+/** Heater on/off take a 2-byte zero value */
 export const encodeHeaterCommand = () => encodeUint16(0);
 
 export const encodeFactoryReset = () => new ArrayBuffer(1);
@@ -166,7 +166,7 @@ export interface CraftyAnalysisInput {
   now: Date;
 }
 
-/** Same checks as the legacy startAnalysisCRAFTYFunc */
+/** Turns the register values into an analysis result */
 export const analyzeCrafty = (input: CraftyAnalysisInput): AnalysisResult => {
   const hasError =
     hasBit(input.akkuStatus, AnalysisMask.AKKU_ERROR) ||

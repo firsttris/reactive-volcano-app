@@ -27,7 +27,7 @@ import {
 } from "./ui/collapsible";
 
 const TROUBLESHOOTING_URL =
-  "https://github.com/firsttris/reactive-volcano-app#-no-devices-found-troubleshooting-with-bluetooth-internals";
+  "https://github.com/firsttris/reactive-volcano-app/blob/main/docs/troubleshooting.md#my-device-does-not-show-up";
 
 // Browsers refuse to open chrome:// URLs from a web page, so we can only
 // offer to copy it for pasting into the address bar.

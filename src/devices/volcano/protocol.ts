@@ -1,5 +1,5 @@
 /**
- * Volcano Hybrid BLE protocol (derived from volcano.js).
+ * Volcano Hybrid BLE protocol.
  *
  * Every value has its own characteristic. Temperatures are in 1/10 °C.
  * The three project registers are changed with a 32-bit write: the lower
@@ -34,7 +34,7 @@ export const Register3Bit = {
   VIBRATION_DISABLED: 0x0400,
 } as const;
 
-// Error bits the legacy analysis checks (their meaning is not documented)
+// Error bits checked by the self-check (their exact meaning is unknown)
 const Register1Error = 0x4018;
 const Register2Error = 0x003b;
 const LOW_BRIGHTNESS = 25;
@@ -47,7 +47,7 @@ export const Limits = {
 } as const;
 
 const SET_BIT_FLAG = 0x10000;
-// The legacy app ignores current temperatures above this raw value
+// Current temperatures above this value are invalid (sent while starting)
 const MAX_VALID_TEMPERATURE = 6536;
 
 export const clamp = (value: number, min: number, max: number) =>
@@ -131,7 +131,7 @@ export interface VolcanoAnalysisInput {
   now: Date;
 }
 
-/** Same checks as the legacy startAnalysisVolcanoFunc */
+/** Turns the register values into an analysis result */
 export const analyzeVolcano = (input: VolcanoAnalysisInput): AnalysisResult => {
   if (
     hasBit(input.register1, Register1Error) ||
