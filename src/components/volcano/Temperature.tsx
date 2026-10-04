@@ -30,6 +30,7 @@ export const Temperature = () => {
         heating={derived.isHeating()}
         minLabel={`${toDisplayUnit(Limits.MIN_TEMP)}°`}
         maxLabel={`${toDisplayUnit(Limits.MAX_TEMP)}°`}
+        targetLabel={`${toDisplayUnit(state.targetTemp)} °${unit()}`}
       >
         <TemperatureDisplay
           value={toDisplayUnit(state.currentTemp)}

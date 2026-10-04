@@ -4,6 +4,7 @@ import { Show } from "solid-js";
 import { Limits } from "../../devices/crafty/protocol";
 import { m } from "../../paraglide/messages";
 import { useCrafty } from "../../provider/CraftyProvider";
+import { TemperatureChart } from "../TemperatureChart";
 import {
   OffsetStepper,
   TargetStepper,
@@ -27,6 +28,7 @@ export const Temperature = () => {
         reached={derived.isSetpointReached()}
         minLabel={`${Limits.MIN_TEMP}°`}
         maxLabel={`${Limits.MAX_TEMP}°`}
+        targetLabel={`${state.targetTemp} °C`}
       >
         <TemperatureDisplay value={state.currentTemp} unit="C" raisedUnit />
       </TemperatureGauge>
@@ -69,6 +71,12 @@ export const Temperature = () => {
           onIncrease={() => actions.setBoostTemp(state.boostTemp + 1)}
         />
       </div>
+
+      <TemperatureChart
+        target={state.targetTemp}
+        unit="C"
+        toDisplay={(celsius) => celsius}
+      />
     </>
   );
 };

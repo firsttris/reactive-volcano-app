@@ -4,6 +4,7 @@ import ChevronDown from "lucide-solid/icons/chevron-down";
 import CircleHelp from "lucide-solid/icons/circle-question-mark";
 import Copy from "lucide-solid/icons/copy";
 import ExternalLink from "lucide-solid/icons/external-link";
+import ListIcon from "lucide-solid/icons/list";
 import TriangleAlert from "lucide-solid/icons/triangle-alert";
 import { createEffect, createSignal, For, Match, Show, Switch } from "solid-js";
 import { cn } from "../lib/utils";
@@ -11,6 +12,7 @@ import { m } from "../paraglide/messages";
 import { useBluetooth } from "../provider/BluetoothProvider";
 import { buildRoute } from "../routes";
 import { ConnectionState, DeviceType } from "../utils/uuids";
+import { decodeWorkflow, getPendingWorkflowCode } from "../utils/workflowShare";
 import { ThemeToggle } from "./AppHeader";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Badge } from "./ui/badge";
@@ -82,6 +84,11 @@ export const Connect = () => {
       connectionState() === ConnectionState.CONNECTION_FAILED
     );
   };
+
+  const pendingCode = getPendingWorkflowCode();
+  const sharedWorkflowName = pendingCode
+    ? decodeWorkflow(pendingCode)?.name
+    : undefined;
 
   const isBluetoothSupported = () =>
     typeof navigator !== "undefined" && "bluetooth" in navigator;
@@ -169,6 +176,17 @@ export const Connect = () => {
               )}
             </For>
           </div>
+
+          <Show when={sharedWorkflowName}>
+            {(name) => (
+              <Alert variant="accent">
+                <ListIcon />
+                <AlertDescription class="text-foreground">
+                  {m.connect_pendingWorkflow({ name: name() })}
+                </AlertDescription>
+              </Alert>
+            )}
+          </Show>
 
           <Switch>
             <Match when={!isBluetoothSupported()}>

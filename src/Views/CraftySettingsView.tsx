@@ -1,6 +1,7 @@
 import TriangleAlert from "lucide-solid/icons/triangle-alert";
 import { type Component, Show } from "solid-js";
 import { AnalysisSection } from "../components/AnalysisSection";
+import { AppSettingsSection } from "../components/AppSettingsSection";
 import { PageTitle } from "../components/DeviceShell";
 import { FactoryReset } from "../components/FactoryReset";
 import {
@@ -85,6 +86,8 @@ export const CraftySettingsView: Component = () => {
           />
         </Show>
       </SettingsSection>
+
+      <AppSettingsSection />
 
       <SettingsSection title={m.device_info()}>
         <InfoRow label={m.device_battery()}>{state.batteryLevel} %</InfoRow>

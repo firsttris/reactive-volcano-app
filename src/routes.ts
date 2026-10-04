@@ -21,6 +21,7 @@ export const ROUTES = {
       BASE: "/volcano",
       ROOT: "/",
       WORKFLOWS: "/workflows",
+      HISTORY: "/history",
       SETTINGS: "/settings",
       WORKFLOW: {
         BASE: "/workflow",
@@ -31,11 +32,13 @@ export const ROUTES = {
     VENTY_VEAZY: {
       BASE: "/venty-veazy",
       ROOT: "/",
+      HISTORY: "/history",
       SETTINGS: "/settings",
     },
     CRAFTY: {
       BASE: "/crafty",
       ROOT: "/",
+      HISTORY: "/history",
       SETTINGS: "/settings",
     },
   },
@@ -60,6 +63,13 @@ export const buildRoute = {
    * Build a route to the Volcano settings
    */
   volcanoSettings: () => "/device/volcano/settings" as const,
+
+  /**
+   * Build a route to the session history of a device
+   */
+  volcanoHistory: () => "/device/volcano/history" as const,
+  ventyVeazyHistory: () => "/device/venty-veazy/history" as const,
+  craftyHistory: () => "/device/crafty/history" as const,
 
   /**
    * Build a route to the workflow list for a specific workflow

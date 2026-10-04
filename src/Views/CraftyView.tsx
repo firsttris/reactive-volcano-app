@@ -1,9 +1,10 @@
 import { type RouteSectionProps, useNavigate } from "@solidjs/router";
 import ChevronRight from "lucide-solid/icons/chevron-right";
 import MapPin from "lucide-solid/icons/map-pin";
+import History from "lucide-solid/icons/rotate-ccw-clock";
 import SlidersHorizontal from "lucide-solid/icons/sliders-horizontal";
 import Thermometer from "lucide-solid/icons/thermometer";
-import { type Component, createEffect, Show } from "solid-js";
+import { type Component, createEffect, type JSX, Show } from "solid-js";
 import { BatteryChip } from "../components/BatteryChip";
 import { ShutdownTime } from "../components/crafty/ShutdownTime";
 import { Temperature } from "../components/crafty/Temperature";
@@ -12,6 +13,7 @@ import { useWakeLock } from "../hooks/utils/useWakeLock";
 import { m } from "../paraglide/messages";
 import { useBluetooth } from "../provider/BluetoothProvider";
 import { CraftyProvider, useCrafty } from "../provider/CraftyProvider";
+import { LiveSessionProvider } from "../provider/LiveSessionProvider";
 import { buildRoute } from "../routes";
 import { ConnectionState } from "../utils/uuids";
 
@@ -54,6 +56,23 @@ const CraftyBattery = () => {
   return <BatteryChip level={state.loaded ? state.batteryLevel : undefined} />;
 };
 
+const CraftyLiveSession = (props: { children: JSX.Element }) => {
+  const { state, derived } = useCrafty();
+  return (
+    <LiveSessionProvider
+      reading={() => ({
+        current: state.currentTemp,
+        target: state.targetTemp,
+        heating: derived.isHeaterActive(),
+        reached: derived.isHeaterActive() && derived.isSetpointReached(),
+        ready: state.loaded,
+      })}
+    >
+      {props.children}
+    </LiveSessionProvider>
+  );
+};
+
 /** Wrapper for all Crafty routes: device store, header and tabs */
 export const CraftyShell = (props: RouteSectionProps) => {
   const navigate = useNavigate();
@@ -73,23 +92,30 @@ export const CraftyShell = (props: RouteSectionProps) => {
 
   return (
     <CraftyProvider>
-      <DeviceShell
-        headerTrailing={<CraftyBattery />}
-        tabs={[
-          {
-            href: buildRoute.craftyRoot(),
-            label: m.nav_control(),
-            icon: Thermometer,
-          },
-          {
-            href: buildRoute.craftySettings(),
-            label: m.settings_title(),
-            icon: SlidersHorizontal,
-          },
-        ]}
-      >
-        {props.children}
-      </DeviceShell>
+      <CraftyLiveSession>
+        <DeviceShell
+          headerTrailing={<CraftyBattery />}
+          tabs={[
+            {
+              href: buildRoute.craftyRoot(),
+              label: m.nav_control(),
+              icon: Thermometer,
+            },
+            {
+              href: buildRoute.craftyHistory(),
+              label: m.nav_history(),
+              icon: History,
+            },
+            {
+              href: buildRoute.craftySettings(),
+              label: m.settings_title(),
+              icon: SlidersHorizontal,
+            },
+          ]}
+        >
+          {props.children}
+        </DeviceShell>
+      </CraftyLiveSession>
     </CraftyProvider>
   );
 };

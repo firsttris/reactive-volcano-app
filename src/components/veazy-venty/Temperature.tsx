@@ -7,6 +7,7 @@ import {
 import { useWakeLock } from "../../hooks/utils/useWakeLock";
 import { m } from "../../paraglide/messages";
 import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
+import { TemperatureChart } from "../TemperatureChart";
 import { OffsetStepper, TargetStepper } from "../TemperatureControls";
 import { TemperatureDisplay } from "../TemperatureDisplay";
 import { TemperatureGauge } from "../TemperatureGauge";
@@ -81,6 +82,7 @@ export const Temperature = () => {
         reached={isHeating() && (state.status?.setpointReached ?? false)}
         minLabel={`${toDisplayTemperature(Limits.MIN_TEMP, isCelsius())}°`}
         maxLabel={`${toDisplayTemperature(Limits.MAX_TEMP, isCelsius())}°`}
+        targetLabel={`${display.effectiveTemp()} °${unit()}`}
       >
         <TemperatureDisplay
           value={toDisplayTemperature(
@@ -154,6 +156,12 @@ export const Temperature = () => {
           onIncrease={() => adjustSuperBoostTemp(1)}
         />
       </div>
+
+      <TemperatureChart
+        target={effectiveCelsius()}
+        unit={unit()}
+        toDisplay={(celsius) => toDisplayTemperature(celsius, isCelsius())}
+      />
     </>
   );
 };

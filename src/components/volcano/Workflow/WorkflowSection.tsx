@@ -2,10 +2,16 @@ import Download from "lucide-solid/icons/download";
 import FileUp from "lucide-solid/icons/file-up";
 import Plus from "lucide-solid/icons/plus";
 import Upload from "lucide-solid/icons/upload";
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, onMount, Show } from "solid-js";
 import { m } from "../../../paraglide/messages";
 import { useToast } from "../../../provider/ToastProvider";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
+import {
+  clearPendingWorkflow,
+  decodeWorkflow,
+  getPendingWorkflowCode,
+  type SharedWorkflow,
+} from "../../../utils/workflowShare";
 import { PageTitle } from "../../DeviceShell";
 import {
   AlertDialog,
@@ -53,11 +59,39 @@ export const WorkFlowSection = () => {
     exportAllWorkflows,
     importAllWorkflows,
     importWorkflow,
+    addSharedWorkflow,
   } = workflow;
   const showToast = useToast();
 
   // Replacing every workflow needs a confirmation first
   const [pendingImportAll, setPendingImportAll] = createSignal<File>();
+
+  // A workflow from a share link waits for confirmation here
+  const [sharedWorkflow, setSharedWorkflow] = createSignal<SharedWorkflow>();
+  onMount(() => {
+    const code = getPendingWorkflowCode();
+    if (!code) return;
+    const shared = decodeWorkflow(code);
+    if (shared) {
+      setSharedWorkflow(shared);
+    } else {
+      clearPendingWorkflow();
+      showToast({ message: m.workflow_invalidLink() });
+    }
+  });
+
+  const dismissShared = () => {
+    clearPendingWorkflow();
+    setSharedWorkflow(undefined);
+  };
+
+  const importShared = () => {
+    const shared = sharedWorkflow();
+    dismissShared();
+    if (!shared) return;
+    addSharedWorkflow(shared);
+    showToast({ message: m.workflow_imported({ name: shared.name }) });
+  };
 
   const reportInvalidFile = (error: unknown) => {
     console.error(`${m.workflow_invalidFile()}: ${(error as Error).message}`);
@@ -154,6 +188,34 @@ export const WorkFlowSection = () => {
           </For>
         </div>
       </Show>
+
+      <AlertDialog
+        open={!!sharedWorkflow()}
+        onOpenChange={(open) => !open && dismissShared()}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{m.workflow_importShared()}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {m.workflow_importSharedDescription({
+                name: sharedWorkflow()?.name ?? "",
+                steps: m.workflow_stepCount({
+                  count: sharedWorkflow()?.workflowSteps.length ?? 0,
+                }),
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogClose as={Button} variant="outline">
+              {m.common_cancel()}
+            </AlertDialogClose>
+            <Button onClick={importShared}>
+              <Download />
+              {m.workflow_importAction()}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog
         open={!!pendingImportAll()}
