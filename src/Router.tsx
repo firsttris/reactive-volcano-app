@@ -4,10 +4,14 @@ import { DeviceRouter } from "./components/DeviceRouter";
 import { Layout } from "./components/Layout";
 import { WorkflowForm } from "./components/volcano/Workflow/WorkflowForm";
 import { WorkflowList } from "./components/volcano/Workflow/WorkflowList";
+import { WorkFlowSection } from "./components/volcano/Workflow/WorkflowSection";
 import { WorkflowWrapper } from "./components/volcano/Workflow/WorkflowWrapper";
 import { ROUTES } from "./routes";
-import { CraftyView } from "./Views/CraftyView";
-import { VentyVeazyView } from "./Views/VentyVeazyView";
+import { CraftySettingsView } from "./Views/CraftySettingsView";
+import { CraftyShell, CraftyView } from "./Views/CraftyView";
+import { VentyVeazySettingsView } from "./Views/VentyVeazySettingsView";
+import { VentyVeazyShell, VentyVeazyView } from "./Views/VentyVeazyView";
+import { VolcanoSettingsView } from "./Views/VolcanoSettingsView";
 import { VolcanoView } from "./Views/VolcanoView";
 
 export const Routes = () => {
@@ -29,6 +33,14 @@ export const Routes = () => {
           {/* Volcano device routes - all wrapped with VolcanoDeviceProvider */}
           <Route path={ROUTES.DEVICE.VOLCANO.BASE} component={WorkflowWrapper}>
             <Route path={ROUTES.DEVICE.VOLCANO.ROOT} component={VolcanoView} />
+            <Route
+              path={ROUTES.DEVICE.VOLCANO.WORKFLOWS}
+              component={WorkFlowSection}
+            />
+            <Route
+              path={ROUTES.DEVICE.VOLCANO.SETTINGS}
+              component={VolcanoSettingsView}
+            />
             <Route path={ROUTES.DEVICE.VOLCANO.WORKFLOW.BASE}>
               <Route
                 path={ROUTES.DEVICE.VOLCANO.WORKFLOW.LIST}
@@ -42,10 +54,28 @@ export const Routes = () => {
           </Route>
 
           {/* Venty/Veazy device routes */}
-          <Route path={ROUTES.DEVICE.VENTY_VEAZY} component={VentyVeazyView} />
+          <Route
+            path={ROUTES.DEVICE.VENTY_VEAZY.BASE}
+            component={VentyVeazyShell}
+          >
+            <Route
+              path={ROUTES.DEVICE.VENTY_VEAZY.ROOT}
+              component={VentyVeazyView}
+            />
+            <Route
+              path={ROUTES.DEVICE.VENTY_VEAZY.SETTINGS}
+              component={VentyVeazySettingsView}
+            />
+          </Route>
 
           {/* Crafty device routes */}
-          <Route path={ROUTES.DEVICE.CRAFTY} component={CraftyView} />
+          <Route path={ROUTES.DEVICE.CRAFTY.BASE} component={CraftyShell}>
+            <Route path={ROUTES.DEVICE.CRAFTY.ROOT} component={CraftyView} />
+            <Route
+              path={ROUTES.DEVICE.CRAFTY.SETTINGS}
+              component={CraftySettingsView}
+            />
+          </Route>
         </Route>
       </Route>
     </Router>

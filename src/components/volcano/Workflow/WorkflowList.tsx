@@ -1,250 +1,136 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { FiEdit2, FiPlus, FiSave, FiTrash2, FiX } from "solid-icons/fi";
-import { For, Show } from "solid-js";
-import { styled } from "solid-styled-components";
+import Pencil from "lucide-solid/icons/pencil";
+import Plus from "lucide-solid/icons/plus";
+import Save from "lucide-solid/icons/save";
+import Trash2 from "lucide-solid/icons/trash";
+import { For, type JSX, Show } from "solid-js";
 import { m } from "../../../paraglide/messages";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { buildRoute } from "../../../routes";
-import { Button } from "../../Button";
+import { Button } from "../../ui/button";
+import { Card } from "../../ui/card";
+import { EditorHeader } from "./EditorHeader";
 
-const Container = styled("div")`
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-`;
-
-const Card = styled("div")`
-  background: var(--secondary-bg);
-  border-radius: 16px;
-  padding: 24px;
-  border: 1px solid var(--border-color);
-  margin-bottom: 20px;
-`;
-
-const Title = styled("h2")`
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  margin-bottom: 24px;
-  text-align: center;
-  font-family: CustomFont;
-`;
-
-const StepList = styled("ol")`
-  list-style: none;
-  counter-reset: step-counter;
-  padding: 0;
-  margin: 0 0 24px 0;
-`;
-
-const StepItem = styled("li")`
-  counter-increment: step-counter;
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
-  position: relative;
-  transition: all 0.3s ease;
-
-  &::before {
-    content: counter(step-counter);
-    position: absolute;
-    left: 16px;
-    top: 16px;
-    width: 32px;
-    height: 32px;
-    background: var(--accent-color);
-    color: var(--text-color);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-family: CustomFont;
-  }
-
-  &:hover {
-    border-color: var(--accent-color);
-    background: rgba(255, 102, 0, 0.05);
-  }
-`;
-
-const StepContent = styled("div")`
-  margin-left: 48px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-
-  @media (max-width: 480px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-`;
-
-const StepDetails = styled("div")`
-  flex: 1;
-  color: var(--secondary-text);
-  font-size: 0.95rem;
-`;
-
-const StepLabel = styled("div")`
-  color: var(--secondary-text);
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-`;
-
-const StepValue = styled("div")`
-  color: var(--text-color);
-  font-size: 1rem;
-  font-weight: 600;
-  font-family: CustomFont;
-`;
-
-const StepActions = styled("div")`
-  display: flex;
-  gap: 8px;
-`;
-
-const IconButton = styled("button")`
-  background: transparent;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--secondary-text);
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: var(--secondary-bg);
-    color: var(--accent-color);
-    border-color: var(--accent-color);
-    transform: scale(1.05);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-`;
-
-const ButtonGroup = styled("div")`
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-`;
-
-const StyledButton = styled(Button)`
-  min-width: 120px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 1rem;
-`;
-
-const EmptyState = styled("div")`
-  text-align: center;
-  padding: 40px;
-  color: var(--secondary-text);
-  font-size: 1rem;
-`;
+const StepValue = (props: { label: string; children: JSX.Element }) => (
+  <div class="flex min-w-0 flex-col gap-0.5">
+    <span class="truncate text-[11px] text-muted-foreground">
+      {props.label}
+    </span>
+    <span class="font-semibold text-sm tabular-nums">{props.children}</span>
+  </div>
+);
 
 export const WorkflowList = () => {
   const workflow = useWorkflowContext();
   const {
     deleteWorkflowStepFromList,
     workflowSteps,
+    workflowList,
     updateWorkflowStepsInList,
     addNewWorkflowStep,
   } = workflow;
-
   const { workflowListId } = useParams();
   const navigate = useNavigate();
 
+  const workflowName = () =>
+    workflowList().find((item) => item.id === workflowListId)?.name;
+  const backToWorkflows = () => navigate(buildRoute.volcanoWorkflows());
+
   return (
-    <Container>
-      <Card>
-        <Title>{m.workflow_editSteps()}</Title>
-        <Show
-          when={workflowSteps().length > 0}
-          fallback={<EmptyState>{m.workflow_noSteps()}</EmptyState>}
-        >
-          <StepList>
-            <For each={workflowSteps()}>
-              {(workflowItem) => (
-                <StepItem>
-                  <StepContent>
-                    <StepDetails>
-                      <StepLabel>{m.workflow_temperature()}</StepLabel>
-                      <StepValue>{workflowItem.temperature}°C</StepValue>
-                    </StepDetails>
-                    <StepDetails>
-                      <StepLabel>{m.workflow_holdTime()}</StepLabel>
-                      <StepValue>{workflowItem.holdTimeInSeconds}</StepValue>
-                    </StepDetails>
-                    <StepDetails>
-                      <StepLabel>{m.workflow_pumpTime()}</StepLabel>
-                      <StepValue>{workflowItem.pumpTimeInSeconds}</StepValue>
-                    </StepDetails>
-                    <StepActions>
-                      <IconButton
-                        onClick={() =>
-                          workflowListId &&
-                          navigate(
-                            buildRoute.workflowForm(
-                              workflowListId,
-                              workflowItem.id
-                            )
-                          )
-                        }
-                      >
-                        <FiEdit2 size={18} />
-                      </IconButton>
-                      <IconButton
-                        onClick={() =>
-                          workflowListId &&
-                          deleteWorkflowStepFromList(
+    <>
+      <EditorHeader
+        title={m.workflow_editSteps()}
+        subtitle={workflowName()}
+        onBack={backToWorkflows}
+      />
+
+      <Show
+        when={workflowSteps().length > 0}
+        fallback={
+          <div class="rounded-card border border-dashed px-6 py-12 text-center text-muted-foreground text-sm">
+            {m.workflow_noSteps()}
+          </div>
+        }
+      >
+        <ol class="grid gap-2.5">
+          <For each={workflowSteps()}>
+            {(workflowItem, index) => (
+              <li>
+                <Card class="flex items-center gap-3 p-3.5">
+                  <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft font-semibold text-primary text-sm tabular-nums">
+                    {index() + 1}
+                  </span>
+                  <div class="grid flex-1 grid-cols-3 gap-2">
+                    <StepValue label={m.workflow_temperature()}>
+                      {workflowItem.temperature} °C
+                    </StepValue>
+                    <StepValue label={m.workflow_holdTime()}>
+                      {workflowItem.holdTimeInSeconds} s
+                    </StepValue>
+                    <StepValue label={m.workflow_pumpTime()}>
+                      {workflowItem.pumpTimeInSeconds} s
+                    </StepValue>
+                  </div>
+                  <div class="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={m.workflow_editStep()}
+                      onClick={() =>
+                        workflowListId &&
+                        navigate(
+                          buildRoute.workflowForm(
                             workflowListId,
                             workflowItem.id
                           )
-                        }
-                      >
-                        <FiTrash2 size={18} />
-                      </IconButton>
-                    </StepActions>
-                  </StepContent>
-                </StepItem>
-              )}
-            </For>
-          </StepList>
-        </Show>
-        <ButtonGroup>
-          <StyledButton onClick={() => navigate(buildRoute.volcanoRoot())}>
-            <FiX size={20} />
-            {m.common_cancel()}
-          </StyledButton>
-          <StyledButton onClick={() => addNewWorkflowStep()}>
-            <FiPlus size={20} />
-            {m.common_add()}
-          </StyledButton>
-          <StyledButton
-            onClick={() => {
-              if (workflowListId) {
-                updateWorkflowStepsInList(workflowListId, workflowSteps());
-              }
-              navigate(buildRoute.volcanoRoot());
-            }}
-          >
-            <FiSave size={20} />
-            {m.common_save()}
-          </StyledButton>
-        </ButtonGroup>
-      </Card>
-    </Container>
+                        )
+                      }
+                    >
+                      <Pencil />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      class="hover:text-destructive"
+                      aria-label={m.workflow_delete()}
+                      onClick={() =>
+                        workflowListId &&
+                        deleteWorkflowStepFromList(
+                          workflowListId,
+                          workflowItem.id
+                        )
+                      }
+                    >
+                      <Trash2 />
+                    </Button>
+                  </div>
+                </Card>
+              </li>
+            )}
+          </For>
+        </ol>
+      </Show>
+
+      <div class="grid grid-cols-3 gap-2 pt-1">
+        <Button variant="outline" onClick={backToWorkflows}>
+          {m.common_cancel()}
+        </Button>
+        <Button variant="secondary" onClick={() => addNewWorkflowStep()}>
+          <Plus />
+          {m.common_add()}
+        </Button>
+        <Button
+          onClick={() => {
+            if (workflowListId) {
+              updateWorkflowStepsInList(workflowListId, workflowSteps());
+            }
+            backToWorkflows();
+          }}
+        >
+          <Save />
+          {m.common_save()}
+        </Button>
+      </div>
+    </>
   );
 };

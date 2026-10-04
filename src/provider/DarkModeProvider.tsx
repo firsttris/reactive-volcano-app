@@ -8,6 +8,9 @@ import {
   useContext,
 } from "solid-js";
 
+const THEME_COLOR_LIGHT = "#fafafa";
+const THEME_COLOR_DARK = "#09090b";
+
 interface DarkModeContextType {
   isDarkMode: Accessor<boolean>;
   toggleDarkMode: (iOn: boolean) => void;
@@ -41,11 +44,11 @@ export const DarkModeProvider: Component<DarkModeProviderProps> = (props) => {
 
   const toggleDarkMode = (iOn: boolean) => {
     setIsDarkMode(iOn);
-    if (iOn) {
-      document.documentElement.classList.add("dark-mode");
-    } else {
-      document.documentElement.classList.remove("dark-mode");
-    }
+    document.documentElement.classList.toggle("dark", iOn);
+    // Lets the browser chrome (address bar, status bar) match the page
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", iOn ? THEME_COLOR_DARK : THEME_COLOR_LIGHT);
   };
 
   return (

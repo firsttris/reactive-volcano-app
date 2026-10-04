@@ -1,4 +1,5 @@
 import { paraglideVitePlugin } from "@inlang/paraglide-js";
+import tailwindcss from "@tailwindcss/vite";
 import legacy from "@vitejs/plugin-legacy";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
@@ -17,6 +18,7 @@ export default defineConfig({
       targets: ["iOS >= 10", "Safari >= 10"],
     }),
     solid(),
+    tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
       manifest: {

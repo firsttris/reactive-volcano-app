@@ -20,14 +20,24 @@ export const ROUTES = {
     VOLCANO: {
       BASE: "/volcano",
       ROOT: "/",
+      WORKFLOWS: "/workflows",
+      SETTINGS: "/settings",
       WORKFLOW: {
         BASE: "/workflow",
         LIST: "/list/:workflowListId",
         FORM: "/form/:workflowListId/:workflowStepId",
       },
     },
-    VENTY_VEAZY: "/venty-veazy",
-    CRAFTY: "/crafty",
+    VENTY_VEAZY: {
+      BASE: "/venty-veazy",
+      ROOT: "/",
+      SETTINGS: "/settings",
+    },
+    CRAFTY: {
+      BASE: "/crafty",
+      ROOT: "/",
+      SETTINGS: "/settings",
+    },
   },
 } as const;
 
@@ -40,6 +50,16 @@ export const buildRoute = {
    * Build a route to the Volcano device main view
    */
   volcanoRoot: () => "/device/volcano" as const,
+
+  /**
+   * Build a route to the Volcano workflow overview
+   */
+  volcanoWorkflows: () => "/device/volcano/workflows" as const,
+
+  /**
+   * Build a route to the Volcano settings
+   */
+  volcanoSettings: () => "/device/volcano/settings" as const,
 
   /**
    * Build a route to the workflow list for a specific workflow
@@ -62,9 +82,19 @@ export const buildRoute = {
   ventyVeazyRoot: () => "/device/venty-veazy" as const,
 
   /**
+   * Build a route to the Venty/Veazy settings
+   */
+  ventyVeazySettings: () => "/device/venty-veazy/settings" as const,
+
+  /**
    * Build a route to the Crafty device view
    */
   craftyRoot: () => "/device/crafty" as const,
+
+  /**
+   * Build a route to the Crafty settings
+   */
+  craftySettings: () => "/device/crafty/settings" as const,
 
   /**
    * Build a route to the connection screen

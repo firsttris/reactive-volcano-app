@@ -1,6 +1,5 @@
 import { createEffect, type JSX, onCleanup } from "solid-js";
-import { styled } from "solid-styled-components";
-import { RoundButton } from "./Button";
+import { Button } from "./ui/button";
 
 // Hold to repeat: wait a bit, then step faster the longer the button is held
 const INITIAL_DELAY_MS = 400;
@@ -11,19 +10,12 @@ const ACCELERATION = 0.85;
 interface RepeatButtonProps {
   onStep: () => void;
   disabled?: boolean;
+  variant?: "default" | "secondary";
+  size?: "icon" | "icon-lg";
+  class?: string;
   "aria-label": string;
   children: JSX.Element;
 }
-
-const HoldableRoundButton = styled(RoundButton)`
-  touch-action: manipulation;
-  -webkit-touch-callout: none;
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-`;
 
 export const RepeatButton = (props: RepeatButtonProps) => {
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -53,21 +45,24 @@ export const RepeatButton = (props: RepeatButtonProps) => {
   onCleanup(stop);
 
   return (
-    <HoldableRoundButton
-      type="button"
+    <Button
+      variant={props.variant ?? "secondary"}
+      size={props.size ?? "icon-lg"}
+      class={props.class}
+      style={{ "-webkit-touch-callout": "none" }}
       disabled={props.disabled}
       aria-label={props["aria-label"]}
       onPointerDown={start}
       onPointerUp={stop}
       onPointerLeave={stop}
       onPointerCancel={stop}
-      onContextMenu={(event) => event.preventDefault()}
+      onContextMenu={(event: MouseEvent) => event.preventDefault()}
       // Pointer presses are handled above; this only covers the keyboard
-      onClick={(event) => {
+      onClick={(event: MouseEvent) => {
         if (event.detail === 0) props.onStep();
       }}
     >
       {props.children}
-    </HoldableRoundButton>
+    </Button>
   );
 };

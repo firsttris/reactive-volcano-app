@@ -1,80 +1,28 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { FiSave, FiX } from "solid-icons/fi";
+import Save from "lucide-solid/icons/save";
 import {
   type Component,
   createEffect,
   createMemo,
   createSignal,
 } from "solid-js";
-import { styled } from "solid-styled-components";
 import { m } from "../../../paraglide/messages";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { buildRoute } from "../../../routes";
-import { Button } from "../../Button";
-import { Slider } from "../../Slider";
-
-const Container = styled("div")`
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-`;
-
-const Card = styled("div")`
-  background: var(--secondary-bg);
-  border-radius: 16px;
-  padding: 24px;
-  border: 1px solid var(--border-color);
-`;
-
-const Title = styled("h2")`
-  color: var(--accent-color);
-  font-size: 1.5rem;
-  margin-bottom: 24px;
-  text-align: center;
-  font-family: CustomFont;
-`;
-
-const Form = styled("form")`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const SliderSection = styled("div")`
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 20px;
-`;
-
-const ButtonGroup = styled("div")`
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 24px;
-`;
-
-const StyledButton = styled(Button)`
-  min-width: 140px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 1rem;
-`;
+import { SettingSlider, SettingsSection } from "../../Settings";
+import { Button } from "../../ui/button";
+import { EditorHeader } from "./EditorHeader";
 
 export const WorkflowForm: Component = () => {
   const workflow = useWorkflowContext();
   const { workflowSteps, editWorkflowStepInList } = workflow;
-
   const { workflowStepId, workflowListId } = useParams();
-
   const navigate = useNavigate();
 
   const workflowStep = createMemo(() =>
     workflowSteps().find((workflowStep) => workflowStep.id === workflowStepId)
   );
+
   const [temperature, setTemperature] = createSignal<number>(0);
   const [holdTime, setHoldTime] = createSignal<number>(0);
   const [pumpTime, setPumpTime] = createSignal<number>(0);
@@ -87,6 +35,9 @@ export const WorkflowForm: Component = () => {
     setPumpTime(step.pumpTimeInSeconds);
   });
 
+  const backToSteps = () =>
+    workflowListId && navigate(buildRoute.workflowList(workflowListId));
+
   const handleSubmit = (event: Event) => {
     event.preventDefault();
     if (!workflowListId || !workflowStepId) return;
@@ -96,62 +47,50 @@ export const WorkflowForm: Component = () => {
       holdTimeInSeconds: holdTime(),
       pumpTimeInSeconds: pumpTime(),
     });
-    navigate(buildRoute.workflowList(workflowListId));
+    backToSteps();
   };
 
   return (
-    <Container>
-      <Card>
-        <Title>{m.workflow_editStep()}</Title>
-        <Form onSubmit={handleSubmit}>
-          <SliderSection>
-            <Slider
-              value={temperature()}
-              label={`${m.workflow_temperature()}: ${temperature()} °C`}
-              min={150}
-              step={5}
-              max={230}
-              onInput={(value) => setTemperature(value)}
-            />
-          </SliderSection>
-          <SliderSection>
-            <Slider
-              value={holdTime()}
-              label={m.workflow_holdTimeSeconds({ seconds: holdTime() })}
-              min={0}
-              step={5}
-              max={60}
-              onInput={(value) => setHoldTime(value)}
-            />
-          </SliderSection>
-          <SliderSection>
-            <Slider
-              value={pumpTime()}
-              label={m.workflow_pumpTimeSeconds({ seconds: pumpTime() })}
-              min={0}
-              step={5}
-              max={60}
-              onInput={(value) => setPumpTime(value)}
-            />
-          </SliderSection>
-          <ButtonGroup>
-            <StyledButton
-              type="button"
-              onClick={() =>
-                workflowListId &&
-                navigate(buildRoute.workflowList(workflowListId))
-              }
-            >
-              <FiX size={20} />
-              {m.common_cancel()}
-            </StyledButton>
-            <StyledButton type="submit">
-              <FiSave size={20} />
-              {m.common_save()}
-            </StyledButton>
-          </ButtonGroup>
-        </Form>
-      </Card>
-    </Container>
+    <form class="flex flex-col gap-4" onSubmit={handleSubmit}>
+      <EditorHeader title={m.workflow_editStep()} onBack={backToSteps} />
+      <SettingsSection title={m.workflow_editStep()}>
+        <SettingSlider
+          label={m.workflow_temperature()}
+          valueLabel={`${temperature()} °C`}
+          value={temperature()}
+          min={150}
+          max={230}
+          step={5}
+          onChange={setTemperature}
+        />
+        <SettingSlider
+          label={m.workflow_holdTime()}
+          valueLabel={`${holdTime()} s`}
+          value={holdTime()}
+          min={0}
+          max={60}
+          step={5}
+          onChange={setHoldTime}
+        />
+        <SettingSlider
+          label={m.workflow_pumpTime()}
+          valueLabel={`${pumpTime()} s`}
+          value={pumpTime()}
+          min={0}
+          max={60}
+          step={5}
+          onChange={setPumpTime}
+        />
+      </SettingsSection>
+      <div class="grid grid-cols-2 gap-2">
+        <Button type="button" variant="outline" onClick={backToSteps}>
+          {m.common_cancel()}
+        </Button>
+        <Button type="submit">
+          <Save />
+          {m.common_save()}
+        </Button>
+      </div>
+    </form>
   );
 };

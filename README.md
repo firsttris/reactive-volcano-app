@@ -14,7 +14,8 @@
 [![SolidJS](https://img.shields.io/badge/SolidJS-2c4f7c?style=for-the-badge&logo=solid&logoColor=c8c8c8)](https://www.solidjs.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![solid-styled-components](https://img.shields.io/badge/solid--styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white)](https://github.com/solidjs/solid-styled-components)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![solid-ui](https://img.shields.io/badge/solid--ui-000000?style=for-the-badge&logo=shadcnui&logoColor=white)](https://www.solid-ui.com)
 
 **Control your Storz & Bickel devices with cutting-edge Web Bluetooth technology.**
 

@@ -1,39 +1,61 @@
-import { useNavigate } from "@solidjs/router";
-import { type Component, createEffect } from "solid-js";
-import { Card } from "../components/Card";
-import { HeaterControl } from "../components/crafty/HeaterControl";
-import { Settings } from "../components/crafty/Settings";
+import { type RouteSectionProps, useNavigate } from "@solidjs/router";
+import ChevronRight from "lucide-solid/icons/chevron-right";
+import MapPin from "lucide-solid/icons/map-pin";
+import SlidersHorizontal from "lucide-solid/icons/sliders-horizontal";
+import Thermometer from "lucide-solid/icons/thermometer";
+import { type Component, createEffect, Show } from "solid-js";
+import { BatteryChip } from "../components/BatteryChip";
 import { ShutdownTime } from "../components/crafty/ShutdownTime";
 import { Temperature } from "../components/crafty/Temperature";
+import { DeviceShell } from "../components/DeviceShell";
 import { useWakeLock } from "../hooks/utils/useWakeLock";
+import { m } from "../paraglide/messages";
 import { useBluetooth } from "../provider/BluetoothProvider";
 import { CraftyProvider, useCrafty } from "../provider/CraftyProvider";
 import { buildRoute } from "../routes";
 import { ConnectionState } from "../utils/uuids";
 
-const CraftyViewContent: Component = () => {
-  const { derived } = useCrafty();
+export const CraftyView: Component = () => {
+  const { actions, derived, isCraftyPlus } = useCrafty();
+
   // Keep the screen on while the device heats
   useWakeLock(derived.isHeaterActive);
 
   return (
     <>
-      {/* Main Controls */}
       <ShutdownTime />
-      <Card>
-        <div style={{ "margin-bottom": "24px" }}>
-          <Temperature />
-        </div>
-        <HeaterControl />
-      </Card>
-
-      {/* Settings */}
-      <Settings />
+      <Temperature />
+      {/* Find My Device - only Crafty+ */}
+      <Show when={isCraftyPlus}>
+        <button
+          type="button"
+          disabled={derived.isFindMyActive()}
+          onClick={actions.findMyDevice}
+          class="flex items-center gap-3 rounded-2xl border bg-card px-4 py-3.5 text-left transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 disabled:opacity-60"
+        >
+          <MapPin class="size-[18px] text-muted-foreground" />
+          <span class="flex flex-1 flex-col gap-0.5">
+            <span class="font-medium text-sm">{m.settings_findMyDevice()}</span>
+            <Show when={derived.isFindMyActive()}>
+              <span class="text-primary text-xs">
+                {m.settings_findMyDeviceRunning()}
+              </span>
+            </Show>
+          </span>
+          <ChevronRight class="size-4 text-muted-foreground" />
+        </button>
+      </Show>
     </>
   );
 };
 
-export const CraftyView: Component = () => {
+const CraftyBattery = () => {
+  const { state } = useCrafty();
+  return <BatteryChip level={state.loaded ? state.batteryLevel : undefined} />;
+};
+
+/** Wrapper for all Crafty routes: device store, header and tabs */
+export const CraftyShell = (props: RouteSectionProps) => {
   const navigate = useNavigate();
   const { connectionState } = useBluetooth();
 
@@ -51,7 +73,23 @@ export const CraftyView: Component = () => {
 
   return (
     <CraftyProvider>
-      <CraftyViewContent />
+      <DeviceShell
+        headerTrailing={<CraftyBattery />}
+        tabs={[
+          {
+            href: buildRoute.craftyRoot(),
+            label: m.nav_control(),
+            icon: Thermometer,
+          },
+          {
+            href: buildRoute.craftySettings(),
+            label: m.settings_title(),
+            icon: SlidersHorizontal,
+          },
+        ]}
+      >
+        {props.children}
+      </DeviceShell>
     </CraftyProvider>
   );
 };

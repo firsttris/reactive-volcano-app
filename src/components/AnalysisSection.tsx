@@ -1,3 +1,7 @@
+import Activity from "lucide-solid/icons/activity";
+import CircleCheck from "lucide-solid/icons/circle-check";
+import LoaderCircle from "lucide-solid/icons/loader-circle";
+import TriangleAlert from "lucide-solid/icons/triangle-alert";
 import {
   type Component,
   createSignal,
@@ -6,57 +10,10 @@ import {
   Show,
   Switch,
 } from "solid-js";
-import { styled } from "solid-styled-components";
 import type { AnalysisResult } from "../devices/shared/analysis";
 import { m } from "../paraglide/messages";
-import { Button } from "./Button";
-
-const Container = styled("div")`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-`;
-
-const StartButton = styled(Button)`
-  width: 200px;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-`;
-
-const Message = styled("div")`
-  color: var(--text-color);
-  font-size: 0.95rem;
-  text-align: center;
-`;
-
-const FindingList = styled("ul")`
-  color: var(--text-color);
-  font-size: 0.95rem;
-  margin: 0;
-  padding-left: 20px;
-  align-self: stretch;
-
-  li + li {
-    margin-top: 6px;
-  }
-`;
-
-const Report = styled("pre")`
-  align-self: stretch;
-  margin: 0;
-  padding: 10px;
-  background: var(--secondary-bg);
-  border-radius: 5px;
-  color: var(--text-color);
-  font-size: 0.85rem;
-  white-space: pre-wrap;
-  word-break: break-all;
-  user-select: text;
-`;
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { Button } from "./ui/button";
 
 type AnalysisState =
   | { kind: "idle" }
@@ -88,47 +45,68 @@ export const AnalysisSection: Component<{
   };
 
   return (
-    <Container>
-      <StartButton
-        type="button"
+    <div class="flex flex-col gap-3 px-4 py-3.5">
+      <Button
+        variant="secondary"
+        class="w-full"
         disabled={analysis().kind === "running"}
         onClick={start}
       >
+        <Show when={analysis().kind === "running"} fallback={<Activity />}>
+          <LoaderCircle class="animate-spin" />
+        </Show>
         {analysis().kind === "running"
           ? m.analysis_running()
           : m.analysis_start()}
-      </StartButton>
+      </Button>
       <Switch>
         <Match when={analysis().kind === "failed"}>
-          <Message>{m.analysis_failed()}</Message>
+          <Alert variant="destructive">
+            <TriangleAlert />
+            <AlertTitle>{m.analysis_failed()}</AlertTitle>
+          </Alert>
         </Match>
         <Match when={result()}>
           {(done) => (
             <>
               <Switch>
                 <Match when={done().findings.length > 0}>
-                  <FindingList>
-                    <For each={done().findings}>
-                      {(finding) => <li>{m[finding]()}</li>}
-                    </For>
-                  </FindingList>
+                  <Alert variant="accent">
+                    <TriangleAlert />
+                    <AlertTitle>{m.analysis_title()}</AlertTitle>
+                    <AlertDescription>
+                      <ul class="list-disc space-y-1.5 pl-4">
+                        <For each={done().findings}>
+                          {(finding) => <li>{m[finding]()}</li>}
+                        </For>
+                      </ul>
+                    </AlertDescription>
+                  </Alert>
                 </Match>
                 <Match when={!done().errorReport}>
-                  <Message>{m.analysis_ok()}</Message>
+                  <Alert>
+                    <CircleCheck class="!text-success" />
+                    <AlertTitle>{m.analysis_ok()}</AlertTitle>
+                  </Alert>
                 </Match>
               </Switch>
               <Show when={done().errorReport}>
                 {(report) => (
-                  <>
-                    <Message>{m.analysis_contactSupport()}</Message>
-                    <Report>{report()}</Report>
-                  </>
+                  <Alert variant="destructive">
+                    <TriangleAlert />
+                    <AlertTitle>{m.analysis_contactSupport()}</AlertTitle>
+                    <AlertDescription>
+                      <pre class="select-text whitespace-pre-wrap break-all rounded-lg bg-muted p-3 font-mono text-foreground text-xs">
+                        {report()}
+                      </pre>
+                    </AlertDescription>
+                  </Alert>
                 )}
               </Show>
             </>
           )}
         </Match>
       </Switch>
-    </Container>
+    </div>
   );
 };
