@@ -1,15 +1,18 @@
 import { type RouteSectionProps, useNavigate } from "@solidjs/router";
 import MapPin from "lucide-solid/icons/map-pin";
+import History from "lucide-solid/icons/rotate-ccw-clock";
 import SlidersHorizontal from "lucide-solid/icons/sliders-horizontal";
 import Thermometer from "lucide-solid/icons/thermometer";
-import { type Component, createEffect, Show } from "solid-js";
+import { type Component, createEffect, type JSX, Show } from "solid-js";
 import { BatteryChip } from "../components/BatteryChip";
 import { DeviceShell } from "../components/DeviceShell";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
 import { Temperature } from "../components/veazy-venty/Temperature";
+import { HeaterMode } from "../devices/ventyVeazy/protocol";
 import { m } from "../paraglide/messages";
 import { useBluetooth } from "../provider/BluetoothProvider";
+import { LiveSessionProvider } from "../provider/LiveSessionProvider";
 import {
   useVentyVeazy,
   VentyVeazyProvider,
@@ -58,6 +61,33 @@ const VentyVeazyBattery = () => {
   );
 };
 
+const VentyVeazyLiveSession = (props: { children: JSX.Element }) => {
+  const { state } = useVentyVeazy();
+  return (
+    <LiveSessionProvider
+      reading={() => {
+        const status = state.status;
+        const heating =
+          (status?.heaterMode ?? HeaterMode.OFF) !== HeaterMode.OFF;
+        let target = status?.targetTemp ?? 0;
+        if (status?.heaterMode === HeaterMode.BOOST) target += status.boostTemp;
+        if (status?.heaterMode === HeaterMode.SUPERBOOST) {
+          target += status.superBoostTemp;
+        }
+        return {
+          current: status?.currentTemp ?? 0,
+          target,
+          heating,
+          reached: heating && (status?.setpointReached ?? false),
+          ready: !!status,
+        };
+      }}
+    >
+      {props.children}
+    </LiveSessionProvider>
+  );
+};
+
 /** Wrapper for all Venty/Veazy routes: device store, header and tabs */
 export const VentyVeazyShell = (props: RouteSectionProps) => {
   const navigate = useNavigate();
@@ -69,6 +99,7 @@ export const VentyVeazyShell = (props: RouteSectionProps) => {
     const state = connectionState();
     if (
       state === ConnectionState.NOT_CONNECTED ||
+      state === ConnectionState.RECONNECTING ||
       state === ConnectionState.CONNECTION_FAILED
     ) {
       navigate(buildRoute.root());
@@ -77,23 +108,30 @@ export const VentyVeazyShell = (props: RouteSectionProps) => {
 
   return (
     <VentyVeazyProvider>
-      <DeviceShell
-        headerTrailing={<VentyVeazyBattery />}
-        tabs={[
-          {
-            href: buildRoute.ventyVeazyRoot(),
-            label: m.nav_control(),
-            icon: Thermometer,
-          },
-          {
-            href: buildRoute.ventyVeazySettings(),
-            label: m.settings_title(),
-            icon: SlidersHorizontal,
-          },
-        ]}
-      >
-        {props.children}
-      </DeviceShell>
+      <VentyVeazyLiveSession>
+        <DeviceShell
+          headerTrailing={<VentyVeazyBattery />}
+          tabs={[
+            {
+              href: buildRoute.ventyVeazyRoot(),
+              label: m.nav_control(),
+              icon: Thermometer,
+            },
+            {
+              href: buildRoute.ventyVeazyHistory(),
+              label: m.nav_history(),
+              icon: History,
+            },
+            {
+              href: buildRoute.ventyVeazySettings(),
+              label: m.settings_title(),
+              icon: SlidersHorizontal,
+            },
+          ]}
+        >
+          {props.children}
+        </DeviceShell>
+      </VentyVeazyLiveSession>
     </VentyVeazyProvider>
   );
 };

@@ -97,6 +97,8 @@ export enum ConnectionState {
   NOT_CONNECTED = "NOT_CONNECTED",
   CONNECTING = "CONNECTING",
   CONNECTED = "CONNECTED",
+  /** The link dropped; the app is trying to get it back */
+  RECONNECTING = "RECONNECTING",
   CONNECTION_FAILED = "CONNECTION_FAILED",
 }
 

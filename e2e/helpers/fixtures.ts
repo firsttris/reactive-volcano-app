@@ -1,8 +1,15 @@
 import { test as base } from "@playwright/test";
-import { type DeviceType, mockBluetooth } from "./bluetooth-mock";
+import {
+  type DeviceType,
+  type MockOptions,
+  mockBluetooth,
+} from "./bluetooth-mock";
 
 type TestFixtures = {
-  bluetoothDevice: (deviceType?: DeviceType) => Promise<void>;
+  bluetoothDevice: (
+    deviceType?: DeviceType,
+    options?: MockOptions
+  ) => Promise<void>;
 };
 
 /**
@@ -10,8 +17,11 @@ type TestFixtures = {
  */
 export const test = base.extend<TestFixtures>({
   bluetoothDevice: async ({ page }, use) => {
-    const setupBluetooth = async (deviceType: DeviceType = "VOLCANO") => {
-      await mockBluetooth(page, deviceType);
+    const setupBluetooth = async (
+      deviceType: DeviceType = "VOLCANO",
+      options: MockOptions = {}
+    ) => {
+      await mockBluetooth(page, deviceType, options);
     };
     await use(setupBluetooth);
   },

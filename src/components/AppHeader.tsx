@@ -6,7 +6,7 @@ import Power from "lucide-solid/icons/power";
 import Sun from "lucide-solid/icons/sun";
 import { type JSX, Match, Show, Switch } from "solid-js";
 import { m } from "../paraglide/messages";
-import { useBluetooth } from "../provider/BluetoothProvider";
+import { type DeviceInfo, useBluetooth } from "../provider/BluetoothProvider";
 import { useDarkMode } from "../provider/DarkModeProvider";
 import { ConnectionState, DeviceType } from "../utils/uuids";
 import {
@@ -26,6 +26,10 @@ const DEVICE_TYPE_LABELS: Partial<Record<DeviceType, string>> = {
   [DeviceType.VEAZY]: "Veazy",
   [DeviceType.CRAFTY]: "Crafty",
 };
+
+/** Friendly device name, e.g. "Volcano Hybrid" instead of "S&B VOLCANO H" */
+export const deviceLabel = (device: Pick<DeviceInfo, "type" | "name">) =>
+  DEVICE_TYPE_LABELS[device.type] ?? device.name;
 
 export const ThemeToggle = () => {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
@@ -65,14 +69,10 @@ const DisconnectButton = () => {
           </AlertDialogTitle>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogClose as={Button} variant="outline">
+          <AlertDialogClose variant="outline">
             {m.common_cancel()}
           </AlertDialogClose>
-          <AlertDialogClose
-            as={Button}
-            variant="destructive"
-            onClick={() => disconnect()}
-          >
+          <AlertDialogClose variant="destructive" onClick={() => disconnect()}>
             <Power />
             {m.connection_disconnect()}
           </AlertDialogClose>
@@ -93,8 +93,7 @@ export const AppHeader = (props: AppHeaderProps) => {
 
   const isConnected = () => connectionState() === ConnectionState.CONNECTED;
   const isConnecting = () => connectionState() === ConnectionState.CONNECTING;
-  const deviceName = () =>
-    DEVICE_TYPE_LABELS[deviceInfo().type] ?? deviceInfo().name;
+  const deviceName = () => deviceLabel(deviceInfo());
 
   return (
     <header class="flex items-center gap-3 pt-[max(1.125rem,env(safe-area-inset-top))] pb-3">

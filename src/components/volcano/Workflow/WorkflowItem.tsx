@@ -5,6 +5,7 @@ import Ellipsis from "lucide-solid/icons/ellipsis";
 import ListOrdered from "lucide-solid/icons/list-ordered";
 import Pencil from "lucide-solid/icons/pencil";
 import Play from "lucide-solid/icons/play";
+import Share2 from "lucide-solid/icons/share-2";
 import Square from "lucide-solid/icons/square";
 import Trash2 from "lucide-solid/icons/trash";
 import X from "lucide-solid/icons/x";
@@ -16,6 +17,7 @@ import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { useWorkflowRunner } from "../../../provider/WorkflowRunnerProvider";
 import { buildRoute } from "../../../routes";
 import type { Workflow } from "../../../utils/workflowData";
+import { buildShareUrl } from "../../../utils/workflowShare";
 import { Button } from "../../ui/button";
 import { Card } from "../../ui/card";
 import {
@@ -73,6 +75,26 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
       actionLabel: m.common_undo(),
       onAction: undo,
     });
+  };
+
+  const handleShare = async () => {
+    const appUrl = new URL(import.meta.env.BASE_URL, window.location.origin);
+    const url = buildShareUrl(props.workflow, appUrl.toString());
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: props.workflow.name, url });
+        return;
+      } catch (error) {
+        // Closing the share sheet is not an error
+        if ((error as DOMException).name === "AbortError") return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast({ message: m.workflow_linkCopied() });
+    } catch (error) {
+      console.error("Copying the share link failed:", error);
+    }
   };
 
   const handleStartEditName = () => {
@@ -174,6 +196,10 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
                 <Pencil />
                 {m.workflow_rename()}
               </DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleShare}>
+                <Share2 />
+                {m.workflow_share()}
+              </DropdownMenuItem>
               <DropdownMenuItem
                 title={m.workflow_exportDescription()}
                 onSelect={() => exportWorkflow(props.workflow.id)}
@@ -249,7 +275,7 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
                   "h-1 rounded-full bg-primary/25 transition-colors",
                   index < currentStep() && "bg-primary",
                   index === currentStep() &&
-                    "bg-primary/70 motion-safe:animate-pulse"
+                    "bg-primary/70 fx:motion-safe:animate-pulse"
                 )}
               />
             )}

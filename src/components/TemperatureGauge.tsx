@@ -9,6 +9,7 @@ import {
 } from "solid-js";
 import { cn } from "../lib/utils";
 import { m } from "../paraglide/messages";
+import { useBluetooth } from "../provider/BluetoothProvider";
 import {
   estimateSecondsRemaining,
   formatDuration,
@@ -18,6 +19,8 @@ import {
   RATE_WINDOW_MS,
   type TemperatureSample,
 } from "../utils/heatProgress";
+import { alertTargetReached } from "../utils/notify";
+import { deviceLabel } from "./AppHeader";
 import { Badge } from "./ui/badge";
 
 interface TemperatureGaugeProps {
@@ -31,6 +34,8 @@ interface TemperatureGaugeProps {
   reached?: boolean;
   /** The current temperature as shown, in the device's unit */
   children: JSX.Element;
+  /** The target as shown, e.g. "185 °C", for the notification */
+  targetLabel: string;
   /** Scale labels below the arc, in the device's unit */
   minLabel: string;
   maxLabel: string;
@@ -56,6 +61,7 @@ const statusBadge: Record<HeatStatus, "secondary" | "success" | "soft"> = {
 /** Ring gauge with the current temperature, a target marker and heat status */
 export const TemperatureGauge = (props: TemperatureGaugeProps) => {
   const gradientId = createUniqueId();
+  const { deviceInfo } = useBluetooth();
   const [samples, setSamples] = createSignal<TemperatureSample[]>([]);
   const [now, setNow] = createSignal(Date.now());
 
@@ -93,6 +99,13 @@ export const TemperatureGauge = (props: TemperatureGaugeProps) => {
       (next, previous) => {
         if (next === "reached" && previous === "heating") {
           navigator.vibrate?.(200);
+          alertTargetReached(
+            m.heat_reached(),
+            m.notify_reachedBody({
+              device: deviceLabel(deviceInfo()),
+              temperature: props.targetLabel,
+            })
+          );
         }
       },
       { defer: true }
@@ -188,11 +201,11 @@ export const TemperatureGauge = (props: TemperatureGaugeProps) => {
             transform={`rotate(${START_ANGLE} ${CENTER} ${CENTER})`}
             class={cn(
               "transition-[stroke-dasharray] duration-700 ease-out",
-              status() === "heating" &&
-                "drop-shadow-[0_0_10px_var(--glow)] motion-safe:animate-pulse",
-              status() === "cooling" && "drop-shadow-[0_0_10px_var(--glow)]",
+              (status() === "heating" || status() === "cooling") &&
+                "fx:drop-shadow-[0_0_10px_var(--glow)] fx-strong:drop-shadow-[0_0_20px_var(--glow)]",
+              status() === "heating" && "fx-strong:motion-safe:animate-pulse",
               status() === "reached" &&
-                "drop-shadow-[0_0_10px_var(--success-soft)]"
+                "fx:drop-shadow-[0_0_10px_var(--success-soft)] fx-strong:drop-shadow-[0_0_18px_var(--success)]"
             )}
           />
           <circle
@@ -209,14 +222,22 @@ export const TemperatureGauge = (props: TemperatureGaugeProps) => {
           <span class="font-medium text-[11px] text-muted-foreground uppercase tracking-[0.14em]">
             {m.temperature_now()}
           </span>
-          <span class="font-extralight text-[80px] leading-none tracking-[-0.04em]">
+          <span
+            class={cn(
+              "font-extralight text-[80px] leading-none tracking-[-0.04em] transition-[text-shadow] duration-700",
+              (status() === "heating" || status() === "cooling") &&
+                "fx-strong:[text-shadow:0_0_28px_var(--glow)]",
+              status() === "reached" &&
+                "fx-strong:[text-shadow:0_0_28px_var(--success-soft)]"
+            )}
+          >
             {props.children}
           </span>
           <Badge variant={statusBadge[status()]} class="mt-1.5 py-1">
             <span
               class={cn(
                 "size-1.5 rounded-full bg-current",
-                status() === "heating" && "motion-safe:animate-pulse"
+                status() === "heating" && "fx:motion-safe:animate-pulse"
               )}
             />
             {label()}

@@ -1,6 +1,7 @@
 import MapPin from "lucide-solid/icons/map-pin";
 import { type Component, Show } from "solid-js";
 import { AnalysisSection } from "../components/AnalysisSection";
+import { AppSettingsSection } from "../components/AppSettingsSection";
 import { PageTitle } from "../components/DeviceShell";
 import { FactoryReset } from "../components/FactoryReset";
 import {
@@ -99,6 +100,8 @@ export const VentyVeazySettingsView: Component = () => {
           onChange={actions.setChargeVoltageLimit}
         />
       </SettingsSection>
+
+      <AppSettingsSection />
 
       <SettingsSection title={m.device_info()}>
         <InfoRow label={m.device_serialNumber()}>

@@ -5,6 +5,7 @@ import {
   type Workflow,
   type WorkflowStep,
 } from "../../utils/workflowData";
+import type { SharedWorkflow } from "../../utils/workflowShare";
 import { useIndexedDB } from "../utils/useIndexedDB";
 export const useWorkflow = () => {
   const [workflowList, setWorkflowList] = useIndexedDB(
@@ -340,6 +341,19 @@ export const useWorkflow = () => {
     });
   };
 
+  /** Adds a workflow from a share link with fresh ids */
+  const addSharedWorkflow = (shared: SharedWorkflow) => {
+    const newWorkflow: Workflow = {
+      id: uuidv4(),
+      name: shared.name,
+      workflowSteps: shared.workflowSteps.map((step) => ({
+        id: uuidv4(),
+        ...step,
+      })),
+    };
+    setWorkflowList([...workflowList(), newWorkflow]);
+  };
+
   const exportAllWorkflows = () => {
     const allWorkflows = workflowList();
 
@@ -449,6 +463,7 @@ export const useWorkflow = () => {
     exportWorkflow,
     importWorkflow,
     exportAllWorkflows,
+    addSharedWorkflow,
     importAllWorkflows,
   };
 };

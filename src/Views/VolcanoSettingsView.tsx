@@ -1,5 +1,6 @@
 import type { Component } from "solid-js";
 import { AnalysisSection } from "../components/AnalysisSection";
+import { AppSettingsSection } from "../components/AppSettingsSection";
 import { PageTitle } from "../components/DeviceShell";
 import {
   InfoRow,
@@ -66,6 +67,8 @@ export const VolcanoSettingsView: Component = () => {
           </ToggleGroup>
         </SettingRow>
       </SettingsSection>
+
+      <AppSettingsSection />
 
       <SettingsSection title={m.settings_sectionInfo()}>
         <InfoRow label={m.device_runtime()}>

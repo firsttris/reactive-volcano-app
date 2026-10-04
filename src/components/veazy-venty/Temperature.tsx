@@ -7,6 +7,7 @@ import {
 import { useWakeLock } from "../../hooks/utils/useWakeLock";
 import { m } from "../../paraglide/messages";
 import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
+import { TemperatureChart } from "../TemperatureChart";
 import { OffsetStepper, TargetStepper } from "../TemperatureControls";
 import { TemperatureDisplay } from "../TemperatureDisplay";
 import { TemperatureGauge } from "../TemperatureGauge";
@@ -81,6 +82,7 @@ export const Temperature = () => {
         reached={isHeating() && (state.status?.setpointReached ?? false)}
         minLabel={`${toDisplayTemperature(Limits.MIN_TEMP, isCelsius())}°`}
         maxLabel={`${toDisplayTemperature(Limits.MAX_TEMP, isCelsius())}°`}
+        targetLabel={`${display.effectiveTemp()} °${unit()}`}
       >
         <TemperatureDisplay
           value={toDisplayTemperature(
@@ -116,7 +118,7 @@ export const Temperature = () => {
             {(mode) => (
               <ToggleGroupItem
                 value={String(mode.value)}
-                class="h-[52px] flex-col gap-0.5 rounded-xl px-1 data-[pressed]:bg-primary data-[pressed]:text-primary-foreground data-[pressed]:shadow-[0_8px_20px_-8px_var(--glow)]"
+                class="h-[52px] flex-col gap-0.5 rounded-xl px-1 data-[pressed]:bg-primary data-[pressed]:text-primary-foreground fx:data-[pressed]:shadow-[0_8px_20px_-8px_var(--glow)] fx-strong:data-[pressed]:shadow-[0_10px_32px_-8px_var(--glow)]"
               >
                 <span class="text-[13px] leading-none">{mode.label}</span>
                 <Show when={mode.detail}>
@@ -154,6 +156,12 @@ export const Temperature = () => {
           onIncrease={() => adjustSuperBoostTemp(1)}
         />
       </div>
+
+      <TemperatureChart
+        target={effectiveCelsius()}
+        unit={unit()}
+        toDisplay={(celsius) => toDisplayTemperature(celsius, isCelsius())}
+      />
     </>
   );
 };

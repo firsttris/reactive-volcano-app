@@ -89,3 +89,38 @@ test.describe("App - Sprache", () => {
     await expect(page.getByText("Gerät verbinden").first()).toBeVisible();
   });
 });
+
+test.describe("App - Zuletzt verwendetes Gerät", () => {
+  test("sollte das bekannte Gerät mit einem Klick verbinden", async ({
+    page,
+    bluetoothDevice,
+  }) => {
+    await page.addInitScript(() =>
+      localStorage.setItem(
+        "lastBluetoothDevice",
+        JSON.stringify({
+          id: "mock-volcano",
+          name: "S&B VOLCANO HYBRID",
+          type: "VOLCANO",
+        })
+      )
+    );
+    await bluetoothDevice("VOLCANO", { remembered: true });
+    await page.goto("/");
+
+    await page.getByRole("button", { name: /Connect Volcano Hybrid/ }).click();
+    await page.waitForURL(/.*volcano.*/i, { timeout: 5000 });
+  });
+
+  test("sollte ohne bekanntes Gerät die Geräteauswahl anbieten", async ({
+    page,
+    bluetoothDevice,
+  }) => {
+    await bluetoothDevice("VOLCANO");
+    await page.goto("/");
+    await expect(
+      page.getByRole("button", { name: "Connect Device" })
+    ).toBeVisible();
+    await expect(page.getByText("Last used")).toHaveCount(0);
+  });
+});

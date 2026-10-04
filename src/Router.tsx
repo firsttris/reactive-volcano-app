@@ -9,6 +9,7 @@ import { WorkflowWrapper } from "./components/volcano/Workflow/WorkflowWrapper";
 import { ROUTES } from "./routes";
 import { CraftySettingsView } from "./Views/CraftySettingsView";
 import { CraftyShell, CraftyView } from "./Views/CraftyView";
+import { HistoryView } from "./Views/HistoryView";
 import { VentyVeazySettingsView } from "./Views/VentyVeazySettingsView";
 import { VentyVeazyShell, VentyVeazyView } from "./Views/VentyVeazyView";
 import { VolcanoSettingsView } from "./Views/VolcanoSettingsView";
@@ -38,6 +39,10 @@ export const Routes = () => {
               component={WorkFlowSection}
             />
             <Route
+              path={ROUTES.DEVICE.VOLCANO.HISTORY}
+              component={HistoryView}
+            />
+            <Route
               path={ROUTES.DEVICE.VOLCANO.SETTINGS}
               component={VolcanoSettingsView}
             />
@@ -63,6 +68,10 @@ export const Routes = () => {
               component={VentyVeazyView}
             />
             <Route
+              path={ROUTES.DEVICE.VENTY_VEAZY.HISTORY}
+              component={HistoryView}
+            />
+            <Route
               path={ROUTES.DEVICE.VENTY_VEAZY.SETTINGS}
               component={VentyVeazySettingsView}
             />
@@ -71,6 +80,10 @@ export const Routes = () => {
           {/* Crafty device routes */}
           <Route path={ROUTES.DEVICE.CRAFTY.BASE} component={CraftyShell}>
             <Route path={ROUTES.DEVICE.CRAFTY.ROOT} component={CraftyView} />
+            <Route
+              path={ROUTES.DEVICE.CRAFTY.HISTORY}
+              component={HistoryView}
+            />
             <Route
               path={ROUTES.DEVICE.CRAFTY.SETTINGS}
               component={CraftySettingsView}
