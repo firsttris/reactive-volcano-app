@@ -5,8 +5,11 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: "html",
+  workers: process.env.CI ? 2 : undefined,
+  // In CI: failures as annotations on the pull request, plus the HTML report
+  reporter: process.env.CI
+    ? [["github"], ["list"], ["html", { open: "never" }]]
+    : "html",
   use: {
     baseURL: "http://localhost:5173",
     trace: "on-first-retry",

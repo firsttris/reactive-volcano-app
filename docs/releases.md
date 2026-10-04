@@ -19,7 +19,7 @@ versioned Docker images on Docker Hub, published from tags.
 |---|---|
 | URL | https://firsttris.github.io/reactive-volcano-app/ |
 | Workflow | [`.github/workflows/build.yml`](../.github/workflows/build.yml) |
-| Trigger | push to `main` (except changes to `README.md` only), or by hand |
+| Trigger | push to `main` (except changes to Markdown, `docs/` or `LICENSE` only), or by hand; pull requests run the checks without deploying |
 | Build | `npm run build` with base `/reactive-volcano-app/` |
 | SPA fallback | `dist/index.html` is copied to `dist/404.html`, so deep links survive a reload |
 

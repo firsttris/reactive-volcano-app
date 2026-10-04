@@ -110,18 +110,27 @@ chooser. Writes update the stored value, so a later read returns it. More detail
 
 ## Continuous integration
 
-`.github/workflows/build.yml` runs on every push to `main` (and by hand):
+`.github/workflows/build.yml` runs on every pull request, on every push to `main` and by hand:
 
 ```mermaid
 flowchart LR
-  U["Unit tests<br/>npm test"] --> B["Build<br/>npm run build"]
-  E["E2E tests<br/>Playwright container"] --> B
-  B --> D["Deploy<br/>GitHub Pages"]
+  C["Lint, unit tests, build<br/>biome ci · npm test · npm run build"] --> D["Deploy<br/>GitHub Pages"]
+  V["Playwright version<br/>from package-lock.json"] --> E["E2E tests<br/>Playwright container"]
+  E --> D
+  K["Docker build<br/>pull requests only"]
 ```
 
-Unit and end-to-end tests run in parallel; the build (which includes the type check) and the deployment
-only happen when both pass. Changes to `README.md` alone do not trigger a deployment. Releases are
-described in [Releases & deployment](releases.md).
+- **Lint, unit tests, build** run in one job. Biome reports problems as annotations in the pull request
+  diff; the build includes the type check.
+- **E2E tests** run in the official Playwright container. Its tag is read from `package-lock.json`, so
+  updating `@playwright/test` never leaves the container behind. Failures show up as annotations; the
+  HTML report is attached to failed runs.
+- **Docker build** (pull requests only) builds the image without pushing it, so a broken `Dockerfile`
+  shows up before a release.
+- **Deploy** only runs for `main`, after the checks and E2E tests passed.
+
+A new push to a pull request cancels its outdated run. Changes to Markdown files, `docs/` or `LICENSE`
+alone trigger nothing. Releases are described in [Releases & deployment](releases.md).
 
 ## Testing on a real device
 
