@@ -34,7 +34,7 @@ export const Temperature = () => {
         <TemperatureDisplay
           value={toDisplayUnit(state.currentTemp)}
           unit={unit()}
-          unitClass="text-[0.33em]"
+          raisedUnit
         />
       </TemperatureGauge>
 
@@ -60,7 +60,7 @@ export const Temperature = () => {
               aria-pressed={state.targetTemp === celsius}
               onClick={() => actions.setTargetTemp(celsius)}
               class={cn(
-                "h-10 rounded-xl border font-medium text-[13px] text-muted-foreground tabular-nums transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
+                "h-9 rounded-[10px] border font-medium text-[13px] text-muted-foreground tabular-nums transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
                 state.targetTemp === celsius &&
                   "border-primary/50 bg-primary-soft text-foreground"
               )}

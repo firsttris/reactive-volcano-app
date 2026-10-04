@@ -88,7 +88,7 @@ export const Temperature = () => {
             isCelsius()
           )}
           unit={unit()}
-          unitClass="text-[0.33em]"
+          raisedUnit
         />
       </TemperatureGauge>
 
