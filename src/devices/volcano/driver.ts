@@ -82,7 +82,7 @@ const readers: Partial<Record<keyof Characteristics, Reader<VolcanoValues>>> = {
   heatingMinutes: (v) => ({ heatingMinutes: parseUint16(v) }),
 };
 
-// Characteristics the device pushes changes for (like the legacy app)
+// Characteristics the device pushes changes for
 const NOTIFYING: (keyof Characteristics)[] = [
   "targetTemp",
   "currentTemp",

@@ -48,7 +48,7 @@ describe("Crafty protocol", () => {
     expect(parseBleFirmwareVersion(view(1, 2, 3))).toBe("V1.2.3");
   });
 
-  it("detects old firmware like the legacy app", () => {
+  it("detects old firmware", () => {
     expect(isOldFirmware("V02.40")).toBe(true);
     expect(isOldFirmware("V2.48")).toBe(true);
     expect(isOldFirmware("V02.51")).toBe(false);

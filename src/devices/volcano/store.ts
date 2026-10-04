@@ -128,7 +128,7 @@ export const createVolcanoStore = (driver: VolcanoDriver) => {
         .setDisplayOnCooling(enabled)
         .catch((error) => console.error("Volcano display failed:", error));
     },
-    /** Self-check like the legacy analysis */
+    /** Reads the registers and runs the self-check */
     async runAnalysis(): Promise<AnalysisResult> {
       const history = await driver.readDiagnostics();
       return analyzeVolcano({

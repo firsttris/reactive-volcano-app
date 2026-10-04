@@ -2,7 +2,7 @@ import { type Accessor, createSignal, onCleanup } from "solid-js";
 import { useVolcano } from "../../provider/VolcanoProvider";
 import type { WorkflowStep } from "../../utils/workflowData";
 
-// Like the legacy app, the pump always runs for at least this long
+// The pump always runs for at least this long
 const MIN_PUMP_TIME_MS = 500;
 
 export type WorkflowPhase =
@@ -75,7 +75,7 @@ export const useWorkflowScheduler = (
       };
       const interval = setInterval(() => {
         const currentTemp = getCurrentTemperature();
-        // Temperature reached if within ±1°C of target (like legacy app)
+        // Temperature reached if within ±1°C of target
         if (currentTemp >= targetTemp - 1 && currentTemp <= targetTemp + 1) {
           clearInterval(interval);
           pendingCancels.delete(cancel);
@@ -84,7 +84,7 @@ export const useWorkflowScheduler = (
           );
           resolve();
         }
-      }, 1500); // Check every 1.5 seconds like legacy app
+      }, 1500); // Check every 1.5 seconds
       pendingCancels.add(cancel);
     });
 
@@ -96,7 +96,7 @@ export const useWorkflowScheduler = (
     await setTargetTemperature(step.temperature);
     ensureActive(id);
 
-    // Wait a bit before turning on heat (like legacy app)
+    // Wait a bit before turning on heat
     await delayFor(750);
 
     if (!isHeatingActive()) {

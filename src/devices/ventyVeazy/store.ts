@@ -36,9 +36,9 @@ import {
   toDisplayTemperature,
 } from "./protocol";
 
-// Temperature writes are delayed until the user stops clicking (like the
-// legacy app); afterwards polled values are ignored for a moment so the
-// display does not jump back to the old value.
+// Temperature writes are delayed until the user stops clicking; afterwards
+// polled values are ignored for a moment so the display does not jump back
+// to the old value.
 const WRITE_DEBOUNCE_MS = 500;
 const IGNORE_POLL_AFTER_WRITE_MS = 1500;
 const ANALYSIS_TIMEOUT_MS = 5000;
@@ -228,7 +228,7 @@ export const createVentyVeazyStore = (driver: VentyVeazyDriver) => {
     triggerFindMyDevice() {
       return send(encodeFindMyDevice());
     },
-    /** Asks the device to check itself, like the legacy analysis */
+    /** Asks the device to check itself */
     async runAnalysis(): Promise<AnalysisResult> {
       // Brightness/vibration are not part of the status poll
       await driver.send(encodeReadBrightnessVibration());

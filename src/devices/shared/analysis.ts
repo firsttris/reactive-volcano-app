@@ -1,7 +1,6 @@
 /**
- * Device self-check, like the "Analysis" entry of the legacy app. Each device
- * module turns its status registers into findings; sharing the result with
- * STORZ & BICKEL is not supported (their server only accepts its own origin).
+ * Device self-check. Each device module turns its status registers into
+ * findings; the app shows an error report but never sends it anywhere.
  *
  * Findings are translation keys so the UI can show them directly.
  */
@@ -28,14 +27,14 @@ export interface AnalysisResult {
   findings: AnalysisFinding[];
 }
 
-/** Hex without prefix, padded like the legacy app's numHex */
+/** Hex without prefix, zero-padded to `digits` */
 export const toHex = (value: number, digits: number) =>
   value.toString(16).padStart(digits, "0");
 
 export const bytesToHex = (bytes: Uint8Array) =>
   [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 
-/** Same layout as the legacy support message */
+/** Plain-text report with serial number and raw values for support */
 export const formatErrorReport = (
   serialNumber: string,
   now: Date,

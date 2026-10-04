@@ -147,11 +147,11 @@ sequenceDiagram
   Store->>Writer: schedule("targetTemp")
   UI->>Store: setTargetTemp(182)
   Store->>Writer: schedule again (timer reset)
-  Note over Writer: 300 ms without changes
+  Note over Writer: 300 ms without changes (Venty / Veazy: 500 ms)
   Writer->>Dev: write 182
   Dev-->>Store: notification 181 (stale)
   Store->>Writer: isHeld("targetTemp")? yes → ignored
-  Note over Writer: hold ends 1 s after the write
+  Note over Writer: hold ends 1 s after the write (Venty / Veazy: 1.5 s)
   Dev-->>Store: notification 182 → applied
 ```
 

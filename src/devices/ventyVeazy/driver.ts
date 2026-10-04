@@ -17,10 +17,10 @@ import {
 } from "./protocol";
 
 const POLL_INTERVAL_MS = 500;
-// Like the legacy app: every ~30 status polls also request the usage times
+// Every ~30 status polls also request the usage times
 const EXTENDED_DATA_EVERY_N_POLLS = 30;
 
-// Sent once after connecting (same order as the legacy app)
+// Sent once after connecting
 const INIT_REQUESTS: ArrayBuffer[] = [
   encodeRequest(Command.FIRMWARE),
   encodeRequest(Command.ADVERTISING_INFO),

@@ -1,5 +1,5 @@
 /**
- * Venty / Veazy BLE protocol (derived from qvap.js).
+ * Venty / Veazy BLE protocol.
  *
  * All communication runs over a single characteristic: the app writes a
  * command frame whose first byte is the command id, and the device answers
@@ -183,7 +183,7 @@ export const parseStatus = (
     boostTemp: value.getUint8(6),
     superBoostTemp: value.getUint8(7),
     batteryLevel: value.getUint8(8),
-    // The original app adds both bytes (not a uint16), so do the same
+    // The two bytes are added, not combined into a uint16
     autoShutdownTimer: value.getUint8(9) + value.getUint8(10),
     heaterMode: value.getUint8(11),
     isCharging: value.getUint8(13) > 0,
@@ -432,7 +432,7 @@ export interface VentyVeazyAnalysisInput {
   now: Date;
 }
 
-/** Same checks as the legacy analysis answer handler (command 3) */
+/** Turns the ANALYSIS response (command 3) into an analysis result */
 export const analyzeVentyVeazy = (
   input: VentyVeazyAnalysisInput
 ): AnalysisResult => {
@@ -447,7 +447,7 @@ export const analyzeVentyVeazy = (
     };
   }
 
-  // Otherwise the legacy app lists settings that differ from the defaults
+  // Otherwise list settings that differ from the defaults
   const findings: AnalysisFinding[] = [];
   if (
     brightnessVibration &&

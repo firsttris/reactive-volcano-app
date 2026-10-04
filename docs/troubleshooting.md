@@ -57,8 +57,8 @@ metres), and on Android that Location / Nearby devices permission is granted to 
 
 ## Values look wrong or do not update
 
-- **Temperature jumps back after pressing + / −**: the app writes 300 ms after your last tap and then
-  ignores the device's echo for one second. If it still jumps back, the device rejected the value (for
+- **Temperature jumps back after pressing + / −**: the app writes 300 ms after your last tap (500 ms on
+  Venty / Veazy) and then ignores the device's echo for 1 s (1.5 s). If it still jumps back, the device rejected the value (for
   example outside its range).
 - **Unit looks wrong**: the app shows what the device is set to. Change it under *Settings*.
 - **Crafty shows only a few settings**: firmware older than 2.51 does not expose the rest

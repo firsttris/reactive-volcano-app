@@ -149,8 +149,8 @@ anywhere itself; pass it on yourself if you contact support. The analysis is an 
 ## How values are written
 
 - **Buttons and sliders that change a number** (temperature, offsets, brightness, shutdown time) update
-  the screen at once and write to the device 300 ms after your last change. Ten taps on + become one
-  Bluetooth write. For a second after the write, values coming back from the device do not overwrite
+  the screen at once and write to the device 300 ms after your last change (500 ms on Venty / Veazy). Ten taps on +
+  become one Bluetooth write. For 1 s after the write (1.5 s on Venty / Veazy), values coming back from the device do not overwrite
   what you see, so the number does not jump back while the device catches up.
 - **Switches** (heater, pump, vibration …) are written immediately and confirmed by the device's next
   notification.

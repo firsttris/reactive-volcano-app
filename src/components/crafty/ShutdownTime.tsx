@@ -5,8 +5,7 @@ import { useCrafty } from "../../provider/CraftyProvider";
 import { StatusNote } from "../TemperatureControls";
 
 /**
- * Like the legacy app: once the target temperature is reached, the Crafty+
- * counts down to its automatic shutdown.
+ * Once the target temperature is reached, the Crafty+ counts down to its automatic shutdown.
  */
 export const ShutdownTime = () => {
   const { state, derived, isOldFirmware } = useCrafty();

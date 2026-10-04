@@ -137,7 +137,7 @@ describe("Volcano driver", () => {
     });
   });
 
-  it("enables notifications like the legacy app", async () => {
+  it("enables notifications for the changing values", async () => {
     const { characteristics } = await connect();
     const notifying = [...characteristics.values()]
       .filter((c) => c.startNotifications.mock.calls.length > 0)

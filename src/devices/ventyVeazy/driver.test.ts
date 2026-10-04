@@ -40,7 +40,7 @@ describe("Venty/Veazy driver", () => {
     vi.useRealTimers();
   });
 
-  it("sends the init requests in the order of the legacy app", async () => {
+  it("sends the init requests in a fixed order", async () => {
     const driver = createVentyVeazyDriver(characteristic, "VENTY", queue);
     await driver.start();
     expect(characteristic.commands()).toEqual([

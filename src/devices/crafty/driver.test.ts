@@ -183,7 +183,7 @@ describe("Crafty driver", () => {
     for (const read of reads) expect(read).toHaveBeenCalledOnce();
   });
 
-  it("enables notifications like the legacy app", async () => {
+  it("enables notifications for the changing values", async () => {
     const { characteristics } = await collect();
     const notifying = [...characteristics.values()]
       .filter((c) => c.startNotifications.mock.calls.length > 0)
