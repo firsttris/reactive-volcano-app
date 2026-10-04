@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Effects level (off / subtle / strong), set on <html> per device:
+   `fx:` applies unless effects are off, `fx-strong:` only when strong */
+@custom-variant fx (&:where(:root:not([data-effects="off"]) *));
+@custom-variant fx-strong (&:where(:root[data-effects="strong"] *));
+
 /* Theme tokens in the shadcn/ui convention: Zinc surfaces, ember accent */
 :root {
   --background: #fafafa;

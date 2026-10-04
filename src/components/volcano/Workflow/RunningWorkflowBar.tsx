@@ -43,7 +43,7 @@ export const RunningWorkflowBar = () => {
       <div class="fixed inset-x-0 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-20 px-4">
         <div
           role="status"
-          class="fade-in-0 slide-in-from-bottom-2 mx-auto flex max-w-[calc(32rem-1.5rem)] animate-in flex-col gap-3 rounded-card border border-primary/45 bg-card/95 p-3.5 shadow-[0_16px_40px_-16px_var(--glow)] backdrop-blur-xl"
+          class="fade-in-0 slide-in-from-bottom-2 mx-auto flex max-w-[calc(32rem-1.5rem)] animate-in flex-col gap-3 rounded-card border border-primary/45 bg-card/95 p-3.5 fx:shadow-[0_16px_40px_-16px_var(--glow)] fx-strong:shadow-[0_18px_56px_-14px_var(--glow)] backdrop-blur-xl"
         >
           <div class="flex items-center gap-3">
             <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
@@ -82,7 +82,7 @@ export const RunningWorkflowBar = () => {
                     "h-1 rounded-full bg-primary/25 transition-colors",
                     index < runner.currentStep() && "bg-primary",
                     index === runner.currentStep() &&
-                      "bg-primary/70 motion-safe:animate-pulse"
+                      "bg-primary/70 fx:motion-safe:animate-pulse"
                   )}
                 />
               )}

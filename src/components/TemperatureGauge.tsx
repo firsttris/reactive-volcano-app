@@ -201,11 +201,11 @@ export const TemperatureGauge = (props: TemperatureGaugeProps) => {
             transform={`rotate(${START_ANGLE} ${CENTER} ${CENTER})`}
             class={cn(
               "transition-[stroke-dasharray] duration-700 ease-out",
-              status() === "heating" &&
-                "drop-shadow-[0_0_10px_var(--glow)] motion-safe:animate-pulse",
-              status() === "cooling" && "drop-shadow-[0_0_10px_var(--glow)]",
+              (status() === "heating" || status() === "cooling") &&
+                "fx:drop-shadow-[0_0_10px_var(--glow)] fx-strong:drop-shadow-[0_0_20px_var(--glow)]",
+              status() === "heating" && "fx-strong:motion-safe:animate-pulse",
               status() === "reached" &&
-                "drop-shadow-[0_0_10px_var(--success-soft)]"
+                "fx:drop-shadow-[0_0_10px_var(--success-soft)] fx-strong:drop-shadow-[0_0_18px_var(--success)]"
             )}
           />
           <circle
@@ -222,14 +222,22 @@ export const TemperatureGauge = (props: TemperatureGaugeProps) => {
           <span class="font-medium text-[11px] text-muted-foreground uppercase tracking-[0.14em]">
             {m.temperature_now()}
           </span>
-          <span class="font-extralight text-[80px] leading-none tracking-[-0.04em]">
+          <span
+            class={cn(
+              "font-extralight text-[80px] leading-none tracking-[-0.04em] transition-[text-shadow] duration-700",
+              (status() === "heating" || status() === "cooling") &&
+                "fx-strong:[text-shadow:0_0_28px_var(--glow)]",
+              status() === "reached" &&
+                "fx-strong:[text-shadow:0_0_28px_var(--success-soft)]"
+            )}
+          >
             {props.children}
           </span>
           <Badge variant={statusBadge[status()]} class="mt-1.5 py-1">
             <span
               class={cn(
                 "size-1.5 rounded-full bg-current",
-                status() === "heating" && "motion-safe:animate-pulse"
+                status() === "heating" && "fx:motion-safe:animate-pulse"
               )}
             />
             {label()}

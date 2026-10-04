@@ -275,7 +275,7 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
                   "h-1 rounded-full bg-primary/25 transition-colors",
                   index < currentStep() && "bg-primary",
                   index === currentStep() &&
-                    "bg-primary/70 motion-safe:animate-pulse"
+                    "bg-primary/70 fx:motion-safe:animate-pulse"
                 )}
               />
             )}

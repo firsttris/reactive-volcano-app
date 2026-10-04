@@ -201,5 +201,10 @@
   "connect_reconnectHint": "Lass das Gerät eingeschaltet und in der Nähe.",
   "connect_knownDevice": "{device} verbinden",
   "connect_lastUsed": "Zuletzt verwendet",
-  "connect_otherDevice": "Anderes Gerät wählen"
+  "connect_otherDevice": "Anderes Gerät wählen",
+  "settings_effects": "Effekte",
+  "settings_effectsOff": "Aus",
+  "settings_effectsSubtle": "Dezent",
+  "settings_effectsStrong": "Kräftig",
+  "settings_effectsHint": "Leuchten und Animationen auf diesem Gerät"
 }

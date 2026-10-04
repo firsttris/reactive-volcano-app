@@ -24,6 +24,9 @@
               ? matchMedia("(prefers-color-scheme: dark)").matches
               : stored === "true";
           document.documentElement.classList.toggle("dark", dark);
+          const effects = localStorage.getItem("effects");
+          document.documentElement.dataset.effects =
+            effects === "off" || effects === "strong" ? effects : "subtle";
         } catch {}
       })();
     </script>

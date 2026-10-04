@@ -201,5 +201,10 @@
   "connect_reconnectHint": "Keep the device switched on and nearby.",
   "connect_knownDevice": "Connect {device}",
   "connect_lastUsed": "Last used",
-  "connect_otherDevice": "Choose another device"
+  "connect_otherDevice": "Choose another device",
+  "settings_effects": "Effects",
+  "settings_effectsOff": "Off",
+  "settings_effectsSubtle": "Subtle",
+  "settings_effectsStrong": "Strong",
+  "settings_effectsHint": "Glow and animations on this device"
 }

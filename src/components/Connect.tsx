@@ -64,11 +64,11 @@ const BluetoothBeacon = (props: { active: boolean }) => (
     <span
       class={cn(
         "absolute inset-0 rounded-full border border-primary/25",
-        props.active && "motion-safe:animate-ping"
+        props.active && "fx:motion-safe:animate-ping"
       )}
     />
     <span class="absolute inset-4 rounded-full border border-primary/40" />
-    <span class="flex size-16 items-center justify-center rounded-[22px] bg-primary text-primary-foreground shadow-[0_10px_40px_-8px_var(--glow)]">
+    <span class="flex size-16 items-center justify-center rounded-[22px] bg-primary text-primary-foreground fx:shadow-[0_10px_40px_-8px_var(--glow)] fx-strong:shadow-[0_12px_56px_-6px_var(--glow)]">
       <Bluetooth class="size-[30px]" stroke-width={2.25} />
     </span>
   </div>
@@ -168,7 +168,7 @@ export const Connect = () => {
     <div class="relative flex min-h-dvh flex-col overflow-hidden">
       <div
         aria-hidden="true"
-        class="pointer-events-none absolute top-24 left-1/2 size-[440px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,var(--glow),transparent)] opacity-50"
+        class="pointer-events-none absolute top-24 left-1/2 size-[440px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,var(--glow),transparent)] opacity-0 fx:opacity-50 fx-strong:opacity-90"
       />
       <div class="relative flex justify-end px-5 pt-[max(1.125rem,env(safe-area-inset-top))]">
         <ThemeToggle />

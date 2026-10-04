@@ -1,6 +1,7 @@
 import { render } from "solid-js/web";
 import { BluetoothProvider } from "./provider/BluetoothProvider";
 import { DarkModeProvider } from "./provider/DarkModeProvider";
+import { EffectsProvider } from "./provider/EffectsProvider";
 import { HistoryProvider } from "./provider/HistoryProvider";
 import { ToastProvider } from "./provider/ToastProvider";
 import "@fontsource-variable/geist";
@@ -19,13 +20,15 @@ capturePendingWorkflow();
 const dispose = render(
   () => (
     <DarkModeProvider>
-      <ToastProvider>
-        <BluetoothProvider>
-          <HistoryProvider>
-            <Routes />
-          </HistoryProvider>
-        </BluetoothProvider>
-      </ToastProvider>
+      <EffectsProvider>
+        <ToastProvider>
+          <BluetoothProvider>
+            <HistoryProvider>
+              <Routes />
+            </HistoryProvider>
+          </BluetoothProvider>
+        </ToastProvider>
+      </EffectsProvider>
     </DarkModeProvider>
   ),
   root

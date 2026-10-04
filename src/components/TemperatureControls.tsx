@@ -102,7 +102,7 @@ export const ToggleTile = (props: ToggleTileProps) => (
     class={cn(
       "flex touch-manipulation flex-col gap-3.5 rounded-card border bg-card p-4 text-left transition-[background-color,border-color,box-shadow,transform] focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 active:scale-[0.98] disabled:opacity-50",
       props.pressed
-        ? "border-primary bg-primary-soft shadow-[0_0_0_1px_var(--primary),0_10px_30px_-12px_var(--glow)]"
+        ? "border-primary bg-primary-soft shadow-[0_0_0_1px_var(--primary)] fx:shadow-[0_0_0_1px_var(--primary),0_10px_30px_-12px_var(--glow)] fx-strong:shadow-[0_0_0_1px_var(--primary),0_14px_48px_-10px_var(--glow)]"
         : "hover:bg-accent"
     )}
   >
