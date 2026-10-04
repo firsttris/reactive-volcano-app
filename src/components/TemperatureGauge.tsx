@@ -207,9 +207,9 @@ export const TemperatureGauge = (props: TemperatureGaugeProps) => {
         </svg>
         <div class="absolute inset-x-0 top-[24%] flex flex-col items-center gap-1">
           <span class="font-medium text-[11px] text-muted-foreground uppercase tracking-[0.14em]">
-            {m.temperature_current()}
+            {m.temperature_now()}
           </span>
-          <span class="font-extralight text-[76px] leading-none tracking-[-0.04em]">
+          <span class="font-extralight text-[80px] leading-none tracking-[-0.04em]">
             {props.children}
           </span>
           <Badge variant={statusBadge[status()]} class="mt-1.5 py-1">
@@ -220,18 +220,18 @@ export const TemperatureGauge = (props: TemperatureGaugeProps) => {
               )}
             />
             {label()}
-            <Show when={eta()}>
-              {(seconds) => (
-                <span class="font-normal opacity-80">
-                  · {m.heat_remaining()} ~{formatDuration(seconds())}
-                </span>
-              )}
-            </Show>
           </Badge>
         </div>
       </div>
       <div class="-mt-3 flex w-[230px] max-w-full justify-between font-mono text-[11px] text-muted-foreground">
         <span>{props.minLabel}</span>
+        <Show when={eta()}>
+          {(seconds) => (
+            <span class="text-foreground">
+              {m.heat_remaining()} ~{formatDuration(seconds())}
+            </span>
+          )}
+        </Show>
         <span>{props.maxLabel}</span>
       </div>
     </section>

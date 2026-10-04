@@ -28,11 +28,7 @@ export const Temperature = () => {
         minLabel={`${Limits.MIN_TEMP}°`}
         maxLabel={`${Limits.MAX_TEMP}°`}
       >
-        <TemperatureDisplay
-          value={state.currentTemp}
-          unit="C"
-          unitClass="text-[0.33em]"
-        />
+        <TemperatureDisplay value={state.currentTemp} unit="C" raisedUnit />
       </TemperatureGauge>
 
       <TargetStepper

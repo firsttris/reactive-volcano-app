@@ -36,7 +36,6 @@
   "connect_intro": "Diese App unterstützt Volcano Hybrid, Veazy und Venty Geräte. Klicken Sie auf die Schaltfläche unten, um eine Bluetooth-Verbindung herzustellen.",
   "connect_button": "Gerät verbinden",
   "temperature_target": "Zieltemperatur",
-  "temperature_current": "Aktuelle Temperatur",
   "temperature_effective": "Effektiv",
   "workflow_editStep": "Schritt bearbeiten",
   "workflow_editSteps": "Workflow-Schritte bearbeiten",
@@ -158,5 +157,6 @@
   "workflow_moreActions": "Weitere Aktionen",
   "workflow_importExport": "Importieren & exportieren",
   "workflow_empty": "Noch keine Workflows.",
-  "connect_help": "Gerät wird nicht gefunden?"
+  "connect_help": "Gerät wird nicht gefunden?",
+  "temperature_now": "Aktuell"
 }
