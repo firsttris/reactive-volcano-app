@@ -14,7 +14,7 @@ jobs:
     uses: firsttris/workflows/.github/workflows/docker-release.yml@v1
     with:
       image: tristanteu/reactive-volcano-app
-      description: Control Storz & Bickel vaporizers (Volcano, Crafty, Venty, Veazy) via Web Bluetooth
+      description: Unofficial Web Bluetooth control app for compatible vaporizers (Volcano, Venty, Veazy, Crafty)
       dockerfile: Dockerfile
     secrets: inherit
     permissions:
