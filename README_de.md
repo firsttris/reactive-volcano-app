@@ -127,8 +127,11 @@ Ein fertiges Image für `linux/amd64` und `linux/arm64` liegt auf
 [Docker Hub](https://hub.docker.com/r/tristanteu/reactive-volcano-app):
 
 ```bash
-docker run -d --name vaporizer-app -p 8080:80 --restart unless-stopped tristanteu/reactive-volcano-app:latest
+docker run -d --name vaporizer-app -p 8080:8080 --restart unless-stopped tristanteu/reactive-volcano-app:latest
 ```
+
+Der Container betreibt nginx ohne Root-Rechte und lauscht auf Port **8080** (ältere Images: 80, siehe
+[Aktualisieren](docs/self-hosting.md#updates)).
 
 <details>
 <summary><b>Docker Compose</b></summary>
@@ -138,7 +141,7 @@ services:
   vaporizer-app:
     image: tristanteu/reactive-volcano-app:latest
     ports:
-      - "8080:80"
+      - "8080:8080"
     restart: unless-stopped
 ```
 
