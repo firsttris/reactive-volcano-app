@@ -72,6 +72,11 @@ export const createCharacteristicDevice = <Key extends string, Values>(
         if (value) emit(reader(value));
       };
       await queue.add(() => characteristic.startNotifications());
+      if (disposed) {
+        // Disposed meanwhile: nothing would remove the handler later
+        await characteristic.stopNotifications().catch(() => {});
+        return;
+      }
       characteristic.addEventListener("characteristicvaluechanged", handler);
       notificationHandlers.set(characteristic, handler);
     }

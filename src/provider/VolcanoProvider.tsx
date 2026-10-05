@@ -14,7 +14,10 @@ const VolcanoStoreProvider = (props: {
   children: JSX.Element;
 }) => {
   // Read once on purpose: one store per driver instance
-  const store = createVolcanoStore(props.driver);
+  const { reportStartFailure } = useBluetooth();
+  const store = createVolcanoStore(props.driver, (error) =>
+    reportStartFailure(props.driver, error)
+  );
   return (
     <VolcanoContext.Provider value={store}>
       {props.children}

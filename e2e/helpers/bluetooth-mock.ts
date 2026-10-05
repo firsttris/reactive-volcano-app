@@ -53,6 +53,8 @@ export interface MockBluetooth {
   _failConnect: boolean;
   /** Makes only the next n GATT connects fail */
   _failConnectTimes: number;
+  /** Makes GATT connects take this long; gatt.disconnect() aborts them */
+  _connectDelayMs: number;
   /** How often the device chooser was opened */
   _requestDeviceCalls: number;
   requestDevice: (options: unknown) => Promise<MockBluetoothDevice>;
@@ -557,6 +559,7 @@ export async function mockBluetooth(
       const eventListeners = new Map<string, Set<MockEventHandler>>();
 
       // Mock Bluetooth API
+      let abortPendingConnect: (() => void) | undefined;
       const createDevice = () => {
         const device: MockBluetoothDevice = {
           // Stable, like the id Chrome keeps for a permitted device
@@ -583,6 +586,17 @@ export async function mockBluetooth(
                 bluetooth._failConnectTimes - 1
               );
               throw new DOMException("Device out of range", "NetworkError");
+            }
+            if (bluetooth._connectDelayMs > 0) {
+              // Like Chrome: disconnect() rejects a pending connect
+              await new Promise<void>((resolve, reject) => {
+                const timer = setTimeout(resolve, bluetooth._connectDelayMs);
+                abortPendingConnect = () => {
+                  clearTimeout(timer);
+                  reject(new DOMException("Connection aborted", "AbortError"));
+                };
+              });
+              abortPendingConnect = undefined;
             }
             if (device.gatt) device.gatt.connected = true;
 
@@ -759,6 +773,8 @@ export async function mockBluetooth(
           },
           disconnect: () => {
             console.log("[Bluetooth Mock] Disconnecting...");
+            abortPendingConnect?.();
+            abortPendingConnect = undefined;
             if (device.gatt) device.gatt.connected = false;
 
             // Trigger disconnect event
@@ -791,6 +807,7 @@ export async function mockBluetooth(
         _failConnect: false,
         _failConnectTimes: 0,
         _requestDeviceCalls: 0,
+        _connectDelayMs: 0,
         requestDevice: async (options: unknown) => {
           bluetooth._requestDeviceCalls++;
           console.log(

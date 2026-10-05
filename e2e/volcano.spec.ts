@@ -121,6 +121,35 @@ test.describe("Volcano Gerät - Disconnect", () => {
     });
   });
 
+  test("sollte beim Abbrechen des Neuverbindens die Verbindung freigeben", async ({
+    page,
+  }) => {
+    await page.evaluate(() => {
+      const { bluetooth } = window.navigator as unknown as {
+        bluetooth: MockBluetooth;
+      };
+      bluetooth._connectDelayMs = 3_000;
+    });
+    await dropConnection(page);
+    await expect(page.getByText("Attempt 1 of 3")).toBeVisible();
+    // The first attempt connects after 2 s; cancel while it is pending
+    await page.waitForTimeout(3_000);
+    await page.getByRole("button", { name: "Cancel" }).click();
+    await page.waitForTimeout(3_000);
+
+    await expect(
+      page.getByRole("button", { name: /Connect/ }).first()
+    ).toBeVisible();
+    expect(page.url()).not.toMatch(/volcano/i);
+    const connected = await page.evaluate(() => {
+      const { bluetooth } = window.navigator as unknown as {
+        bluetooth: MockBluetooth;
+      };
+      return bluetooth._currentDevice?.gatt?.connected;
+    });
+    expect(connected).toBe(false);
+  });
+
   test("sollte nach erfolglosen Versuchen aufgeben", async ({ page }) => {
     await page.clock.install();
     await page.evaluate(() => {

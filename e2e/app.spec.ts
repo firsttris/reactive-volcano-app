@@ -127,6 +127,32 @@ test.describe("App - Zuletzt verwendetes Gerät", () => {
   });
 });
 
+test.describe("App - Verbinden abbrechen", () => {
+  test("sollte nach Abbrechen nicht doch noch verbinden", async ({
+    page,
+    bluetoothDevice,
+  }) => {
+    await bluetoothDevice("VOLCANO");
+    await page.goto("/");
+    await page.evaluate(() => {
+      const { bluetooth } = window.navigator as unknown as {
+        bluetooth: MockBluetooth;
+      };
+      bluetooth._connectDelayMs = 2_000;
+    });
+
+    await page.getByRole("button", { name: "Connect Device" }).click();
+    await expect(page.getByText(/Connecting to/)).toBeVisible();
+    await page.getByRole("button", { name: "Cancel" }).click();
+    await page.waitForTimeout(3_000);
+
+    await expect(
+      page.getByRole("button", { name: "Connect Device" })
+    ).toBeVisible();
+    expect(page.url()).not.toMatch(/volcano/i);
+  });
+});
+
 test.describe("App - Zuletzt verwendetes Gerät, robust verbinden", () => {
   const rememberVolcano = (page: Page) =>
     page.addInitScript(() =>

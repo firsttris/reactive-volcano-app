@@ -28,7 +28,11 @@ export interface VolcanoState extends VolcanoValues {
  * Reactive state for a connected Volcano. Must be called inside a Solid owner
  * (component/provider); starts the driver and unsubscribes on cleanup.
  */
-export const createVolcanoStore = (driver: VolcanoDriver) => {
+export const createVolcanoStore = (
+  driver: VolcanoDriver,
+  /** Told when the first reads fail, so the app can report it */
+  onStartFailed?: (error: unknown) => void
+) => {
   const [state, setState] = createStore<VolcanoState>({
     loaded: false,
     targetTemp: 0,
@@ -61,7 +65,10 @@ export const createVolcanoStore = (driver: VolcanoDriver) => {
   driver
     .start()
     .then(() => setState("loaded", true))
-    .catch((error) => console.error("Volcano start failed:", error));
+    .catch((error) => {
+      console.error("Volcano start failed:", error);
+      onStartFailed?.(error);
+    });
 
   onCleanup(() => {
     unsubscribe();

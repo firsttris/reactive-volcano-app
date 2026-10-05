@@ -46,6 +46,16 @@ export type ConnectionError =
 /** What a connect attempt is waiting for, to tell the user */
 export type ConnectPhase = "searching" | "connecting";
 
+/** Thrown by a connect attempt that was cancelled or replaced meanwhile */
+class AttemptCancelled extends Error {
+  constructor() {
+    super("Connect attempt cancelled");
+  }
+}
+
+const errorText = (error: unknown) =>
+  error instanceof Error ? error.message : String(error);
+
 const NO_DEVICE: DeviceInfo = { type: DeviceType.UNKNOWN, name: "" };
 
 /**
@@ -209,7 +219,8 @@ const createBluetoothMethods = () => {
         "gattserverdisconnected",
         handleDisconnect
       );
-      if (currentDevice.gatt?.connected) currentDevice.gatt.disconnect();
+      // Also ends a gatt.connect() that is still pending
+      currentDevice.gatt?.disconnect();
     }
     setDevice(undefined);
     setDeviceInfo(NO_DEVICE);
@@ -254,14 +265,14 @@ const createBluetoothMethods = () => {
       if (seen === "unsupported") await sleep(delay, signal);
       if (token !== reconnectToken) return;
       try {
-        await connectToDevice(bluetoothDevice);
-        if (token !== reconnectToken) return;
+        await connectToDevice(bluetoothDevice, token);
         setReconnectAttempt(0);
         setConnectionState(ConnectionState.CONNECTED);
         return;
       } catch (error) {
+        await abandonAttempt(bluetoothDevice, token);
+        if (token !== reconnectToken) return;
         console.warn(`Reconnect attempt ${index + 1} failed:`, error);
-        await abandonAttempt(bluetoothDevice);
       }
     }
 
@@ -272,78 +283,147 @@ const createBluetoothMethods = () => {
     setConnectionError({ kind: "lost" });
   };
 
-  /** Cleans up after a failed connect so the next attempt starts fresh */
-  const abandonAttempt = async (bluetoothDevice: BluetoothDevice) => {
+  /**
+   * Cleans up after a failed connect so the next attempt starts fresh. A
+   * cancelled attempt leaves alone what a newer attempt may already use.
+   */
+  const abandonAttempt = async (
+    bluetoothDevice: BluetoothDevice,
+    token: number
+  ) => {
+    if (token !== reconnectToken) {
+      if (device() !== bluetoothDevice) bluetoothDevice.gatt?.disconnect();
+      return;
+    }
     bluetoothDevice.removeEventListener(
       "gattserverdisconnected",
       handleDisconnect
     );
     await disposeDrivers();
-    if (bluetoothDevice.gatt?.connected) bluetoothDevice.gatt.disconnect();
+    bluetoothDevice.gatt?.disconnect();
   };
 
   const disconnect = async () => {
-    startAttempt();
+    const { token } = startAttempt();
+    const oldDevice = device();
+    // Leave the connected state first, so a drop while the drivers shut down
+    // does not start a reconnect
+    oldDevice?.removeEventListener("gattserverdisconnected", handleDisconnect);
     setReconnectAttempt(0);
     setConnectionError(undefined);
-    await disposeDrivers();
-    releaseDevice();
     setConnectionState(ConnectionState.NOT_CONNECTED);
+    await disposeDrivers();
+    if (token === reconnectToken) releaseDevice();
+    else if (oldDevice && oldDevice !== device()) oldDevice.gatt?.disconnect();
   };
 
+  /**
+   * Connects GATT and sets up the driver. Only an attempt that is still
+   * current publishes its device and driver; a cancelled one throws.
+   */
   const connectToDevice = async (
     bluetoothDevice: BluetoothDevice,
+    token: number,
     timeoutMs = CONNECT_TIMEOUT_MS
   ) => {
     if (!bluetoothDevice.gatt) {
       throw new Error("Device does not support GATT");
     }
+    const ensureCurrent = () => {
+      if (token !== reconnectToken) throw new AttemptCancelled();
+    };
+    ensureCurrent();
+    // Known early, so cancelling can end the pending connect
     setDevice(bluetoothDevice);
-    // Critical for handling unexpected disconnects
-    bluetoothDevice.addEventListener(
-      "gattserverdisconnected",
-      handleDisconnect
-    );
-
     const name = bluetoothDevice.name || "";
     const type = detectDeviceType(name);
     setDeviceInfo({ type, name });
 
     const server = await connectGatt(bluetoothDevice, timeoutMs);
+    ensureCurrent();
 
+    let publish: () => void;
+    let driver: { dispose: () => Promise<void> };
     switch (type) {
       case DeviceType.VOLCANO: {
-        const driver = await connectVolcano(server, bluetoothQueue);
-        setDeviceInfo({
-          type,
-          name,
-          serialNumber: driver.info.serialNumber,
-          firmwareVersion: driver.info.firmwareVersion,
-        });
-        setVolcanoDriver(driver);
+        const volcano = await connectVolcano(server, bluetoothQueue);
+        driver = volcano;
+        publish = () => {
+          setDeviceInfo({
+            type,
+            name,
+            serialNumber: volcano.info.serialNumber,
+            firmwareVersion: volcano.info.firmwareVersion,
+          });
+          setVolcanoDriver(volcano);
+        };
         break;
       }
       case DeviceType.VENTY:
       case DeviceType.VEAZY: {
         const model = type === DeviceType.VEAZY ? "VEAZY" : "VENTY";
-        // Serial number is part of the name: "S&B VY123456"
-        setDeviceInfo({ type, name, serialNumber: name.split(" ")[1] });
-        setVentyVeazyDriver(
-          await connectVentyVeazy(server, model, bluetoothQueue)
+        const ventyVeazy = await connectVentyVeazy(
+          server,
+          model,
+          bluetoothQueue
         );
+        driver = ventyVeazy;
+        publish = () => {
+          // Serial number is part of the name: "S&B VY123456"
+          setDeviceInfo({ type, name, serialNumber: name.split(" ")[1] });
+          setVentyVeazyDriver(ventyVeazy);
+        };
         break;
       }
       default: {
-        const driver = await connectCrafty(server, bluetoothQueue);
-        setDeviceInfo({
-          type,
-          name,
-          serialNumber: driver.serialNumber || undefined,
-          firmwareVersion: driver.firmwareVersion,
-        });
-        setCraftyDriver(driver);
+        const crafty = await connectCrafty(server, bluetoothQueue);
+        driver = crafty;
+        publish = () => {
+          setDeviceInfo({
+            type,
+            name,
+            serialNumber: crafty.serialNumber || undefined,
+            firmwareVersion: crafty.firmwareVersion,
+          });
+          setCraftyDriver(crafty);
+        };
       }
     }
+
+    if (token !== reconnectToken) {
+      await driver.dispose();
+      throw new AttemptCancelled();
+    }
+    publish();
+    // Critical for handling unexpected disconnects
+    bluetoothDevice.addEventListener(
+      "gattserverdisconnected",
+      handleDisconnect
+    );
+  };
+
+  /**
+   * Called by a device store whose first reads failed: without them the
+   * device pages would show nothing but zeros.
+   */
+  const reportStartFailure = (driver: object, error: unknown) => {
+    const current: unknown[] = [
+      volcanoDriver(),
+      craftyDriver(),
+      ventyVeazyDriver(),
+    ];
+    // A lost connection is already being handled by the reconnect
+    if (
+      !current.includes(driver) ||
+      connectionState() !== ConnectionState.CONNECTED ||
+      !device()?.gatt?.connected
+    ) {
+      return;
+    }
+    startAttempt();
+    setConnectionState(ConnectionState.CONNECTION_FAILED);
+    setConnectionError({ kind: "failed", message: errorText(error) });
+    disposeDrivers().finally(releaseDevice);
   };
 
   const rememberDevice = (bluetoothDevice: BluetoothDevice) => {
@@ -357,43 +437,56 @@ const createBluetoothMethods = () => {
     setKnownDevice(bluetoothDevice);
   };
 
-  const runConnect = async (pickDevice: () => Promise<BluetoothDevice>) => {
-    startAttempt();
+  /**
+   * Shows the browser's device chooser and connects the picked device.
+   * `cancelError` is shown instead of nothing if the user closes the chooser.
+   */
+  const chooseDevice = async (cancelError?: ConnectionError) => {
+    const { token } = startAttempt();
     setConnectPhase("connecting");
     setConnectionState(ConnectionState.CONNECTING);
     setConnectionError(undefined);
+
+    let bluetoothDevice: BluetoothDevice;
     try {
-      const bluetoothDevice = await pickDevice();
-      await connectToDevice(bluetoothDevice);
-      rememberDevice(bluetoothDevice);
-      setConnectionState(ConnectionState.CONNECTED);
-    } catch (error) {
-      console.error("Connection failed:", error);
-      await disposeDrivers();
-      releaseDevice();
-      setConnectionState(ConnectionState.CONNECTION_FAILED);
-
-      // Closing the device chooser is not an error worth showing
-      const userCancelled =
-        error instanceof DOMException && error.name === "NotFoundError";
-      if (!userCancelled) {
-        setConnectionError({
-          kind: "failed",
-          message: error instanceof Error ? error.message : String(error),
-        });
-      }
-    }
-  };
-
-  /** Shows the browser's device chooser */
-  const connect = () =>
-    runConnect(() =>
-      navigator.bluetooth.requestDevice({
+      bluetoothDevice = await navigator.bluetooth.requestDevice({
         filters: getDeviceFilters(),
         acceptAllDevices: false,
         optionalServices: ["generic_access", ServiceUUIDs.GenericAccess],
-      })
-    );
+      });
+    } catch (error) {
+      if (token !== reconnectToken) return;
+      setConnectionState(ConnectionState.CONNECTION_FAILED);
+      // Closing the chooser is not an error worth showing; other errors
+      // (e.g. Bluetooth switched off) are
+      const userCancelled =
+        error instanceof DOMException &&
+        error.name === "NotFoundError" &&
+        /cancel/i.test(error.message);
+      setConnectionError(
+        userCancelled
+          ? cancelError
+          : { kind: "failed", message: errorText(error) }
+      );
+      return;
+    }
+    if (token !== reconnectToken) return;
+
+    try {
+      await connectToDevice(bluetoothDevice, token);
+      rememberDevice(bluetoothDevice);
+      setConnectionState(ConnectionState.CONNECTED);
+    } catch (error) {
+      await abandonAttempt(bluetoothDevice, token);
+      if (token !== reconnectToken) return;
+      console.error("Connection failed:", error);
+      releaseDevice();
+      setConnectionState(ConnectionState.CONNECTION_FAILED);
+      setConnectionError({ kind: "failed", message: errorText(error) });
+    }
+  };
+
+  const connect = () => chooseDevice();
 
   /**
    * Connects the last used device without the chooser. The system only
@@ -434,35 +527,31 @@ const createBluetoothMethods = () => {
       const remaining = deadline - Date.now();
       if (remaining < 500) break;
       try {
-        await connectToDevice(known, remaining);
-        if (token !== reconnectToken) {
-          // Cancelled while the connect was still running
-          await abandonAttempt(known);
-          return;
-        }
+        await connectToDevice(known, token, remaining);
         rememberDevice(known);
         setConnectionState(ConnectionState.CONNECTED);
         return;
       } catch (error) {
+        await abandonAttempt(known, token);
+        if (token !== reconnectToken) return;
         console.warn("Connecting the last used device failed:", error);
         lastError = error;
-        await abandonAttempt(known);
         await sleep(RETRY_PAUSE_MS, signal);
       }
     }
 
     if (token !== reconnectToken) return;
     releaseDevice();
+    const unreachable: ConnectionError = {
+      kind: "unreachable",
+      message: errorText(lastError),
+    };
     if (hasUserActivation()) {
-      connect();
+      chooseDevice(unreachable);
       return;
     }
     setConnectionState(ConnectionState.CONNECTION_FAILED);
-    setConnectionError({
-      kind: "unreachable",
-      message:
-        lastError instanceof Error ? lastError.message : String(lastError),
-    });
+    setConnectionError(unreachable);
   };
 
   return {
@@ -475,6 +564,7 @@ const createBluetoothMethods = () => {
     reconnectTotal,
     connectPhase,
     disconnect,
+    reportStartFailure,
     connectionState,
     connectionError,
     deviceInfo,
