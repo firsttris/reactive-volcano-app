@@ -29,7 +29,7 @@ with nginx.
 ```bash
 docker run -d \
   --name vaporizer-app \
-  -p 8080:80 \
+  -p 8080:8080 \
   --restart unless-stopped \
   tristanteu/reactive-volcano-app:latest
 ```
@@ -44,7 +44,7 @@ services:
     image: tristanteu/reactive-volcano-app:latest
     container_name: vaporizer-app
     ports:
-      - "8080:80"
+      - "8080:8080"
     restart: unless-stopped
 ```
 
@@ -169,7 +169,13 @@ Two things the server must do:
 | Podman Quadlet | automatic with `podman-auto-update.timer`, or `podman auto-update` |
 | Static | rebuild and replace `dist/` |
 
-After an update, open browsers switch to the new version the next time the app is opened.
+The app looks for a new version when it is opened and every hour; it switches right away, or asks first
+while a device is connected.
+
+> **Upgrading from an image that listened on port 80:** the container no longer runs as root and
+> therefore listens on **8080** instead of 80. Change the port mapping from `8080:80` to `8080:8080`
+> (`-p`, `ports:` or `PublishPort=`). With Quadlet's automatic updates, update the unit before the new
+> image arrives, otherwise the app stops answering until you do.
 
 ## Image details
 
@@ -178,8 +184,9 @@ After an update, open browsers switch to the new version the next time the app i
 | Image | [`tristanteu/reactive-volcano-app`](https://hub.docker.com/r/tristanteu/reactive-volcano-app) |
 | Tags | `latest`, `x.y.z`, `x.y` for releases; `edge` for manual builds from `main` |
 | Platforms | `linux/amd64`, `linux/arm64` |
-| Base | `nginx:alpine`, built in a `node:22-alpine` stage ([`Dockerfile`](../Dockerfile)) |
-| Port | `80` inside the container |
+| Base | `nginxinc/nginx-unprivileged:stable-alpine` (nginx without root), built in a `node:22-alpine` stage ([`Dockerfile`](../Dockerfile)) |
+| Port | `8080` inside the container |
+| User | `nginx` (uid 101), not root |
 | Volumes, environment | none needed |
 | Outbound traffic | none |
 
