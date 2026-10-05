@@ -2,6 +2,7 @@ import Timer from "lucide-solid/icons/timer";
 import { Show } from "solid-js";
 import { m } from "../../paraglide/messages";
 import { useCrafty } from "../../provider/CraftyProvider";
+import { formatDuration } from "../../utils/heatProgress";
 import { StatusNote } from "../TemperatureControls";
 
 /**
@@ -19,7 +20,9 @@ export const ShutdownTime = () => {
   return (
     <Show when={isVisible()}>
       <StatusNote icon={Timer}>
-        {m.device_shutdownIn({ seconds: state.autoOffRemaining ?? 0 })}
+        {m.device_shutdownIn({
+          time: formatDuration(state.autoOffRemaining ?? 0),
+        })}
       </StatusNote>
     </Show>
   );

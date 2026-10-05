@@ -14,9 +14,7 @@ import { Alert, AlertDescription } from "../components/ui/alert";
 import { Limits } from "../devices/crafty/protocol";
 import { m } from "../paraglide/messages";
 import { useCrafty } from "../provider/CraftyProvider";
-
-const formatCountdown = (seconds: number) =>
-  `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, "0")}`;
+import { formatDuration } from "../utils/heatProgress";
 
 export const CraftySettingsView: Component = () => {
   const { state, actions, derived, firmwareVersion, isOldFirmware } =
@@ -29,9 +27,7 @@ export const CraftySettingsView: Component = () => {
       <Show when={isOldFirmware}>
         <Alert variant="accent">
           <TriangleAlert />
-          <AlertDescription>
-            Old Crafty detected. Some features are not available.
-          </AlertDescription>
+          <AlertDescription>{m.crafty_oldDetected()}</AlertDescription>
         </Alert>
       </Show>
 
@@ -52,7 +48,7 @@ export const CraftySettingsView: Component = () => {
             valueLabel={
               state.autoOffCountdown === null
                 ? "-"
-                : formatCountdown(state.autoOffCountdown)
+                : formatDuration(state.autoOffCountdown)
             }
             value={state.autoOffCountdown ?? Limits.MIN_AUTO_OFF}
             min={Limits.MIN_AUTO_OFF}
@@ -91,26 +87,34 @@ export const CraftySettingsView: Component = () => {
 
       <SettingsSection title={m.device_info()}>
         <InfoRow label={m.device_battery()}>{state.batteryLevel} %</InfoRow>
-        <InfoRow label="Usage Time">
+        <InfoRow label={m.crafty_usageTime()}>
           {state.useHours} h{!isOldFirmware && ` ${state.useMinutes ?? 0} min`}
         </InfoRow>
         <Show when={!isOldFirmware}>
-          <InfoRow label="Current Auto-Off Time">
-            {formatCountdown(state.autoOffRemaining ?? 0)} min
+          <InfoRow label={m.crafty_autoOffRemaining()}>
+            {formatDuration(state.autoOffRemaining ?? 0)}
           </InfoRow>
         </Show>
         <InfoRow label={m.device_firmware()}>{firmwareVersion}</InfoRow>
         <Show when={!isOldFirmware}>
-          <InfoRow label="BLE Firmware Version">
+          <InfoRow label={m.crafty_bleFirmware()}>
             {state.bleFirmwareVersion ?? "-"}
           </InfoRow>
         </Show>
-        <InfoRow label="Status Register 2">{state.statusRegister2}</InfoRow>
+        <InfoRow label={m.crafty_statusRegister2()}>
+          {state.statusRegister2}
+        </InfoRow>
         {/* System status - only on Crafty+ */}
         <Show when={!isOldFirmware}>
-          <InfoRow label="System Status">{state.systemStatus ?? "-"}</InfoRow>
-          <InfoRow label="Akku Status 1">{state.akkuStatus ?? "-"}</InfoRow>
-          <InfoRow label="Akku Status 2">{state.akkuStatus2 ?? "-"}</InfoRow>
+          <InfoRow label={m.crafty_systemStatus()}>
+            {state.systemStatus ?? "-"}
+          </InfoRow>
+          <InfoRow label={m.crafty_batteryStatus({ number: 1 })}>
+            {state.akkuStatus ?? "-"}
+          </InfoRow>
+          <InfoRow label={m.crafty_batteryStatus({ number: 2 })}>
+            {state.akkuStatus2 ?? "-"}
+          </InfoRow>
         </Show>
       </SettingsSection>
 

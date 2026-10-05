@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import { m } from "../../paraglide/messages";
 import {
   initialListOfWorkflows,
   type Workflow,
@@ -26,8 +26,8 @@ export const useWorkflow = () => {
 
   const addWorkflowToList = () => {
     const newWorkflow: Workflow = {
-      id: uuidv4(),
-      name: "New Workflow",
+      id: crypto.randomUUID(),
+      name: m.workflow_newName(),
       workflowSteps: [],
     };
     setWorkflowList([...workflowList(), newWorkflow]);
@@ -239,7 +239,7 @@ export const useWorkflow = () => {
     const steps = stepsOf(workflowId);
     const last = steps[steps.length - 1];
     const workflowStep: WorkflowStep = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       temperature: last?.temperature ?? 185,
       holdTimeInSeconds: last?.holdTimeInSeconds ?? 0,
       pumpTimeInSeconds: last?.pumpTimeInSeconds ?? 10,
@@ -251,10 +251,10 @@ export const useWorkflow = () => {
 
   /** A stored workflow with fresh ids */
   const withFreshIds = (workflow: SharedWorkflow): Workflow => ({
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     name: workflow.name,
     workflowSteps: workflow.workflowSteps.map((step) => ({
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       ...step,
     })),
   });

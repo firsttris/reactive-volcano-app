@@ -104,6 +104,8 @@ export async function mockBluetooth(
                     writeWithoutResponse: boolean;
                   };
                   value?: Uint8Array;
+                  /** Answers a request frame with this value, like a Venty */
+                  answersRequests?: boolean;
                 }
               >;
             }
@@ -521,6 +523,7 @@ export async function mockBluetooth(
                     write: true,
                     writeWithoutResponse: false,
                   },
+                  answersRequests: true,
                   // Status response like a real Venty: no current
                   // temperature (0x8000), target 185 °C, boost +15,
                   // superboost +15, battery 52 %, heater on (normal mode)
@@ -661,6 +664,28 @@ export async function mockBluetooth(
                             throw new Error(
                               "Characteristic does not support write"
                             );
+                          }
+                          const written = new Uint8Array(
+                            value instanceof ArrayBuffer ? value : value.buffer
+                          );
+                          // A status request: answer with the status frame
+                          if (
+                            charConfig.answersRequests &&
+                            written[0] === charConfig.value?.[0]
+                          ) {
+                            setTimeout(() => {
+                              const event = new Event(
+                                "characteristicvaluechanged"
+                              );
+                              Object.defineProperty(event, "target", {
+                                value: characteristic,
+                              });
+                              for (const handler of charEventListeners.get(
+                                "characteristicvaluechanged"
+                              ) ?? [])
+                                handler(event);
+                            }, 20);
+                            return;
                           }
                           // Update internal value
                           if (value instanceof ArrayBuffer) {

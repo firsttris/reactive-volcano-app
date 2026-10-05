@@ -1,3 +1,5 @@
+import { m } from "../paraglide/messages";
+
 export interface WorkflowStep {
   id: string;
   temperature: number;
@@ -170,22 +172,22 @@ export interface Workflow {
 // Fixed ids, so links and the selection survive until the list is first saved
 export const initialListOfWorkflows: Workflow[] = [
   {
-    name: "Ballon",
+    name: m.workflow_defaultBalloon(),
     id: "default-ballon",
     workflowSteps: workflow0,
   },
   {
-    name: "workflow2",
+    name: m.workflow_defaultName({ number: 2 }),
     id: "default-2",
     workflowSteps: workflow1,
   },
   {
-    name: "workflow3",
+    name: m.workflow_defaultName({ number: 3 }),
     id: "default-3",
     workflowSteps: workflow2,
   },
   {
-    name: "workflow4",
+    name: m.workflow_defaultName({ number: 4 }),
     id: "default-4",
     workflowSteps: workflow3,
   },

@@ -1,19 +1,40 @@
-import { Route, Router } from "@solidjs/router";
+import { Route, Router, type RouteSectionProps } from "@solidjs/router";
+import { type Component, lazy } from "solid-js";
 import { Connect } from "./components/Connect";
 import { DeviceRouter } from "./components/DeviceRouter";
 import { Layout } from "./components/Layout";
-import { WorkflowForm } from "./components/volcano/Workflow/WorkflowForm";
-import { WorkflowList } from "./components/volcano/Workflow/WorkflowList";
-import { WorkFlowSection } from "./components/volcano/Workflow/WorkflowSection";
-import { WorkflowWrapper } from "./components/volcano/Workflow/WorkflowWrapper";
 import { ROUTES } from "./routes";
-import { CraftySettingsView } from "./Views/CraftySettingsView";
-import { CraftyShell, CraftyView } from "./Views/CraftyView";
-import { HistoryView } from "./Views/HistoryView";
-import { VentyVeazySettingsView } from "./Views/VentyVeazySettingsView";
-import { VentyVeazyShell, VentyVeazyView } from "./Views/VentyVeazyView";
-import { VolcanoSettingsView } from "./Views/VolcanoSettingsView";
-import { VolcanoView } from "./Views/VolcanoView";
+
+/**
+ * Device pages load on demand, so the connect screen does not wait for code
+ * of all four devices. The service worker precaches every chunk for offline
+ * use.
+ */
+const page = <T, K extends keyof T>(load: () => Promise<T>, name: K) =>
+  lazy(() =>
+    load().then((module) => ({
+      default: module[name] as Component<RouteSectionProps>,
+    }))
+  );
+
+const volcano = () => import("./devices/pages/volcano");
+const ventyVeazy = () => import("./devices/pages/ventyVeazy");
+const crafty = () => import("./devices/pages/crafty");
+const history = () => import("./Views/HistoryView");
+
+const WorkflowWrapper = page(volcano, "WorkflowWrapper");
+const VolcanoView = page(volcano, "VolcanoView");
+const WorkFlowSection = page(volcano, "WorkFlowSection");
+const VolcanoSettingsView = page(volcano, "VolcanoSettingsView");
+const WorkflowList = page(volcano, "WorkflowList");
+const WorkflowForm = page(volcano, "WorkflowForm");
+const VentyVeazyShell = page(ventyVeazy, "VentyVeazyShell");
+const VentyVeazyView = page(ventyVeazy, "VentyVeazyView");
+const VentyVeazySettingsView = page(ventyVeazy, "VentyVeazySettingsView");
+const CraftyShell = page(crafty, "CraftyShell");
+const CraftyView = page(crafty, "CraftyView");
+const CraftySettingsView = page(crafty, "CraftySettingsView");
+const HistoryView = page(history, "HistoryView");
 
 export const Routes = () => {
   // Vite's BASE_URL has a trailing slash ("/reactive-volcano-app/"), which the
