@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="docs/banner.png" alt="Reactive Vaporizer App: Web Bluetooth control with live temperature, workflows, device settings and self-diagnosis" width="900">
-
 **Control your vaporizer from the browser.**<br>
 Live temperature, heater and pump, heat-up workflows, device settings and self-diagnosis over Web Bluetooth.<br>
 No app store, no account, no server: open the page, connect, done.

@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="docs/banner.png" alt="Reactive Vaporizer App: Steuerung per Web Bluetooth mit Live-Temperatur, Workflows, Geräteeinstellungen und Selbstdiagnose" width="900">
-
 **Steuere deinen Vaporizer direkt aus dem Browser.**<br>
 Live-Temperatur, Heizung und Pumpe, Aufheiz-Workflows, Geräteeinstellungen und Selbstdiagnose per Web Bluetooth.<br>
 Kein App-Store, kein Konto, kein Server: Seite öffnen, verbinden, fertig.

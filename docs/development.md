@@ -213,12 +213,9 @@ npm run screenshots
 ```
 
 This runs `scripts/screenshots.spec.ts` with `playwright.screenshots.config.ts` (it starts the dev
-server if none is running), writes `docs/screenshot-*.png`, then renders `docs/banner.svg` to
-`docs/banner.png` and composes `docs/hero.png`. If Playwright's bundled browser is not installed, point
-it at a local Chromium: `CHROMIUM_PATH=/usr/bin/chromium npm run screenshots`.
-
-Edit `docs/banner.svg` by hand for the banner; the PNG is only there because GitHub and Docker Hub
-render PNG more reliably.
+server if none is running), writes `docs/screenshot-*.png` and composes `docs/hero.png`. If Playwright's
+bundled browser is not installed, point it at a local Chromium:
+`CHROMIUM_PATH=/usr/bin/chromium npm run screenshots`.
 
 ## App icons
 
