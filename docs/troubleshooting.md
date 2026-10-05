@@ -54,6 +54,21 @@ metres), and on Android that Location / Nearby devices permission is granted to 
 | Works once, then not again | close other tabs that use the app; only one page can hold the connection |
 | `GATT operation failed` in the console | usually a busy or sleeping device; reconnect. If it persists, restart the device |
 | Windows: device found, connection hangs | update the Bluetooth driver; some older adapters handle BLE poorly |
+| *Connect <device>* (last used) shows *not reachable*, while *Search for device* finds it | the system connects a known device only after it has recently seen it advertise. The app listens for the device first and retries several times; if it still fails, *Search for device* scans afresh. See below for Linux |
+
+### Linux (Chrome, Brave, Edge)
+
+Connecting the last used device without the chooser relies on two Chromium features that are behind
+flags on Linux. Open `chrome://flags` (in Brave `brave://flags`) and enable:
+
+- **Use the new permissions backend for Web Bluetooth** (`#enable-web-bluetooth-new-permissions-backend`):
+  the browser remembers the device across restarts, so *Connect <device>* appears at all.
+- **Experimental Web Platform features** (`#enable-experimental-web-platform-features`): lets the app
+  wait for the device's advertisement before connecting. Without it the app falls back to retrying,
+  which works too but may need a few seconds longer.
+
+Right after switching the device on or disconnecting it, BlueZ often refuses the first connection
+attempts; the app retries for about ten seconds before it reports the device as not reachable.
 
 ## Values look wrong or do not update
 

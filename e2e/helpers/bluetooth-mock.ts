@@ -51,6 +51,8 @@ export interface MockBluetooth {
   _currentDevice: MockBluetoothDevice | null;
   /** Makes every GATT connect fail, as if the device were out of range */
   _failConnect: boolean;
+  /** Makes only the next n GATT connects fail */
+  _failConnectTimes: number;
   requestDevice: (options: unknown) => Promise<MockBluetoothDevice>;
   getDevices: () => Promise<MockBluetoothDevice[]>;
   getAvailability: () => Promise<boolean>;
@@ -65,6 +67,8 @@ export type DeviceType = "VOLCANO" | "CRAFTY" | "VENTY" | "VEAZY";
 export interface MockOptions {
   /** The browser already has permission for the device (getDevices) */
   remembered?: boolean;
+  /** watchAdvertisements is supported and the device advertises */
+  advertises?: boolean;
 }
 
 export async function mockBluetooth(
@@ -73,7 +77,11 @@ export async function mockBluetooth(
   options: MockOptions = {}
 ) {
   await page.addInitScript(
-    ({ deviceType, remembered }: { deviceType: DeviceType } & MockOptions) => {
+    ({
+      deviceType,
+      remembered,
+      advertises,
+    }: { deviceType: DeviceType } & MockOptions) => {
       // Gerätespezifische Daten
       const deviceConfigs: Record<
         DeviceType,
@@ -567,7 +575,11 @@ export async function mockBluetooth(
           connected: false,
           connect: async () => {
             console.log("[Bluetooth Mock] Connecting to GATT server...");
-            if (bluetooth._failConnect) {
+            if (bluetooth._failConnect || bluetooth._failConnectTimes > 0) {
+              bluetooth._failConnectTimes = Math.max(
+                0,
+                bluetooth._failConnectTimes - 1
+              );
               throw new DOMException("Device out of range", "NetworkError");
             }
             if (device.gatt) device.gatt.connected = true;
@@ -756,12 +768,26 @@ export async function mockBluetooth(
           },
         };
 
+        if (advertises) {
+          // Advertises shortly after the app starts watching
+          Object.assign(device, {
+            watchAdvertisements: async () => {
+              setTimeout(() => {
+                for (const handler of eventListeners.get(
+                  "advertisementreceived"
+                ) ?? [])
+                  handler(new Event("advertisementreceived"));
+              }, 500);
+            },
+          });
+        }
         return device;
       };
 
       const bluetooth: MockBluetooth = {
         _currentDevice: null, // Expose for test access
         _failConnect: false,
+        _failConnectTimes: 0,
         requestDevice: async (options: unknown) => {
           console.log(
             "[Bluetooth Mock] requestDevice called with options:",

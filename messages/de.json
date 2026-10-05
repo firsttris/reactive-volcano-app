@@ -206,5 +206,10 @@
   "settings_effectsOff": "Aus",
   "settings_effectsSubtle": "Dezent",
   "settings_effectsStrong": "Kräftig",
-  "settings_effectsHint": "Leuchten und Animationen auf diesem Gerät"
+  "settings_effectsHint": "Leuchten und Animationen auf diesem Gerät",
+  "connect_searching": "Suche {device} …",
+  "connect_unreachable": "{device} nicht erreichbar",
+  "connect_unreachableHint": "Prüfe, ob es eingeschaltet und in der Nähe ist. „Gerät suchen“ startet eine neue Suche, die es meist findet.",
+  "connect_searchDevice": "Gerät suchen",
+  "connect_retry": "Erneut versuchen"
 }

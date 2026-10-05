@@ -81,6 +81,7 @@ export const Connect = () => {
     knownDevice,
     rememberedDevice,
     reconnectAttempt,
+    connectPhase,
     connectionState,
     connectionError,
     deviceInfo,
@@ -125,7 +126,22 @@ export const Connect = () => {
 
   const errorMessage = () => {
     const error = connectionError();
-    return error?.kind === "failed" ? error.message : undefined;
+    return error?.kind === "failed" || error?.kind === "unreachable"
+      ? error.message
+      : undefined;
+  };
+
+  const isUnreachable = () => connectionError()?.kind === "unreachable";
+
+  const errorTitle = () => {
+    switch (connectionError()?.kind) {
+      case "lost":
+        return m.connect_lost();
+      case "unreachable":
+        return m.connect_unreachable({ device: knownDeviceLabel() ?? "" });
+      default:
+        return m.connect_failed();
+    }
   };
 
   const getDeviceTypeText = () => {
@@ -239,12 +255,11 @@ export const Connect = () => {
               {(error) => (
                 <Alert variant="destructive" role="alert">
                   <TriangleAlert />
-                  <AlertTitle>
-                    {error().kind === "lost"
-                      ? m.connect_lost()
-                      : m.connect_failed()}
-                  </AlertTitle>
+                  <AlertTitle>{errorTitle()}</AlertTitle>
                   <AlertDescription>
+                    <Show when={error().kind === "unreachable"}>
+                      <p>{m.connect_unreachableHint()}</p>
+                    </Show>
                     <Show when={errorMessage()}>
                       <p class="break-words text-xs">{errorMessage()}</p>
                     </Show>
@@ -266,24 +281,43 @@ export const Connect = () => {
             }
           >
             {(label) => (
-              <div class="flex w-full flex-col gap-2">
-                <Button
-                  size="lg"
-                  class="h-auto w-full flex-col gap-0.5 py-3"
-                  onClick={connectKnownDevice}
-                >
-                  <span class="flex items-center gap-2">
-                    <Bluetooth />
-                    {m.connect_knownDevice({ device: label() })}
-                  </span>
-                  <span class="font-normal text-xs opacity-75">
-                    {m.connect_lastUsed()}
-                  </span>
-                </Button>
-                <Button variant="ghost" class="w-full" onClick={connect}>
-                  {m.connect_otherDevice()}
-                </Button>
-              </div>
+              <Show
+                when={!isUnreachable()}
+                fallback={
+                  <div class="flex w-full flex-col gap-2">
+                    <Button size="lg" class="w-full" onClick={connect}>
+                      <Bluetooth />
+                      {m.connect_searchDevice()}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      class="w-full"
+                      onClick={connectKnownDevice}
+                    >
+                      {m.connect_retry()}
+                    </Button>
+                  </div>
+                }
+              >
+                <div class="flex w-full flex-col gap-2">
+                  <Button
+                    size="lg"
+                    class="h-auto w-full flex-col gap-0.5 py-3"
+                    onClick={connectKnownDevice}
+                  >
+                    <span class="flex items-center gap-2">
+                      <Bluetooth />
+                      {m.connect_knownDevice({ device: label() })}
+                    </span>
+                    <span class="font-normal text-xs opacity-75">
+                      {m.connect_lastUsed()}
+                    </span>
+                  </Button>
+                  <Button variant="ghost" class="w-full" onClick={connect}>
+                    {m.connect_otherDevice()}
+                  </Button>
+                </div>
+              </Show>
             )}
           </Show>
 
@@ -329,8 +363,21 @@ export const Connect = () => {
 
         <Show when={isConnecting()}>
           <p class="text-center text-muted-foreground" role="status">
-            {m.connect_connectingTo({ device: getDeviceTypeText() })}
+            {connectPhase() === "searching"
+              ? m.connect_searching({
+                  device: knownDeviceLabel() ?? getDeviceTypeText(),
+                })
+              : m.connect_connectingTo({
+                  // The chooser may have picked another device than last time
+                  device:
+                    deviceInfo().type === DeviceType.UNKNOWN
+                      ? (knownDeviceLabel() ?? getDeviceTypeText())
+                      : deviceLabel(deviceInfo()),
+                })}
           </p>
+          <Button variant="outline" class="w-full" onClick={disconnect}>
+            {m.common_cancel()}
+          </Button>
         </Show>
       </main>
     </div>

@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+import type { MockBluetooth } from "./helpers/bluetooth-mock";
 import { expect, test } from "./helpers/fixtures";
 
 test.describe("App - Allgemeine Funktionen", () => {
@@ -122,5 +124,76 @@ test.describe("App - Zuletzt verwendetes Gerät", () => {
       page.getByRole("button", { name: "Connect Device" })
     ).toBeVisible();
     await expect(page.getByText("Last used")).toHaveCount(0);
+  });
+});
+
+test.describe("App - Zuletzt verwendetes Gerät, robust verbinden", () => {
+  const rememberVolcano = (page: Page) =>
+    page.addInitScript(() =>
+      localStorage.setItem(
+        "lastBluetoothDevice",
+        JSON.stringify({
+          id: "mock-volcano",
+          name: "S&B VOLCANO HYBRID",
+          type: "VOLCANO",
+        })
+      )
+    );
+
+  const setMock = (page: Page, values: Partial<MockBluetooth>) =>
+    page.evaluate((v) => {
+      const { bluetooth } = window.navigator as unknown as {
+        bluetooth: MockBluetooth;
+      };
+      Object.assign(bluetooth, v);
+    }, values);
+
+  test("sollte erst auf das Gerät warten, dann verbinden", async ({
+    page,
+    bluetoothDevice,
+  }) => {
+    await rememberVolcano(page);
+    await bluetoothDevice("VOLCANO", { remembered: true, advertises: true });
+    await page.goto("/");
+
+    await page.getByRole("button", { name: /Connect Volcano Hybrid/ }).click();
+    await expect(page.getByText("Looking for Volcano Hybrid…")).toBeVisible();
+    await page.waitForURL(/.*volcano.*/i, { timeout: 10000 });
+  });
+
+  test("sollte fehlgeschlagene erste Versuche wiederholen", async ({
+    page,
+    bluetoothDevice,
+  }) => {
+    await rememberVolcano(page);
+    await bluetoothDevice("VOLCANO", { remembered: true });
+    await page.goto("/");
+    await setMock(page, { _failConnectTimes: 2 });
+
+    await page.getByRole("button", { name: /Connect Volcano Hybrid/ }).click();
+    await page.waitForURL(/.*volcano.*/i, { timeout: 15000 });
+  });
+
+  test("sollte bei unerreichbarem Gerät die Suche anbieten", async ({
+    page,
+    bluetoothDevice,
+  }) => {
+    await rememberVolcano(page);
+    await bluetoothDevice("VOLCANO", { remembered: true });
+    await page.clock.install();
+    await page.goto("/");
+    await setMock(page, { _failConnect: true });
+
+    await page.getByRole("button", { name: /Connect Volcano Hybrid/ }).click();
+    await page.clock.runFor(15_000);
+    await expect(page.getByRole("alert")).toContainText(
+      "Volcano Hybrid not reachable"
+    );
+
+    // The chooser scans afresh and finds the device
+    await setMock(page, { _failConnect: false });
+    await page.getByRole("button", { name: "Search for device" }).click();
+    await page.clock.runFor(2_000);
+    await page.waitForURL(/.*volcano.*/i, { timeout: 10000 });
   });
 });

@@ -206,5 +206,10 @@
   "settings_effectsOff": "Off",
   "settings_effectsSubtle": "Subtle",
   "settings_effectsStrong": "Strong",
-  "settings_effectsHint": "Glow and animations on this device"
+  "settings_effectsHint": "Glow and animations on this device",
+  "connect_searching": "Looking for {device}…",
+  "connect_unreachable": "{device} not reachable",
+  "connect_unreachableHint": "Make sure it is switched on and nearby. “Search for device” starts a new scan, which usually finds it.",
+  "connect_searchDevice": "Search for device",
+  "connect_retry": "Try again"
 }
