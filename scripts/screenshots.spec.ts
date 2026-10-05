@@ -137,19 +137,12 @@ test("light mode", async ({ page, bluetoothDevice }) => {
   await page.screenshot({ path: shot("volcano-light") });
 });
 
-// Runs last: builds the banner and the hero image from the files above
-test("banner and hero", async ({ browser }) => {
+// Runs last: composes the hero image from the files above
+test("hero", async ({ browser }) => {
   const page = await browser.newPage({
-    viewport: { width: 1280, height: 360 },
+    viewport: { width: 1280, height: 860 },
     deviceScaleFactor: 2,
   });
-  const svg = readFileSync("docs/banner.svg", "utf8");
-  await page.setContent(
-    `<body style="margin:0;background:transparent">${svg}</body>`
-  );
-  await page
-    .locator("svg")
-    .screenshot({ path: "docs/banner.png", omitBackground: true });
 
   const dataUri = (name: string) =>
     `data:image/png;base64,${readFileSync(shot(name)).toString("base64")}`;
@@ -158,7 +151,6 @@ test("banner and hero", async ({ browser }) => {
       <img src="${dataUri(name)}" />
       <figcaption>${label}</figcaption>
     </figure>`;
-  await page.setViewportSize({ width: 1280, height: 860 });
   await page.setContent(`
     <style>
       body { margin: 0; background: #09090b; font-family: system-ui, sans-serif; }
