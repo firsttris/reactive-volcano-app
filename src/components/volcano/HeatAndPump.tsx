@@ -24,14 +24,26 @@ export const HeatAndPump = () => {
         }
         icon={Flame}
         pressed={derived.isHeating()}
-        onToggle={() => actions.setHeater(!derived.isHeating())}
+        onToggle={() =>
+          actions
+            .setHeater(!derived.isHeating())
+            .catch((error) =>
+              console.error("Switching the heater failed:", error)
+            )
+        }
       />
       <ToggleTile
         label={m.heat_pump()}
         status={derived.isPumpActive() ? m.heat_pumpRunning() : m.common_off()}
         icon={Wind}
         pressed={derived.isPumpActive()}
-        onToggle={() => actions.setPump(!derived.isPumpActive())}
+        onToggle={() =>
+          actions
+            .setPump(!derived.isPumpActive())
+            .catch((error) =>
+              console.error("Switching the pump failed:", error)
+            )
+        }
       />
     </div>
   );

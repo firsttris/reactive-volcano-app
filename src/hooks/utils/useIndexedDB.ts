@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onMount } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 
 // IndexedDB setup (shared across the app)
 const DB_NAME = "VolcanoWorkflowDB";
@@ -27,8 +27,21 @@ export const openDB = (): Promise<IDBDatabase> => {
   });
 };
 
+// One connection per IndexedDB factory, reused for all reads and writes
+let connection: { factory: IDBFactory; db: Promise<IDBDatabase> } | undefined;
+const getDB = () => {
+  if (connection?.factory !== indexedDB) {
+    const db = openDB();
+    connection = { factory: indexedDB, db };
+    db.catch(() => {
+      connection = undefined;
+    });
+  }
+  return connection.db;
+};
+
 export const loadFromDB = async <T>(key: string): Promise<T | null> => {
-  const db = await openDB();
+  const db = await getDB();
   const transaction = db.transaction([STORE_NAME], "readonly");
   const store = transaction.objectStore(STORE_NAME);
   const request = store.get(key);
@@ -39,7 +52,7 @@ export const loadFromDB = async <T>(key: string): Promise<T | null> => {
 };
 
 export const saveToDB = async <T>(key: string, value: T): Promise<void> => {
-  const db = await openDB();
+  const db = await getDB();
   const transaction = db.transaction([STORE_NAME], "readwrite");
   const store = transaction.objectStore(STORE_NAME);
   store.put(value, key);
@@ -49,34 +62,53 @@ export const saveToDB = async <T>(key: string, value: T): Promise<void> => {
   });
 };
 
+type Update<T> = T | ((prev: T) => T);
+
 /**
- * Generic hook for persisting a value in IndexedDB.
- * Automatically detects if it's an object or primitive.
+ * Persists a value in IndexedDB. Every change is saved, including a change
+ * back to the default. Changes made before the stored value has loaded are
+ * applied on top of it instead of being lost or overwriting it.
  * @param key - The key to store the value under.
- * @param defaultValue - The default value if nothing is stored.
- * @returns A signal for the value.
+ * @param defaultValue - The value until something is stored.
+ * @returns A getter and a setter, like a signal.
  */
 export const useIndexedDB = <T>(key: string, defaultValue: T) => {
   const [value, setValue] = createSignal<T>(defaultValue);
+  let loaded = false;
+  const pending: ((prev: T) => T)[] = [];
+
+  const persist = (next: T) =>
+    saveToDB(key, next).catch((error) =>
+      console.error(`Error saving ${key} to IndexedDB:`, error)
+    );
+
+  const set = (next: Update<T>): T => {
+    const update =
+      typeof next === "function" ? (next as (prev: T) => T) : () => next;
+    if (!loaded) pending.push(update);
+    const result = setValue((prev) => update(prev));
+    if (loaded) persist(result);
+    return result;
+  };
 
   onMount(async () => {
     try {
-      const loaded = await loadFromDB<T>(key);
-      if (loaded !== null) {
-        (setValue as (value: T) => void)(loaded);
+      const stored = await loadFromDB<T>(key);
+      if (stored !== null) {
+        const merged = pending.reduce<T>(
+          (prev, update) => update(prev),
+          stored
+        );
+        setValue((() => merged) as Parameters<typeof setValue>[0]);
       }
+      if (pending.length > 0) persist(value());
     } catch (error) {
       console.error(`Error loading ${key} from IndexedDB:`, error);
+    } finally {
+      loaded = true;
+      pending.length = 0;
     }
   });
 
-  createEffect(() => {
-    const val = value();
-    if (JSON.stringify(val) === JSON.stringify(defaultValue)) return;
-    saveToDB(key, val).catch((error) =>
-      console.error(`Error saving ${key} to IndexedDB:`, error)
-    );
-  });
-
-  return [value, setValue] as const;
+  return [value, set] as const;
 };

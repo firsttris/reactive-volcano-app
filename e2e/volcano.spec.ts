@@ -169,3 +169,50 @@ test.describe("Volcano Gerät - Disconnect", () => {
     ).toBeVisible();
   });
 });
+
+test.describe("Volcano Gerät - Workflow-Schritte", () => {
+  test.beforeEach(async ({ page, bluetoothDevice }) => {
+    await bluetoothDevice("VOLCANO");
+    await page.goto("/");
+    await page.locator('button:has-text("Connect")').first().click();
+    await page.waitForURL(/.*volcano.*/i, { timeout: 10000 });
+    await page.getByRole("link", { name: "Workflows" }).click();
+  });
+
+  const editSteps = async (
+    page: import("@playwright/test").Page,
+    n: number
+  ) => {
+    await page.getByRole("button", { name: "More actions" }).nth(n).click();
+    await page.getByRole("menuitem", { name: "Edit Workflow Steps" }).click();
+  };
+
+  test("sollte immer die Schritte des Workflows aus der URL zeigen", async ({
+    page,
+  }) => {
+    await editSteps(page, 0);
+    await expect(page.getByRole("listitem")).toHaveCount(11);
+    await page.getByRole("button", { name: "Done" }).click();
+
+    // Starting another workflow selects it; the editor must not follow
+    await page.getByRole("button", { name: "Start" }).nth(1).click();
+    await page.getByRole("button", { name: "Stop" }).first().click();
+    await page.goBack();
+
+    await expect(page).toHaveURL(/workflow\/list\/default-ballon/);
+    await expect(page.getByRole("listitem")).toHaveCount(11);
+  });
+
+  test("sollte einen neuen Schritt wie den letzten anlegen", async ({
+    page,
+  }) => {
+    await editSteps(page, 1);
+    await expect(page.getByRole("listitem")).toHaveCount(4);
+    await page.getByRole("button", { name: "Add step" }).click();
+
+    await expect(page).toHaveURL(/workflow\/form\//);
+    await expect(page.getByText("220 °C")).toBeVisible();
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect(page.getByRole("listitem")).toHaveCount(5);
+  });
+});

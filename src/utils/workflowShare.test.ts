@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { Workflow } from "./workflowData";
-import { buildShareUrl, decodeWorkflow, encodeWorkflow } from "./workflowShare";
+import {
+  buildShareUrl,
+  decodeWorkflow,
+  encodeWorkflow,
+  parseWorkflowFile,
+} from "./workflowShare";
 
 const workflow: Workflow = {
   id: "w1",
@@ -41,5 +46,48 @@ describe("workflowShare", () => {
     expect(url.pathname).toBe("/app/device/volcano");
     expect(url.search.startsWith("?workflow=")).toBe(true);
     expect(url.hash).toBe("");
+  });
+
+  it("raises step temperatures below the Volcano minimum", () => {
+    const code = encodeWorkflow({
+      id: "x",
+      name: "Cold",
+      workflowSteps: [
+        { id: "a", temperature: 0, holdTimeInSeconds: 0, pumpTimeInSeconds: 5 },
+      ],
+    });
+    expect(decodeWorkflow(code)?.workflowSteps[0].temperature).toBe(40);
+  });
+
+  describe("parseWorkflowFile", () => {
+    const step = {
+      temperature: 180,
+      holdTimeInSeconds: 5,
+      pumpTimeInSeconds: 10,
+    };
+
+    it("accepts an exported workflow", () => {
+      expect(
+        parseWorkflowFile({ name: " Ballon ", workflowSteps: [step] })
+      ).toEqual({ name: "Ballon", workflowSteps: [step] });
+    });
+
+    it.each([
+      ["a non-string name", { name: 5, workflowSteps: [step] }],
+      ["an empty name", { name: "  ", workflowSteps: [step] }],
+      ["missing steps", { name: "A" }],
+      [
+        "a temperature above 230",
+        { name: "A", workflowSteps: [{ ...step, temperature: 999 }] },
+      ],
+      [
+        "a negative hold time",
+        { name: "A", workflowSteps: [{ ...step, holdTimeInSeconds: -1 }] },
+      ],
+      ["a step that is no object", { name: "A", workflowSteps: [null] }],
+      ["no object", "workflow"],
+    ])("rejects %s", (_, data) => {
+      expect(parseWorkflowFile(data)).toBeNull();
+    });
   });
 });

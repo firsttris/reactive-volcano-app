@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-
 export interface WorkflowStep {
   id: string;
   temperature: number;
@@ -9,67 +7,67 @@ export interface WorkflowStep {
 
 export const workflow0: WorkflowStep[] = [
   {
-    id: uuidv4(),
+    id: "default-step-0",
     temperature: 170,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 5,
   },
   {
-    id: uuidv4(),
+    id: "default-step-1",
     temperature: 175,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 5,
   },
   {
-    id: uuidv4(),
+    id: "default-step-2",
     temperature: 180,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 5,
   },
   {
-    id: uuidv4(),
+    id: "default-step-3",
     temperature: 185,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 5,
   },
   {
-    id: uuidv4(),
+    id: "default-step-4",
     temperature: 190,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 5,
   },
   {
-    id: uuidv4(),
+    id: "default-step-5",
     temperature: 195,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 5,
   },
   {
-    id: uuidv4(),
+    id: "default-step-6",
     temperature: 200,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 5,
   },
   {
-    id: uuidv4(),
+    id: "default-step-7",
     temperature: 205,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 5,
   },
   {
-    id: uuidv4(),
+    id: "default-step-8",
     temperature: 210,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 5,
   },
   {
-    id: uuidv4(),
+    id: "default-step-9",
     temperature: 215,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 5,
   },
   {
-    id: uuidv4(),
+    id: "default-step-10",
     temperature: 220,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 5,
@@ -78,25 +76,25 @@ export const workflow0: WorkflowStep[] = [
 
 export const workflow1: WorkflowStep[] = [
   {
-    id: uuidv4(),
+    id: "default-step-11",
     temperature: 182,
     holdTimeInSeconds: 10,
     pumpTimeInSeconds: 10,
   },
   {
-    id: uuidv4(),
+    id: "default-step-12",
     temperature: 192,
     holdTimeInSeconds: 7,
     pumpTimeInSeconds: 12,
   },
   {
-    id: uuidv4(),
+    id: "default-step-13",
     temperature: 201,
     holdTimeInSeconds: 5,
     pumpTimeInSeconds: 10,
   },
   {
-    id: uuidv4(),
+    id: "default-step-14",
     temperature: 220,
     holdTimeInSeconds: 3,
     pumpTimeInSeconds: 10,
@@ -105,31 +103,31 @@ export const workflow1: WorkflowStep[] = [
 
 export const workflow2: WorkflowStep[] = [
   {
-    id: uuidv4(),
+    id: "default-step-15",
     temperature: 175,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 7,
   },
   {
-    id: uuidv4(),
+    id: "default-step-16",
     temperature: 180,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 7,
   },
   {
-    id: uuidv4(),
+    id: "default-step-17",
     temperature: 185,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 7,
   },
   {
-    id: uuidv4(),
+    id: "default-step-18",
     temperature: 190,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 7,
   },
   {
-    id: uuidv4(),
+    id: "default-step-19",
     temperature: 195,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 10,
@@ -138,25 +136,25 @@ export const workflow2: WorkflowStep[] = [
 
 export const workflow3: WorkflowStep[] = [
   {
-    id: uuidv4(),
+    id: "default-step-20",
     temperature: 174,
     holdTimeInSeconds: 20,
     pumpTimeInSeconds: 8,
   },
   {
-    id: uuidv4(),
+    id: "default-step-21",
     temperature: 199,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 20,
   },
   {
-    id: uuidv4(),
+    id: "default-step-22",
     temperature: 213,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 10,
   },
   {
-    id: uuidv4(),
+    id: "default-step-23",
     temperature: 222,
     holdTimeInSeconds: 0,
     pumpTimeInSeconds: 10,
@@ -169,25 +167,26 @@ export interface Workflow {
   workflowSteps: WorkflowStep[];
 }
 
+// Fixed ids, so links and the selection survive until the list is first saved
 export const initialListOfWorkflows: Workflow[] = [
   {
     name: "Ballon",
-    id: uuidv4(),
+    id: "default-ballon",
     workflowSteps: workflow0,
   },
   {
     name: "workflow2",
-    id: uuidv4(),
+    id: "default-2",
     workflowSteps: workflow1,
   },
   {
     name: "workflow3",
-    id: uuidv4(),
+    id: "default-3",
     workflowSteps: workflow2,
   },
   {
     name: "workflow4",
-    id: uuidv4(),
+    id: "default-4",
     workflowSteps: workflow3,
   },
 ];

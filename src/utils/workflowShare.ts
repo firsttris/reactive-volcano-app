@@ -45,35 +45,82 @@ const isValidNumber = (value: unknown, max: number): value is number =>
   value >= 0 &&
   value <= max;
 
+// Volcano limits; steps below the minimum (e.g. 0 °C) would stall a run
+const MIN_TEMP = 40;
+const MAX_TEMP = 230;
+const MAX_SECONDS = 3600;
+
+type SharedStep = SharedWorkflow["workflowSteps"][number];
+
+/** A valid step with the temperature in range, or null */
+export const toValidStep = (
+  temperature: unknown,
+  hold: unknown,
+  pump: unknown
+): SharedStep | null => {
+  if (
+    !isValidNumber(temperature, MAX_TEMP) ||
+    !isValidNumber(hold, MAX_SECONDS) ||
+    !isValidNumber(pump, MAX_SECONDS)
+  ) {
+    return null;
+  }
+  return {
+    temperature: Math.max(MIN_TEMP, temperature),
+    holdTimeInSeconds: hold,
+    pumpTimeInSeconds: pump,
+  };
+};
+
+const toValidName = (name: unknown) =>
+  typeof name === "string" && name.trim()
+    ? name.trim().slice(0, MAX_NAME_LENGTH)
+    : null;
+
 /** The shared workflow, or null if the code is broken or tampered with */
 export const decodeWorkflow = (code: string): SharedWorkflow | null => {
   try {
     const data = JSON.parse(fromBase64Url(code));
-    if (typeof data?.n !== "string" || !data.n.trim()) return null;
-    if (!Array.isArray(data.s) || data.s.length > MAX_STEPS) return null;
+    const name = toValidName(data?.n);
+    if (!name || !Array.isArray(data.s) || data.s.length > MAX_STEPS) {
+      return null;
+    }
     const steps = data.s.map((step: unknown) => {
       if (!Array.isArray(step) || step.length !== 3) throw new Error();
-      const [temperature, hold, pump] = step;
-      if (
-        !isValidNumber(temperature, 230) ||
-        !isValidNumber(hold, 3600) ||
-        !isValidNumber(pump, 3600)
-      ) {
-        throw new Error();
-      }
-      return {
-        temperature,
-        holdTimeInSeconds: hold,
-        pumpTimeInSeconds: pump,
-      };
+      const valid = toValidStep(step[0], step[1], step[2]);
+      if (!valid) throw new Error();
+      return valid;
     });
-    return {
-      name: data.n.trim().slice(0, MAX_NAME_LENGTH),
-      workflowSteps: steps,
-    };
+    return { name, workflowSteps: steps };
   } catch {
     return null;
   }
+};
+
+/** A workflow from an exported file, or null if it is invalid */
+export const parseWorkflowFile = (data: unknown): SharedWorkflow | null => {
+  if (typeof data !== "object" || data === null) return null;
+  const { name, workflowSteps } = data as Record<string, unknown>;
+  const validName = toValidName(name);
+  if (
+    !validName ||
+    !Array.isArray(workflowSteps) ||
+    workflowSteps.length > MAX_STEPS
+  ) {
+    return null;
+  }
+  const steps: SharedStep[] = [];
+  for (const step of workflowSteps) {
+    if (typeof step !== "object" || step === null) return null;
+    const valid = toValidStep(
+      step.temperature,
+      step.holdTimeInSeconds,
+      step.pumpTimeInSeconds
+    );
+    if (!valid) return null;
+    steps.push(valid);
+  }
+  return { name: validName, workflowSteps: steps };
 };
 
 /** Link that opens the app and offers to import the workflow */

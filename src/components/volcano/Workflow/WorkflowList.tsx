@@ -1,10 +1,11 @@
 import { useNavigate, useParams } from "@solidjs/router";
+import Check from "lucide-solid/icons/check";
 import Pencil from "lucide-solid/icons/pencil";
 import Plus from "lucide-solid/icons/plus";
-import Save from "lucide-solid/icons/save";
 import Trash2 from "lucide-solid/icons/trash";
 import { For, type JSX, Show } from "solid-js";
 import { m } from "../../../paraglide/messages";
+import { useToast } from "../../../provider/ToastProvider";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { buildRoute } from "../../../routes";
 import { Button } from "../../ui/button";
@@ -21,20 +22,46 @@ const StepValue = (props: { label: string; children: JSX.Element }) => (
 );
 
 export const WorkflowList = () => {
-  const workflow = useWorkflowContext();
   const {
-    deleteWorkflowStepFromList,
-    workflowSteps,
+    stepsOf,
     workflowList,
     updateWorkflowStepsInList,
     addNewWorkflowStep,
-  } = workflow;
-  const { workflowListId } = useParams();
+  } = useWorkflowContext();
+  // Not destructured, so the page follows a change of the route
+  const params = useParams();
+  const workflowId = () => params.workflowListId ?? "";
   const navigate = useNavigate();
+  const showToast = useToast();
 
+  // Always the workflow in the URL, never just the selected one
+  const workflowSteps = () => stepsOf(workflowId());
   const workflowName = () =>
-    workflowList().find((item) => item.id === workflowListId)?.name;
+    workflowList().find((item) => item.id === workflowId())?.name;
   const backToWorkflows = () => navigate(buildRoute.volcanoWorkflows());
+
+  const editStep = (stepId: string) =>
+    navigate(buildRoute.workflowForm(workflowId(), stepId));
+
+  const addStep = () => {
+    const stepId = addNewWorkflowStep(workflowId());
+    if (stepId) editStep(stepId);
+  };
+
+  // Changes are saved right away; a deleted step can be put back
+  const deleteStep = (stepId: string, number: number) => {
+    const id = workflowId();
+    const before = workflowSteps();
+    updateWorkflowStepsInList(
+      id,
+      before.filter((step) => step.id !== stepId)
+    );
+    showToast({
+      message: m.workflow_stepDeleted({ number }),
+      actionLabel: m.common_undo(),
+      onAction: () => updateWorkflowStepsInList(id, before),
+    });
+  };
 
   return (
     <>
@@ -76,15 +103,7 @@ export const WorkflowList = () => {
                       variant="ghost"
                       size="icon-sm"
                       aria-label={m.workflow_editStep()}
-                      onClick={() =>
-                        workflowListId &&
-                        navigate(
-                          buildRoute.workflowForm(
-                            workflowListId,
-                            workflowItem.id
-                          )
-                        )
-                      }
+                      onClick={() => editStep(workflowItem.id)}
                     >
                       <Pencil />
                     </Button>
@@ -92,14 +111,8 @@ export const WorkflowList = () => {
                       variant="ghost"
                       size="icon-sm"
                       class="hover:text-destructive"
-                      aria-label={m.workflow_delete()}
-                      onClick={() =>
-                        workflowListId &&
-                        deleteWorkflowStepFromList(
-                          workflowListId,
-                          workflowItem.id
-                        )
-                      }
+                      aria-label={m.workflow_deleteStep()}
+                      onClick={() => deleteStep(workflowItem.id, index() + 1)}
                     >
                       <Trash2 />
                     </Button>
@@ -111,24 +124,14 @@ export const WorkflowList = () => {
         </ol>
       </Show>
 
-      <div class="grid grid-cols-3 gap-2 pt-1">
-        <Button variant="outline" onClick={backToWorkflows}>
-          {m.common_cancel()}
-        </Button>
-        <Button variant="secondary" onClick={() => addNewWorkflowStep()}>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <Button variant="secondary" onClick={addStep}>
           <Plus />
-          {m.common_add()}
+          {m.workflow_addStep()}
         </Button>
-        <Button
-          onClick={() => {
-            if (workflowListId) {
-              updateWorkflowStepsInList(workflowListId, workflowSteps());
-            }
-            backToWorkflows();
-          }}
-        >
-          <Save />
-          {m.common_save()}
+        <Button onClick={backToWorkflows}>
+          <Check />
+          {m.common_done()}
         </Button>
       </div>
     </>

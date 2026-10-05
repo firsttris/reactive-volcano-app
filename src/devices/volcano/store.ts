@@ -96,11 +96,22 @@ export const createVolcanoStore = (
     },
     async setHeater(on: boolean) {
       setRegister1Bit(Register1Bit.HEATER, on);
-      await (on ? driver.heaterOn() : driver.heaterOff());
+      try {
+        await (on ? driver.heaterOn() : driver.heaterOff());
+      } catch (error) {
+        // Show the state the device still has
+        setRegister1Bit(Register1Bit.HEATER, !on);
+        throw error;
+      }
     },
     async setPump(on: boolean) {
       setRegister1Bit(Register1Bit.PUMP, on);
-      await (on ? driver.pumpOn() : driver.pumpOff());
+      try {
+        await (on ? driver.pumpOn() : driver.pumpOff());
+      } catch (error) {
+        setRegister1Bit(Register1Bit.PUMP, !on);
+        throw error;
+      }
     },
     setShutoffTime(seconds: number) {
       setState("shutoffTime", seconds);

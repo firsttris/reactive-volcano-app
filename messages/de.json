@@ -39,8 +39,7 @@
   "temperature_effective": "Effektiv",
   "workflow_editStep": "Schritt bearbeiten",
   "workflow_editSteps": "Workflow-Schritte bearbeiten",
-  "workflow_noSteps": "Noch keine Schritte. Klicken Sie auf \"Hinzufügen\", um einen hinzuzufügen.",
-  "common_add": "Hinzufügen",
+  "workflow_noSteps": "Noch keine Schritte. Fügen Sie mit „Schritt hinzufügen“ einen hinzu.",
   "workflow_title": "Workflows",
   "workflow_add": "Workflow hinzufügen",
   "common_save": "Speichern",
@@ -212,5 +211,9 @@
   "connect_unreachable": "{device} nicht erreichbar",
   "connect_unreachableHint": "Prüfe, ob es eingeschaltet und in der Nähe ist. „Gerät suchen“ startet eine neue Suche, die es meist findet.",
   "connect_searchDevice": "Gerät suchen",
-  "connect_retry": "Erneut versuchen"
+  "connect_retry": "Erneut versuchen",
+  "common_done": "Fertig",
+  "workflow_addStep": "Schritt hinzufügen",
+  "workflow_deleteStep": "Schritt löschen",
+  "workflow_stepDeleted": "Schritt {number} gelöscht"
 }

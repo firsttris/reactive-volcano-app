@@ -1,11 +1,13 @@
-import { createMemo } from "solid-js";
 import { v4 as uuidv4 } from "uuid";
 import {
   initialListOfWorkflows,
   type Workflow,
   type WorkflowStep,
 } from "../../utils/workflowData";
-import type { SharedWorkflow } from "../../utils/workflowShare";
+import {
+  parseWorkflowFile,
+  type SharedWorkflow,
+} from "../../utils/workflowShare";
 import { useIndexedDB } from "../utils/useIndexedDB";
 export const useWorkflow = () => {
   const [workflowList, setWorkflowList] = useIndexedDB(
@@ -17,12 +19,10 @@ export const useWorkflow = () => {
     ""
   );
 
-  const workflowSteps = createMemo(() => {
-    const workflow = workflowList().find(
-      (workflow) => workflow.id === selectedWorkflowId()
-    );
-    return workflow?.workflowSteps || [];
-  });
+  /** The steps of one workflow; editors pass the id from the URL */
+  const stepsOf = (workflowId: string | undefined) =>
+    workflowList().find((workflow) => workflow.id === workflowId)
+      ?.workflowSteps ?? [];
 
   const addWorkflowToList = () => {
     const newWorkflow: Workflow = {
@@ -234,33 +234,30 @@ export const useWorkflow = () => {
     ]);
   };
 
-  const addNewWorkflowStep = () => {
+  /** Adds a step like the last one (or a sensible first one); returns its id */
+  const addNewWorkflowStep = (workflowId: string) => {
+    const steps = stepsOf(workflowId);
+    const last = steps[steps.length - 1];
     const workflowStep: WorkflowStep = {
       id: uuidv4(),
-      temperature: 0,
-      holdTimeInSeconds: 0,
-      pumpTimeInSeconds: 0,
+      temperature: last?.temperature ?? 185,
+      holdTimeInSeconds: last?.holdTimeInSeconds ?? 0,
+      pumpTimeInSeconds: last?.pumpTimeInSeconds ?? 10,
     };
-    const workflows = workflowList();
-    const workflowIndex = findWorkflowIndex(selectedWorkflowId());
-
-    if (workflowIndex === -1) {
-      console.log(`Workflow with id ${selectedWorkflowId()} not found`);
-      return;
-    }
-
-    const workflow = workflows[workflowIndex];
-    const updatedWorkflow = {
-      ...workflow,
-      workflowSteps: [...workflow.workflowSteps, workflowStep],
-    };
-
-    setWorkflowList([
-      ...workflows.slice(0, workflowIndex),
-      updatedWorkflow,
-      ...workflows.slice(workflowIndex + 1),
-    ]);
+    if (findWorkflowIndex(workflowId) === -1) return undefined;
+    addWorkflowStepToWorkflow(workflowId, workflowStep);
+    return workflowStep.id;
   };
+
+  /** A stored workflow with fresh ids */
+  const withFreshIds = (workflow: SharedWorkflow): Workflow => ({
+    id: uuidv4(),
+    name: workflow.name,
+    workflowSteps: workflow.workflowSteps.map((step) => ({
+      id: uuidv4(),
+      ...step,
+    })),
+  });
 
   const exportWorkflow = (workflowId: string) => {
     const workflow = workflowList().find((w) => w.id === workflowId);
@@ -300,35 +297,9 @@ export const useWorkflow = () => {
           const content = e.target?.result as string;
           const importData = JSON.parse(content);
 
-          // Validate the import data structure
-          if (!importData.name || !Array.isArray(importData.workflowSteps)) {
-            throw new Error("Invalid workflow file structure");
-          }
-
-          // Validate each step
-          for (const step of importData.workflowSteps) {
-            if (
-              typeof step.temperature !== "number" ||
-              typeof step.holdTimeInSeconds !== "number" ||
-              typeof step.pumpTimeInSeconds !== "number"
-            ) {
-              throw new Error("Invalid workflow step data");
-            }
-          }
-
-          // Create new workflow with fresh IDs
-          const newWorkflow: Workflow = {
-            id: uuidv4(),
-            name: importData.name,
-            workflowSteps: importData.workflowSteps.map(
-              (step: WorkflowStep) => ({
-                id: uuidv4(),
-                temperature: step.temperature,
-                holdTimeInSeconds: step.holdTimeInSeconds,
-                pumpTimeInSeconds: step.pumpTimeInSeconds,
-              })
-            ),
-          };
+          const workflow = parseWorkflowFile(importData);
+          if (!workflow) throw new Error("Invalid workflow file");
+          const newWorkflow = withFreshIds(workflow);
 
           setWorkflowList([...workflowList(), newWorkflow]);
           resolve();
@@ -343,15 +314,7 @@ export const useWorkflow = () => {
 
   /** Adds a workflow from a share link with fresh ids */
   const addSharedWorkflow = (shared: SharedWorkflow) => {
-    const newWorkflow: Workflow = {
-      id: uuidv4(),
-      name: shared.name,
-      workflowSteps: shared.workflowSteps.map((step) => ({
-        id: uuidv4(),
-        ...step,
-      })),
-    };
-    setWorkflowList([...workflowList(), newWorkflow]);
+    setWorkflowList([...workflowList(), withFreshIds(shared)]);
   };
 
   const exportAllWorkflows = () => {
@@ -396,42 +359,11 @@ export const useWorkflow = () => {
             throw new Error("Invalid workflows file structure");
           }
 
-          // Validate each workflow
           const newWorkflows: Workflow[] = [];
           for (const workflowData of importData.workflows) {
-            if (
-              !workflowData.name ||
-              !Array.isArray(workflowData.workflowSteps)
-            ) {
-              throw new Error("Invalid workflow structure in file");
-            }
-
-            // Validate each step
-            for (const step of workflowData.workflowSteps) {
-              if (
-                typeof step.temperature !== "number" ||
-                typeof step.holdTimeInSeconds !== "number" ||
-                typeof step.pumpTimeInSeconds !== "number"
-              ) {
-                throw new Error("Invalid workflow step data");
-              }
-            }
-
-            // Create new workflow with fresh IDs
-            const newWorkflow: Workflow = {
-              id: uuidv4(),
-              name: workflowData.name,
-              workflowSteps: workflowData.workflowSteps.map(
-                (step: WorkflowStep) => ({
-                  id: uuidv4(),
-                  temperature: step.temperature,
-                  holdTimeInSeconds: step.holdTimeInSeconds,
-                  pumpTimeInSeconds: step.pumpTimeInSeconds,
-                })
-              ),
-            };
-
-            newWorkflows.push(newWorkflow);
+            const workflow = parseWorkflowFile(workflowData);
+            if (!workflow) throw new Error("Invalid workflow in file");
+            newWorkflows.push(withFreshIds(workflow));
           }
 
           setWorkflowList(newWorkflows);
@@ -446,7 +378,7 @@ export const useWorkflow = () => {
   };
 
   return {
-    workflowSteps,
+    stepsOf,
     selectedWorkflowId,
     setSelectedWorkflowId,
     addWorkflowToList,
