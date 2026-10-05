@@ -36,15 +36,21 @@ export const RunningWorkflowBar = () => {
     return `${label} ${formatDuration(seconds)}`;
   };
 
+  const phaseLabel = () => {
+    const phase = runner.phase();
+    if (!phase) return "";
+    if (phase.type === "heating") {
+      return `, ${m.workflow_heatingTo()} ${formatTemp(phase.targetTemp)}`;
+    }
+    return `, ${phase.type === "holding" ? m.workflow_holding() : m.workflow_pumping()}`;
+  };
+
   return (
     <Show when={runner.isRunning()}>
       {/* Keeps the end of the page reachable behind the floating bar */}
       <div class="h-24 shrink-0" />
       <div class="fixed inset-x-0 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-20 px-4">
-        <div
-          role="status"
-          class="fade-in-0 slide-in-from-bottom-2 mx-auto flex max-w-[calc(32rem-1.5rem)] animate-in flex-col gap-3 rounded-card border border-primary/45 bg-card/95 p-3.5 fx:shadow-[0_16px_40px_-16px_var(--glow)] fx-strong:shadow-[0_18px_56px_-14px_var(--glow)] backdrop-blur-xl"
-        >
+        <div class="fade-in-0 slide-in-from-bottom-2 mx-auto flex max-w-[calc(32rem-1.5rem)] animate-in flex-col gap-3 rounded-card border border-primary/45 bg-card/95 p-3.5 fx:shadow-[0_16px_40px_-16px_var(--glow)] fx-strong:shadow-[0_18px_56px_-14px_var(--glow)] backdrop-blur-xl">
           <div class="flex items-center gap-3">
             <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <Wind class="size-[18px]" />
@@ -54,13 +60,19 @@ export const RunningWorkflowBar = () => {
                 {runner.runningWorkflow()?.name}
               </div>
               <div class="truncate text-muted-foreground text-xs">
-                {m.workflow_stepOf({
-                  current: runner.currentStep() + 1,
-                  total: steps().length,
-                })}
+                {/* Announces the step and phase, not every tick */}
+                <span role="status">
+                  {m.workflow_stepOf({
+                    current: runner.currentStep() + 1,
+                    total: steps().length,
+                  })}
+                  <span class="sr-only">{phaseLabel()}</span>
+                </span>
                 <Show when={phaseText()}>
                   {" · "}
-                  <span class="font-medium text-primary">{phaseText()}</span>
+                  <span class="font-medium text-primary" aria-hidden="true">
+                    {phaseText()}
+                  </span>
                 </Show>
               </div>
             </div>

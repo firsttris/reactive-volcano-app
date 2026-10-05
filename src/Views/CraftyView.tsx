@@ -9,7 +9,6 @@ import { BatteryChip } from "../components/BatteryChip";
 import { ShutdownTime } from "../components/crafty/ShutdownTime";
 import { Temperature } from "../components/crafty/Temperature";
 import { DeviceShell } from "../components/DeviceShell";
-import { useWakeLock } from "../hooks/utils/useWakeLock";
 import { m } from "../paraglide/messages";
 import { useBluetooth } from "../provider/BluetoothProvider";
 import { CraftyProvider, useCrafty } from "../provider/CraftyProvider";
@@ -21,7 +20,6 @@ export const CraftyView: Component = () => {
   const { actions, derived, isCraftyPlus } = useCrafty();
 
   // Keep the screen on while the device heats
-  useWakeLock(derived.isHeaterActive);
 
   return (
     <>

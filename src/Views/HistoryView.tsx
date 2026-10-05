@@ -25,6 +25,7 @@ import {
 import { m } from "../paraglide/messages";
 import { getLocale } from "../paraglide/runtime";
 import { useHistory } from "../provider/HistoryProvider";
+import { useTemperatureFormat } from "../provider/LiveSessionProvider";
 import {
   type Session,
   sessionsToCsv,
@@ -118,44 +119,47 @@ const StatTile = (props: { label: string; children: JSX.Element }) => (
   </Card>
 );
 
-const SessionRow = (props: { session: Session }) => (
-  <li class="flex items-center gap-3 px-4 py-3">
-    <div class="flex min-w-0 flex-1 flex-col gap-1">
-      <div class="flex items-baseline gap-2">
-        <span class="font-semibold text-sm tabular-nums">
-          {timeLabel(props.session.startedAt)}
-        </span>
-        <span class="truncate text-muted-foreground text-xs">
-          {props.session.device}
-        </span>
-      </div>
-      <div class="text-sm tabular-nums">
-        {formatLength(props.session.durationSeconds)} ·{" "}
-        {props.session.maxTarget} °C
-      </div>
-      <div class="flex flex-wrap gap-x-2 text-muted-foreground text-xs tabular-nums">
-        <Show when={props.session.heatUpSeconds !== null}>
-          <span>
-            {m.history_heatUp({
-              duration: formatLength(props.session.heatUpSeconds ?? 0),
-            })}
+const SessionRow = (props: { session: Session }) => {
+  const formatTemp = useTemperatureFormat();
+  return (
+    <li class="flex items-center gap-3 px-4 py-3">
+      <div class="flex min-w-0 flex-1 flex-col gap-1">
+        <div class="flex items-baseline gap-2">
+          <span class="font-semibold text-sm tabular-nums">
+            {timeLabel(props.session.startedAt)}
           </span>
-        </Show>
-        <Show when={props.session.peakTemp !== null}>
-          <span>
-            {m.history_peak({ temperature: `${props.session.peakTemp} °C` })}
+          <span class="truncate text-muted-foreground text-xs">
+            {props.session.device}
           </span>
-        </Show>
-        <Show when={props.session.pumpCycles > 0}>
-          <span>
-            {m.history_pumpCycles({ count: props.session.pumpCycles })}
-          </span>
-        </Show>
+        </div>
+        <div class="text-sm tabular-nums">
+          {formatLength(props.session.durationSeconds)} ·{" "}
+          {formatTemp(props.session.maxTarget)}
+        </div>
+        <div class="flex flex-wrap gap-x-2 text-muted-foreground text-xs tabular-nums">
+          <Show when={props.session.heatUpSeconds !== null}>
+            <span>
+              {m.history_heatUp({
+                duration: formatLength(props.session.heatUpSeconds ?? 0),
+              })}
+            </span>
+          </Show>
+          <Show when={props.session.peakTemp}>
+            {(peak) => (
+              <span>{m.history_peak({ temperature: formatTemp(peak()) })}</span>
+            )}
+          </Show>
+          <Show when={props.session.pumpCycles > 0}>
+            <span>
+              {m.history_pumpCycles({ count: props.session.pumpCycles })}
+            </span>
+          </Show>
+        </div>
       </div>
-    </div>
-    <Sparkline samples={props.session.samples} />
-  </li>
-);
+      <Sparkline samples={props.session.samples} />
+    </li>
+  );
+};
 
 export const HistoryView = () => {
   const history = useHistory();

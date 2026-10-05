@@ -263,3 +263,30 @@ test.describe("App - Zuletzt verwendetes Gerät, robust verbinden", () => {
     await page.waitForURL(/.*volcano.*/i, { timeout: 10000 });
   });
 });
+
+test.describe("App - Farbschema", () => {
+  const isDark = (page: Page) =>
+    page.evaluate(() => document.documentElement.classList.contains("dark"));
+
+  test("sollte dem System folgen, bis man selbst umschaltet", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.goto("/");
+    expect(await isDark(page)).toBe(false);
+
+    await page.emulateMedia({ colorScheme: "dark" });
+    await expect.poll(() => isDark(page)).toBe(true);
+
+    // A reload still follows the system: nothing was stored
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.reload();
+    expect(await isDark(page)).toBe(false);
+
+    await page.getByRole("button", { name: "Dark Mode" }).click();
+    expect(await isDark(page)).toBe(true);
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.reload();
+    expect(await isDark(page)).toBe(true);
+  });
+});

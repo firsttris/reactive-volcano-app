@@ -7,12 +7,10 @@ import {
 } from "solid-js";
 import { useWakeLock } from "../hooks/utils/useWakeLock";
 import { useWorkflowScheduler } from "../hooks/volcano/useWorkflowScheduler";
-import { useVolcano } from "./VolcanoProvider";
 import { useWorkflowContext } from "./WorkflowProvider";
 
 const createWorkflowRunner = () => {
   const { workflowList } = useWorkflowContext();
-  const { derived } = useVolcano();
   const [runningWorkflowId, setRunningWorkflowId] = createSignal<string>();
 
   const runningWorkflow = createMemo(() =>
@@ -23,8 +21,9 @@ const createWorkflowRunner = () => {
     () => runningWorkflow()?.workflowSteps ?? []
   );
 
-  // Keep the screen on while the device heats or a workflow runs
-  useWakeLock(() => scheduler.isRunning() || derived.isHeating());
+  // Keep the screen on while a workflow runs (LiveSessionProvider covers
+  // heating)
+  useWakeLock(scheduler.isRunning);
 
   const start = async (workflowId: string) => {
     setRunningWorkflowId(workflowId);

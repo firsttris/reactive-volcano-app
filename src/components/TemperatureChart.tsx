@@ -33,7 +33,8 @@ export const TemperatureChart = (props: TemperatureChartProps) => {
   const [now, setNow] = createSignal(Date.now());
   const timer = setInterval(() => setNow(Date.now()), 2_000);
   onCleanup(() => clearInterval(timer));
-  const [hoverIndex, setHoverIndex] = createSignal<number>();
+  // The hovered sample by its time; an index would shift as old ones drop off
+  const [hoverTime, setHoverTime] = createSignal<number>();
   const fillId = createUniqueId();
 
   const range = createMemo(() => {
@@ -83,8 +84,10 @@ export const TemperatureChart = (props: TemperatureChartProps) => {
   };
 
   const hovered = () => {
-    const index = hoverIndex();
-    return index === undefined ? undefined : samples()[index];
+    const time = hoverTime();
+    return time === undefined
+      ? undefined
+      : samples().find((sample) => sample.time === time);
   };
 
   const handlePointer = (event: PointerEvent) => {
@@ -92,13 +95,13 @@ export const TemperatureChart = (props: TemperatureChartProps) => {
     const rect = svg.getBoundingClientRect();
     const time =
       now() - (1 - (event.clientX - rect.left) / rect.width) * windowMs();
-    let nearest = 0;
-    samples().forEach((s, i) => {
-      if (Math.abs(s.time - time) < Math.abs(samples()[nearest].time - time)) {
-        nearest = i;
+    let nearest = samples()[0];
+    for (const sample of samples()) {
+      if (Math.abs(sample.time - time) < Math.abs(nearest.time - time)) {
+        nearest = sample;
       }
-    });
-    setHoverIndex(nearest);
+    }
+    setHoverTime(nearest?.time);
   };
 
   const latest = () => samples()[samples().length - 1];
@@ -141,7 +144,7 @@ export const TemperatureChart = (props: TemperatureChartProps) => {
             aria-label={`${m.chart_title()}: ${latest() ? props.toDisplay(latest().temp) : ""} °${props.unit}`}
             onPointerMove={handlePointer}
             onPointerDown={handlePointer}
-            onPointerLeave={() => setHoverIndex(undefined)}
+            onPointerLeave={() => setHoverTime(undefined)}
           >
             <defs>
               <linearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">

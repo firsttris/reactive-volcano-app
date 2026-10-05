@@ -26,6 +26,9 @@
               ? matchMedia("(prefers-color-scheme: dark)").matches
               : stored === "true";
           document.documentElement.classList.toggle("dark", dark);
+          document
+            .querySelector('meta[name="theme-color"]')
+            .setAttribute("content", dark ? "#09090b" : "#fafafa");
           const effects = localStorage.getItem("effects");
           document.documentElement.dataset.effects =
             effects === "off" || effects === "strong" ? effects : "subtle";

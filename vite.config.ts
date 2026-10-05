@@ -20,7 +20,8 @@ export default defineConfig({
     solid(),
     tailwindcss(),
     VitePWA({
-      registerType: "autoUpdate",
+      // UpdatePrompt activates new versions, asking first while connected
+      registerType: "prompt",
       // The globPatterns below already cover the icons
       includeManifestIcons: false,
       // Icons are rendered from scripts/icons/icon.svg: npm run icons

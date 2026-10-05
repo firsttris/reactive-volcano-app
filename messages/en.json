@@ -215,5 +215,7 @@
   "common_done": "Done",
   "workflow_addStep": "Add step",
   "workflow_deleteStep": "Delete step",
-  "workflow_stepDeleted": "Step {number} deleted"
+  "workflow_stepDeleted": "Step {number} deleted",
+  "app_updateAvailable": "A new version is available",
+  "app_reload": "Reload"
 }

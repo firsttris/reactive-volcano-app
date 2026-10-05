@@ -105,8 +105,9 @@ its own window, without the browser's address bar, and starts even without a net
 
 ## Updates
 
-There is nothing to update by hand. The service worker checks for a new version whenever the app is
-opened and switches to it automatically. A self-hosted container is updated by pulling a new image,
+There is nothing to update by hand. The app looks for a new version when it is opened or brought to the
+front, and every hour while it stays open. Without a connected device it switches right away; while a
+device is connected it asks first (*Reload*), since reloading ends the Bluetooth connection. A self-hosted container is updated by pulling a new image,
 see [Self-hosting](self-hosting.md#updates).
 
 ## Language and theme

@@ -33,6 +33,7 @@ const VolcanoLiveSession = (props: { children: JSX.Element }) => {
           ) === "reached",
         pumping: derived.isPumpActive(),
         ready: state.loaded,
+        isCelsius: derived.isCelsius(),
       })}
     >
       {props.children}
