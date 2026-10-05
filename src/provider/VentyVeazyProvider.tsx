@@ -14,7 +14,10 @@ const VentyVeazyStoreProvider = (props: {
   children: JSX.Element;
 }) => {
   // Read once on purpose: one store per driver instance
-  const store = createVentyVeazyStore(props.driver);
+  const { reportStartFailure } = useBluetooth();
+  const store = createVentyVeazyStore(props.driver, (error) =>
+    reportStartFailure(props.driver, error)
+  );
   return (
     <VentyVeazyContext.Provider value={store}>
       {props.children}

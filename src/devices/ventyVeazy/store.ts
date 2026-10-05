@@ -58,7 +58,11 @@ export interface VentyVeazyState {
  * Reactive state for a connected Venty/Veazy. Must be called inside a Solid
  * owner (component/provider); starts the driver and unsubscribes on cleanup.
  */
-export const createVentyVeazyStore = (driver: VentyVeazyDriver) => {
+export const createVentyVeazyStore = (
+  driver: VentyVeazyDriver,
+  /** Told when the first reads fail, so the app can report it */
+  onStartFailed?: (error: unknown) => void
+) => {
   const [state, setState] = createStore<VentyVeazyState>({
     status: null,
     firmware: null,
@@ -126,6 +130,7 @@ export const createVentyVeazyStore = (driver: VentyVeazyDriver) => {
   const unsubscribe = driver.subscribe(handleResponse);
   driver.start().catch((error) => {
     console.error("Venty/Veazy start failed:", error);
+    onStartFailed?.(error);
   });
 
   onCleanup(() => {

@@ -48,15 +48,15 @@ export const waitForAdvertisement = async (
   try {
     return await new Promise<AdvertisementResult>((resolve) => {
       const timer = setTimeout(() => resolve("timeout"), timeoutMs);
+      const onAbort = () => finish("timeout");
       const finish = (result: AdvertisementResult) => {
         clearTimeout(timer);
+        signal?.removeEventListener("abort", onAbort);
         resolve(result);
       };
       onAdvertisement = () => finish("seen");
       device.addEventListener("advertisementreceived", onAdvertisement);
-      signal?.addEventListener("abort", () => finish("timeout"), {
-        once: true,
-      });
+      signal?.addEventListener("abort", onAbort, { once: true });
       // Rejects where the feature is behind a flag (e.g. Chromium on Linux)
       device
         .watchAdvertisements({ signal: watching.signal })
@@ -94,13 +94,11 @@ export const connectGatt = async (
 
 export const sleep = (ms: number, signal?: AbortSignal) =>
   new Promise<void>((resolve) => {
-    const timer = setTimeout(resolve, ms);
-    signal?.addEventListener(
-      "abort",
-      () => {
-        clearTimeout(timer);
-        resolve();
-      },
-      { once: true }
-    );
+    const finish = () => {
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", finish);
+      resolve();
+    };
+    const timer = setTimeout(finish, ms);
+    signal?.addEventListener("abort", finish, { once: true });
   });

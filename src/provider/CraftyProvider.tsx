@@ -11,7 +11,10 @@ const CraftyStoreProvider = (props: {
   children: JSX.Element;
 }) => {
   // Read once on purpose: one store per driver instance
-  const store = createCraftyStore(props.driver);
+  const { reportStartFailure } = useBluetooth();
+  const store = createCraftyStore(props.driver, (error) =>
+    reportStartFailure(props.driver, error)
+  );
   return (
     <CraftyContext.Provider value={store}>
       {props.children}

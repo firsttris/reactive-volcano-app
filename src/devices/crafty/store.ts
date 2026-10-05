@@ -34,7 +34,11 @@ export interface CraftyState extends CraftyValues {
  * Reactive state for a connected Crafty. Must be called inside a Solid owner
  * (component/provider); starts the driver and unsubscribes on cleanup.
  */
-export const createCraftyStore = (driver: CraftyDriver) => {
+export const createCraftyStore = (
+  driver: CraftyDriver,
+  /** Told when the first reads fail, so the app can report it */
+  onStartFailed?: (error: unknown) => void
+) => {
   const [state, setState] = createStore<CraftyState>({
     loaded: false,
     targetTemp: 0,
@@ -72,7 +76,10 @@ export const createCraftyStore = (driver: CraftyDriver) => {
   driver
     .start()
     .then(() => setState("loaded", true))
-    .catch((error) => console.error("Crafty start failed:", error));
+    .catch((error) => {
+      console.error("Crafty start failed:", error);
+      onStartFailed?.(error);
+    });
 
   onCleanup(() => {
     unsubscribe();
