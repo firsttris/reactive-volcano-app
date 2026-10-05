@@ -226,9 +226,11 @@ stay free of UI text.
 ## PWA and offline
 
 `vite-plugin-pwa` generates the web app manifest and a Workbox service worker that precaches the
-build. `registerType: "autoUpdate"` activates a new version on the next start without a prompt. The
+build, except the legacy bundles and what only installing needs (screenshots, 512 px icons, Apple touch
+icon). `registerType: "autoUpdate"` activates a new version on the next start without a prompt. The
 nginx configuration serves hashed assets as immutable and `index.html` with `no-cache`, so updates are
-picked up promptly.
+picked up promptly. The Docker build writes `.gz` copies of all text files
+([`scripts/precompress.mjs`](../scripts/precompress.mjs)), which nginx serves with `gzip_static`.
 
 ## Build and runtime targets
 

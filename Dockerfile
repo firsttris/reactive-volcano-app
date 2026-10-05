@@ -8,7 +8,8 @@ RUN npm ci
 
 COPY . .
 
-RUN npm run build:root
+# .gz copies next to the files for gzip_static in nginx.conf
+RUN npm run build:root && node scripts/precompress.mjs dist
 
 # Runs nginx as an unprivileged user instead of root; the stable branch,
 # not mainline, since the image updates itself (AutoUpdate)
