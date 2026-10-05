@@ -71,7 +71,7 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
     const undo = deleteWorkflowFromList(props.workflow.id);
     if (!undo) return;
     showToast({
-      message: `„${name}“ ${m.workflow_deleted()}`,
+      message: m.workflow_deleted({ name }),
       actionLabel: m.common_undo(),
       onAction: undo,
     });

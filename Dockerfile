@@ -10,9 +10,11 @@ COPY . .
 
 RUN npm run build:root
 
-FROM nginx:alpine
+# The stable branch, not mainline: the image updates itself (AutoUpdate)
+FROM nginx:stable-alpine
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx-security-headers.inc /etc/nginx/conf.d/security-headers.inc
 COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80

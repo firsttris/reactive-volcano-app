@@ -58,8 +58,7 @@ export const Temperature = () => {
             <Alert class="rounded-card">
               <TriangleAlert />
               <AlertDescription class="text-xs">
-                Heater controls not available on old Crafty (firmware &lt;=
-                2.51).
+                {m.crafty_oldHeaterUnavailable()}
               </AlertDescription>
             </Alert>
           }

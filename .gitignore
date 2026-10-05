@@ -31,3 +31,6 @@ test-results/
 
 # Paraglide (generated from messages/*.json)
 src/paraglide
+
+# TypeScript incremental build info
+*.tsbuildinfo

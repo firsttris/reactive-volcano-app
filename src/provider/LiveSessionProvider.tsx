@@ -7,7 +7,6 @@ import {
   onCleanup,
   useContext,
 } from "solid-js";
-import { v4 as uuidv4 } from "uuid";
 import { deviceLabel } from "../components/AppHeader";
 import { useWakeLock } from "../hooks/utils/useWakeLock";
 import { m } from "../paraglide/messages";
@@ -89,7 +88,7 @@ export const LiveSessionProvider = (props: {
 
   const finish = (time: number) => {
     if (!active) return;
-    const session = finishSession(active, device, time, uuidv4());
+    const session = finishSession(active, device, time, crypto.randomUUID());
     active = undefined;
     if (session) history.add(session);
   };
