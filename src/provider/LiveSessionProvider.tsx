@@ -9,7 +9,11 @@ import {
 } from "solid-js";
 import { v4 as uuidv4 } from "uuid";
 import { deviceLabel } from "../components/AppHeader";
+import { useWakeLock } from "../hooks/utils/useWakeLock";
+import { m } from "../paraglide/messages";
+import { convertCelsiusToFahrenheit } from "../utils/bluetoothUtils";
 import type { TemperatureSample } from "../utils/heatProgress";
+import { alertTargetReached } from "../utils/notify";
 import {
   type ActiveSession,
   finishSession,
@@ -31,12 +35,19 @@ export interface LiveReading {
   pumping?: boolean;
   /** False until the device sent its first values */
   ready: boolean;
+  /** The unit the device shows; °C if unset */
+  isCelsius?: boolean;
 }
 
 export const LIVE_WINDOW_MS = 10 * 60 * 1000;
 const TICK_MS = 2_000;
 
-const LiveSessionContext = createContext<Accessor<TemperatureSample[]>>();
+interface LiveSession {
+  samples: Accessor<TemperatureSample[]>;
+  isCelsius: Accessor<boolean>;
+}
+
+const LiveSessionContext = createContext<LiveSession>();
 
 /**
  * Keeps the recent temperature curve and records heater sessions into the
@@ -51,7 +62,30 @@ export const LiveSessionProvider = (props: {
   // Read once: the provider only lives while one device is connected
   const device = deviceLabel(deviceInfo());
   const [samples, setSamples] = createSignal<TemperatureSample[]>([]);
+  const isCelsius = () => props.reading().isCelsius ?? true;
   let active: ActiveSession | undefined;
+  let previous: LiveReading | undefined;
+
+  // Lives here rather than in the gauge, so it also fires on other tabs
+  const alertWhenReached = (reading: LiveReading) => {
+    const wasHeatingUp =
+      previous?.heating &&
+      !previous.reached &&
+      (previous.current === undefined || previous.current < previous.target);
+    previous = reading;
+    if (!wasHeatingUp || !reading.heating || !reading.reached) return;
+    const target = isCelsius()
+      ? reading.target
+      : convertCelsiusToFahrenheit(reading.target);
+    navigator.vibrate?.(200);
+    alertTargetReached(
+      m.heat_reached(),
+      m.notify_reachedBody({
+        device,
+        temperature: `${target} °${isCelsius() ? "C" : "F"}`,
+      })
+    );
+  };
 
   const finish = (time: number) => {
     if (!active) return;
@@ -94,7 +128,14 @@ export const LiveSessionProvider = (props: {
     }
   };
 
-  createEffect(() => record(props.reading()));
+  // Keep the screen on while the device heats, on every tab
+  useWakeLock(() => props.reading().heating);
+
+  createEffect(() => {
+    const reading = props.reading();
+    record(reading);
+    if (reading.ready) alertWhenReached(reading);
+  });
   // Readings only arrive on change, so keep the curve moving
   const timer = setInterval(() => record(props.reading()), TICK_MS);
 
@@ -105,7 +146,7 @@ export const LiveSessionProvider = (props: {
   });
 
   return (
-    <LiveSessionContext.Provider value={samples}>
+    <LiveSessionContext.Provider value={{ samples, isCelsius }}>
       {props.children}
     </LiveSessionContext.Provider>
   );
@@ -117,5 +158,15 @@ export const useLiveSamples = () => {
   if (!context) {
     throw new Error("useLiveSamples must be used within LiveSessionProvider");
   }
-  return context;
+  return context.samples;
+};
+
+/** Formats a temperature in °C in the unit the connected device shows */
+export const useTemperatureFormat = () => {
+  const context = useContext(LiveSessionContext);
+  return (celsius: number) => {
+    const isCelsius = context?.isCelsius() ?? true;
+    const value = isCelsius ? celsius : convertCelsiusToFahrenheit(celsius);
+    return `${value} °${isCelsius ? "C" : "F"}`;
+  };
 };

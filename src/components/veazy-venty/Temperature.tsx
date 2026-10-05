@@ -4,7 +4,6 @@ import {
   Limits,
   toDisplayTemperature,
 } from "../../devices/ventyVeazy/protocol";
-import { useWakeLock } from "../../hooks/utils/useWakeLock";
 import { m } from "../../paraglide/messages";
 import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
 import { OffsetStepper, TargetStepper } from "../TemperatureControls";
@@ -20,7 +19,6 @@ export const Temperature = () => {
   const isHeating = () => heaterMode() !== HeaterMode.OFF;
 
   // Keep the screen on while the device heats
-  useWakeLock(isHeating);
 
   /** The temperature the device heats to, in °C, including boost */
   const effectiveCelsius = () => {

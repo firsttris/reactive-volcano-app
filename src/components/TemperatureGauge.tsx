@@ -9,7 +9,6 @@ import {
 } from "solid-js";
 import { cn } from "../lib/utils";
 import { m } from "../paraglide/messages";
-import { useBluetooth } from "../provider/BluetoothProvider";
 import {
   estimateSecondsRemaining,
   formatDuration,
@@ -19,9 +18,7 @@ import {
   RATE_WINDOW_MS,
   type TemperatureSample,
 } from "../utils/heatProgress";
-import { alertTargetReached } from "../utils/notify";
 import { isPlausibleTemp } from "../utils/sessionHistory";
-import { deviceLabel } from "./AppHeader";
 import { Badge } from "./ui/badge";
 
 interface TemperatureGaugeProps {
@@ -66,7 +63,6 @@ const statusBadge: Record<HeatStatus, "secondary" | "success" | "soft"> = {
 /** Ring gauge with the current temperature, a target marker and heat status */
 export const TemperatureGauge = (props: TemperatureGaugeProps) => {
   const gradientId = createUniqueId();
-  const { deviceInfo } = useBluetooth();
   const [samples, setSamples] = createSignal<TemperatureSample[]>([]);
   const [now, setNow] = createSignal(Date.now());
 
@@ -105,26 +101,6 @@ export const TemperatureGauge = (props: TemperatureGaugeProps) => {
           { time, temp },
         ]);
       }
-    )
-  );
-
-  // A short buzz when the target is reached, where the device supports it
-  createEffect(
-    on(
-      status,
-      (next, previous) => {
-        if (next === "reached" && previous === "heating") {
-          navigator.vibrate?.(200);
-          alertTargetReached(
-            m.heat_reached(),
-            m.notify_reachedBody({
-              device: deviceLabel(deviceInfo()),
-              temperature: props.targetLabel,
-            })
-          );
-        }
-      },
-      { defer: true }
     )
   );
 

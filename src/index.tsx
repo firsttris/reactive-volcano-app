@@ -1,4 +1,5 @@
 import { render } from "solid-js/web";
+import { UpdatePrompt } from "./components/UpdatePrompt";
 import { BluetoothProvider } from "./provider/BluetoothProvider";
 import { DarkModeProvider } from "./provider/DarkModeProvider";
 import { EffectsProvider } from "./provider/EffectsProvider";
@@ -25,6 +26,7 @@ const dispose = render(
           <BluetoothProvider>
             <HistoryProvider>
               <Routes />
+              <UpdatePrompt />
             </HistoryProvider>
           </BluetoothProvider>
         </ToastProvider>

@@ -215,5 +215,7 @@
   "common_done": "Fertig",
   "workflow_addStep": "Schritt hinzufügen",
   "workflow_deleteStep": "Schritt löschen",
-  "workflow_stepDeleted": "Schritt {number} gelöscht"
+  "workflow_stepDeleted": "Schritt {number} gelöscht",
+  "app_updateAvailable": "Eine neue Version ist verfügbar",
+  "app_reload": "Neu laden"
 }

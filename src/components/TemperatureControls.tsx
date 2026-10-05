@@ -152,7 +152,8 @@ export const StatusNote = (props: {
     <props.icon class="size-4 shrink-0 text-primary" />
     <span class="flex-1">{props.children}</span>
     <Show when={props.trailing}>
-      <span class="font-mono text-muted-foreground text-xs">
+      {/* A ticking countdown; announcing every second would be noise */}
+      <span class="font-mono text-muted-foreground text-xs" aria-hidden="true">
         {props.trailing}
       </span>
     </Show>
