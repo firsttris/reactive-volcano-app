@@ -53,6 +53,8 @@ export interface MockBluetooth {
   _failConnect: boolean;
   /** Makes only the next n GATT connects fail */
   _failConnectTimes: number;
+  /** How often the device chooser was opened */
+  _requestDeviceCalls: number;
   requestDevice: (options: unknown) => Promise<MockBluetoothDevice>;
   getDevices: () => Promise<MockBluetoothDevice[]>;
   getAvailability: () => Promise<boolean>;
@@ -788,7 +790,9 @@ export async function mockBluetooth(
         _currentDevice: null, // Expose for test access
         _failConnect: false,
         _failConnectTimes: 0,
+        _requestDeviceCalls: 0,
         requestDevice: async (options: unknown) => {
+          bluetooth._requestDeviceCalls++;
           console.log(
             "[Bluetooth Mock] requestDevice called with options:",
             options

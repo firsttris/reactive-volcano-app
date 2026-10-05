@@ -9,10 +9,7 @@ import TriangleAlert from "lucide-solid/icons/triangle-alert";
 import { createEffect, createSignal, For, Match, Show, Switch } from "solid-js";
 import { cn } from "../lib/utils";
 import { m } from "../paraglide/messages";
-import {
-  RECONNECT_DELAYS_MS,
-  useBluetooth,
-} from "../provider/BluetoothProvider";
+import { useBluetooth } from "../provider/BluetoothProvider";
 import { buildRoute } from "../routes";
 import { ConnectionState, DeviceType } from "../utils/uuids";
 import { decodeWorkflow, getPendingWorkflowCode } from "../utils/workflowShare";
@@ -79,8 +76,10 @@ export const Connect = () => {
     connect,
     connectKnownDevice,
     knownDevice,
+    knownDeviceInRange,
     rememberedDevice,
     reconnectAttempt,
+    reconnectTotal,
     connectPhase,
     connectionState,
     connectionError,
@@ -309,8 +308,13 @@ export const Connect = () => {
                       <Bluetooth />
                       {m.connect_knownDevice({ device: label() })}
                     </span>
-                    <span class="font-normal text-xs opacity-75">
-                      {m.connect_lastUsed()}
+                    <span class="flex items-center gap-1.5 font-normal text-xs opacity-75">
+                      <Show when={knownDeviceInRange()}>
+                        <span class="size-1.5 rounded-full bg-current" />
+                      </Show>
+                      {knownDeviceInRange()
+                        ? m.connect_inRange()
+                        : m.connect_lastUsed()}
                     </span>
                   </Button>
                   <Button variant="ghost" class="w-full" onClick={connect}>
@@ -352,7 +356,7 @@ export const Connect = () => {
             <Badge variant="soft" class="mt-1 py-1 tabular-nums">
               {m.connect_reconnectAttempt({
                 current: reconnectAttempt(),
-                total: RECONNECT_DELAYS_MS.length,
+                total: reconnectTotal(),
               })}
             </Badge>
           </div>

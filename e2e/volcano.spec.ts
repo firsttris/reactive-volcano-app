@@ -130,7 +130,7 @@ test.describe("Volcano Gerät - Disconnect", () => {
       bluetooth._failConnect = true;
     });
     await dropConnection(page);
-    await expect(page.getByText("Attempt 1 of 5")).toBeVisible();
+    await expect(page.getByText("Attempt 1 of 3")).toBeVisible();
 
     await page.clock.runFor(30_000);
 
