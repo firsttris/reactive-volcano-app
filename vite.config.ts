@@ -76,9 +76,16 @@ export default defineConfig({
       },
       workbox: {
         // Fonts belong to the offline copy; the legacy bundles only serve
-        // browsers without service workers, and screenshots are install-only
+        // browsers without service workers. Screenshots, the 512 px icons and
+        // the Apple touch icon are only read when installing, which needs a
+        // connection anyway (pwa-192x192.png stays: notifications use it)
         globPatterns: ["**/*.{js,css,html,svg,png,ico}", "**/*latin*.woff2"],
-        globIgnores: ["**/*-legacy-*.js", "screenshots/**"],
+        globIgnores: [
+          "**/*-legacy-*.js",
+          "screenshots/**",
+          "*-512x512.png",
+          "apple-touch-icon.png",
+        ],
       },
     }),
   ],
