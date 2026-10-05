@@ -1,5 +1,11 @@
 import type { JSX } from "solid-js";
-import { createContext, createSignal, useContext } from "solid-js";
+import {
+  createContext,
+  createEffect,
+  createSignal,
+  onCleanup,
+  useContext,
+} from "solid-js";
 import { type CraftyDriver, connectCrafty } from "../devices/crafty/driver";
 import {
   connectVentyVeazy,
@@ -8,8 +14,11 @@ import {
 import { connectVolcano, type VolcanoDriver } from "../devices/volcano/driver";
 import {
   connectGatt,
+  hasUserActivation,
   sleep,
+  supportsAdvertisementWatching,
   waitForAdvertisement,
+  watchPresence,
 } from "../utils/bluetoothConnect";
 import { bluetoothQueue } from "../utils/bluetoothQueue";
 import { ConnectionState, DeviceType, ServiceUUIDs } from "../utils/uuids";
@@ -39,15 +48,26 @@ export type ConnectPhase = "searching" | "connecting";
 
 const NO_DEVICE: DeviceInfo = { type: DeviceType.UNKNOWN, name: "" };
 
-/** Waits between reconnect attempts; the device may need a moment */
+/**
+ * Waits between reconnect attempts. Where advertisements can be watched, an
+ * attempt starts as soon as the device shows up again.
+ */
 export const RECONNECT_DELAYS_MS = [1_000, 2_000, 4_000, 8_000, 8_000];
+/** Without watching (Linux, ChromeOS): blind attempts, like Chrome's sample */
+export const RECONNECT_DELAYS_BLIND_MS = [2_000, 4_000, 8_000];
 
-/** How long to listen for the last used device before connecting anyway */
-const ADVERTISEMENT_TIMEOUT_MS = 10_000;
-/** Retries of the direct connect; BlueZ often refuses the first attempts */
-const KNOWN_DEVICE_RETRY_DELAYS_MS = [0, 1_500, 3_000, 5_000];
+/** How long to listen for the last used device if it was not seen yet */
+const SEARCH_TIMEOUT_MS = 8_000;
+/**
+ * Time for connecting the last used device without seeing it first. Short,
+ * so the device chooser can still open on the same click (the browser allows
+ * that for about five seconds); the chooser's scan finds the device reliably.
+ */
+const DIRECT_CONNECT_BUDGET_MS = 3_500;
 /** A GATT connect that takes longer has failed */
-const CONNECT_TIMEOUT_MS = 12_000;
+const CONNECT_TIMEOUT_MS = 8_000;
+/** Pause before retrying a refused connect */
+const RETRY_PAUSE_MS = 300;
 
 /** The last connected device, to offer it again without the chooser */
 export interface RememberedDevice {
@@ -117,6 +137,9 @@ const createBluetoothMethods = () => {
   const [deviceInfo, setDeviceInfo] = createSignal<DeviceInfo>(NO_DEVICE);
   const [connectionError, setConnectionError] = createSignal<ConnectionError>();
   const [reconnectAttempt, setReconnectAttempt] = createSignal(0);
+  const [reconnectTotal, setReconnectTotal] = createSignal(
+    RECONNECT_DELAYS_MS.length
+  );
   const [connectPhase, setConnectPhase] =
     createSignal<ConnectPhase>("connecting");
   // Bumped to cancel a running connect or reconnect loop
@@ -149,6 +172,21 @@ const createBluetoothMethods = () => {
     }
   };
   findKnownDevice();
+
+  // Whether the last used device advertises nearby. Only known where the
+  // browser can watch advertisements, and only while nothing is connected.
+  const [knownDeviceInRange, setKnownDeviceInRange] = createSignal(false);
+  createEffect(() => {
+    const known = knownDevice();
+    const state = connectionState();
+    const idle =
+      state === ConnectionState.NOT_CONNECTED ||
+      state === ConnectionState.CONNECTION_FAILED;
+    if (!known || !idle || !supportsAdvertisementWatching(known)) return;
+    // It may have left since it was last seen
+    setKnownDeviceInRange(false);
+    onCleanup(watchPresence(known, () => setKnownDeviceInRange(true)));
+  });
 
   // One driver per device type; the device providers subscribe to them
   const [volcanoDriver, setVolcanoDriver] = createSignal<VolcanoDriver>();
@@ -202,15 +240,17 @@ const createBluetoothMethods = () => {
     setConnectionError(undefined);
     setConnectionState(ConnectionState.RECONNECTING);
 
-    for (const [index, delay] of RECONNECT_DELAYS_MS.entries()) {
+    const watching = supportsAdvertisementWatching(bluetoothDevice);
+    const delays = watching ? RECONNECT_DELAYS_MS : RECONNECT_DELAYS_BLIND_MS;
+    setReconnectTotal(delays.length);
+
+    for (const [index, delay] of delays.entries()) {
       setReconnectAttempt(index + 1);
       // Connect as soon as the device advertises again; without support for
       // watching, wait the planned time
-      const seen = await waitForAdvertisement(
-        bluetoothDevice,
-        delay + 2_000,
-        signal
-      );
+      const seen = watching
+        ? await waitForAdvertisement(bluetoothDevice, delay + 2_000, signal)
+        : "unsupported";
       if (seen === "unsupported") await sleep(delay, signal);
       if (token !== reconnectToken) return;
       try {
@@ -251,7 +291,10 @@ const createBluetoothMethods = () => {
     setConnectionState(ConnectionState.NOT_CONNECTED);
   };
 
-  const connectToDevice = async (bluetoothDevice: BluetoothDevice) => {
+  const connectToDevice = async (
+    bluetoothDevice: BluetoothDevice,
+    timeoutMs = CONNECT_TIMEOUT_MS
+  ) => {
     if (!bluetoothDevice.gatt) {
       throw new Error("Device does not support GATT");
     }
@@ -266,7 +309,7 @@ const createBluetoothMethods = () => {
     const type = detectDeviceType(name);
     setDeviceInfo({ type, name });
 
-    const server = await connectGatt(bluetoothDevice, CONNECT_TIMEOUT_MS);
+    const server = await connectGatt(bluetoothDevice, timeoutMs);
 
     switch (type) {
       case DeviceType.VOLCANO: {
@@ -354,28 +397,44 @@ const createBluetoothMethods = () => {
 
   /**
    * Connects the last used device without the chooser. The system only
-   * connects a device it has recently seen advertising, so listen for it
-   * first, then retry a few times: right after a disconnect or after a long
-   * idle period the first attempts often fail (notably with BlueZ on Linux).
+   * connects a device it has recently seen advertising. Where advertisements
+   * can be watched, wait until it shows up, then connect. Elsewhere (Linux,
+   * ChromeOS) try briefly and fall back to the chooser, whose scan finds the
+   * device reliably, while the click still allows opening it.
    */
   const connectKnownDevice = async () => {
     const known = knownDevice();
     if (!known) return;
+    const seenNearby = knownDeviceInRange();
     const { token, signal } = startAttempt();
     setConnectionError(undefined);
     setConnectionState(ConnectionState.CONNECTING);
-    setConnectPhase("searching");
 
-    await waitForAdvertisement(known, ADVERTISEMENT_TIMEOUT_MS, signal);
-    if (token !== reconnectToken) return;
+    const watching = supportsAdvertisementWatching(known);
+    if (watching && !seenNearby) {
+      setConnectPhase("searching");
+      const seen = await waitForAdvertisement(known, SEARCH_TIMEOUT_MS, signal);
+      if (token !== reconnectToken) return;
+      if (seen === "timeout") {
+        setConnectionState(ConnectionState.CONNECTION_FAILED);
+        setConnectionError({
+          kind: "unreachable",
+          message: "The device did not advertise",
+        });
+        return;
+      }
+    }
     setConnectPhase("connecting");
 
+    // BlueZ often refuses the first attempts, so retry until the time is up
+    const deadline =
+      Date.now() + (watching ? CONNECT_TIMEOUT_MS : DIRECT_CONNECT_BUDGET_MS);
     let lastError: unknown;
-    for (const delay of KNOWN_DEVICE_RETRY_DELAYS_MS) {
-      if (delay) await sleep(delay, signal);
-      if (token !== reconnectToken) return;
+    while (token === reconnectToken) {
+      const remaining = deadline - Date.now();
+      if (remaining < 500) break;
       try {
-        await connectToDevice(known);
+        await connectToDevice(known, remaining);
         if (token !== reconnectToken) {
           // Cancelled while the connect was still running
           await abandonAttempt(known);
@@ -388,11 +447,16 @@ const createBluetoothMethods = () => {
         console.warn("Connecting the last used device failed:", error);
         lastError = error;
         await abandonAttempt(known);
+        await sleep(RETRY_PAUSE_MS, signal);
       }
     }
 
     if (token !== reconnectToken) return;
     releaseDevice();
+    if (hasUserActivation()) {
+      connect();
+      return;
+    }
     setConnectionState(ConnectionState.CONNECTION_FAILED);
     setConnectionError({
       kind: "unreachable",
@@ -405,8 +469,10 @@ const createBluetoothMethods = () => {
     connect,
     connectKnownDevice,
     knownDevice,
+    knownDeviceInRange,
     rememberedDevice,
     reconnectAttempt,
+    reconnectTotal,
     connectPhase,
     disconnect,
     connectionState,

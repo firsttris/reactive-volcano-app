@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { connectGatt, waitForAdvertisement } from "./bluetoothConnect";
+import {
+  connectGatt,
+  supportsAdvertisementWatching,
+  waitForAdvertisement,
+  watchPresence,
+} from "./bluetoothConnect";
 
 type FakeDevice = EventTarget & {
   watchAdvertisements?: (options?: { signal?: AbortSignal }) => Promise<void>;
@@ -75,5 +80,43 @@ describe("connectGatt", () => {
     await vi.advanceTimersByTimeAsync(1000);
     await assertion;
     expect(disconnect).toHaveBeenCalled();
+  });
+});
+
+describe("supportsAdvertisementWatching", () => {
+  const watching = fakeDevice({ watchAdvertisements: async () => {} });
+  const linux = "Mozilla/5.0 (X11; Linux x86_64) Chrome/140.0";
+  const chromeOS = "Mozilla/5.0 (X11; CrOS x86_64 16000.0.0) Chrome/140.0";
+  const android = "Mozilla/5.0 (Linux; Android 15; Pixel 7) Chrome/140.0";
+  const windows = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/140.0";
+
+  it("is off on Linux and ChromeOS, where BlueZ cannot watch", () => {
+    expect(supportsAdvertisementWatching(watching, linux)).toBe(false);
+    expect(supportsAdvertisementWatching(watching, chromeOS)).toBe(false);
+  });
+
+  it("is on for Android and Windows when the API exists", () => {
+    expect(supportsAdvertisementWatching(watching, android)).toBe(true);
+    expect(supportsAdvertisementWatching(watching, windows)).toBe(true);
+    expect(supportsAdvertisementWatching(fakeDevice(), windows)).toBe(false);
+  });
+});
+
+describe("watchPresence", () => {
+  it("reports advertisements until stopped", async () => {
+    let signal: AbortSignal | undefined;
+    const device = fakeDevice({
+      watchAdvertisements: async (options) => {
+        signal = options?.signal;
+      },
+    });
+    const onSeen = vi.fn();
+    const stop = watchPresence(device, onSeen);
+    device.dispatchEvent(new Event("advertisementreceived"));
+    expect(onSeen).toHaveBeenCalledTimes(1);
+    stop();
+    device.dispatchEvent(new Event("advertisementreceived"));
+    expect(onSeen).toHaveBeenCalledTimes(1);
+    expect(signal?.aborted).toBe(true);
   });
 });

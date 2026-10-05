@@ -201,6 +201,7 @@
   "connect_reconnectHint": "Keep the device switched on and nearby.",
   "connect_knownDevice": "Connect {device}",
   "connect_lastUsed": "Last used",
+  "connect_inRange": "In range",
   "connect_otherDevice": "Choose another device",
   "settings_effects": "Effects",
   "settings_effectsOff": "Off",

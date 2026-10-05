@@ -201,6 +201,7 @@
   "connect_reconnectHint": "Lass das Gerät eingeschaltet und in der Nähe.",
   "connect_knownDevice": "{device} verbinden",
   "connect_lastUsed": "Zuletzt verwendet",
+  "connect_inRange": "In Reichweite",
   "connect_otherDevice": "Anderes Gerät wählen",
   "settings_effects": "Effekte",
   "settings_effectsOff": "Aus",
