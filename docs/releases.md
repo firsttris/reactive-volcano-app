@@ -38,6 +38,14 @@ The version in `package.json` follows [Semantic Versioning](https://semver.org/)
 
 ## Cutting a release
 
+Either way creates the tag `vX.Y.Z`:
+
+- without a checkout: *Actions → Bump version → Run workflow* with patch, minor or major
+  ([`bump.yml`](../.github/workflows/bump.yml), the shared
+  [`bump-version`](https://github.com/firsttris/workflows#bump-version)). It raises the version, commits it
+  as `Release vX.Y.Z` on `main`, tags it and starts the release workflow on the tag.
+- on a checkout:
+
 ```bash
 git checkout main && git pull
 npm run release:minor     # or release:patch / release:major
@@ -48,7 +56,8 @@ the `postversion` script pushes the commit and the tag.
 
 ## What the release workflow does
 
-[`.github/workflows/release.yml`](../.github/workflows/release.yml) runs on tags `v*` and calls the shared
+[`.github/workflows/release.yml`](../.github/workflows/release.yml) runs on tags `v*`, first the checks
+from [`build.yml`](../.github/workflows/build.yml) (lint, unit and E2E tests, build), then the shared
 [`docker-release`](https://github.com/firsttris/workflows) workflow:
 
 ```mermaid
