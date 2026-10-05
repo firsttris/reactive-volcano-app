@@ -14,16 +14,18 @@ import { Button } from "../../ui/button";
 import { EditorHeader } from "./EditorHeader";
 
 export const WorkflowForm: Component = () => {
-  const workflow = useWorkflowContext();
-  const { workflowSteps, editWorkflowStepInList } = workflow;
-  const { workflowStepId, workflowListId } = useParams();
+  const { stepsOf, editWorkflowStepInList } = useWorkflowContext();
+  // Not destructured, so the form follows a change of the route
+  const params = useParams();
+  const workflowId = () => params.workflowListId ?? "";
+  const stepId = () => params.workflowStepId ?? "";
   const navigate = useNavigate();
 
   const workflowStep = createMemo(() =>
-    workflowSteps().find((workflowStep) => workflowStep.id === workflowStepId)
+    stepsOf(workflowId()).find((workflowStep) => workflowStep.id === stepId())
   );
 
-  const [temperature, setTemperature] = createSignal<number>(0);
+  const [temperature, setTemperature] = createSignal<number>(185);
   const [holdTime, setHoldTime] = createSignal<number>(0);
   const [pumpTime, setPumpTime] = createSignal<number>(0);
 
@@ -35,14 +37,13 @@ export const WorkflowForm: Component = () => {
     setPumpTime(step.pumpTimeInSeconds);
   });
 
-  const backToSteps = () =>
-    workflowListId && navigate(buildRoute.workflowList(workflowListId));
+  const backToSteps = () => navigate(buildRoute.workflowList(workflowId()));
 
   const handleSubmit = (event: Event) => {
     event.preventDefault();
-    if (!workflowListId || !workflowStepId) return;
-    editWorkflowStepInList(workflowListId, workflowStepId, {
-      id: workflowStepId,
+    if (!workflowStep()) return;
+    editWorkflowStepInList(workflowId(), stepId(), {
+      id: stepId(),
       temperature: temperature(),
       holdTimeInSeconds: holdTime(),
       pumpTimeInSeconds: pumpTime(),

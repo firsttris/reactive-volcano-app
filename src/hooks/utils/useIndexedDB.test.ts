@@ -1,6 +1,7 @@
+import { createRoot } from "solid-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockIndexedDB } from "./__mocks__/indexedDB";
-import { loadFromDB, openDB, saveToDB } from "./useIndexedDB";
+import { loadFromDB, openDB, saveToDB, useIndexedDB } from "./useIndexedDB";
 
 describe("useIndexedDB", () => {
   let mockControl: ReturnType<typeof createMockIndexedDB>;
@@ -149,6 +150,55 @@ describe("useIndexedDB", () => {
 
       await saveToDB(testKey, 20);
       expect(mockControl.getStoreData().get(testKey)).toBe(20);
+    });
+  });
+
+  describe("useIndexedDB hook", () => {
+    // Lets the mocked IndexedDB (setTimeout based) finish its work
+    const settle = () => new Promise((resolve) => setTimeout(resolve, 20));
+
+    const mount = <T>(key: string, defaultValue: T) => {
+      let hook!: ReturnType<typeof useIndexedDB<T>>;
+      const dispose = createRoot((dispose) => {
+        hook = useIndexedDB(key, defaultValue);
+        return dispose;
+      });
+      return { hook, dispose };
+    };
+
+    it("loads the stored value", async () => {
+      await saveToDB("list", [1, 2]);
+      const { hook, dispose } = mount<number[]>("list", []);
+      await settle();
+      expect(hook[0]()).toEqual([1, 2]);
+      dispose();
+    });
+
+    it("saves a change back to the default value", async () => {
+      await saveToDB("selected", "a");
+      const { hook, dispose } = mount("selected", "");
+      await settle();
+      hook[1]("");
+      await settle();
+      expect(mockControl.getStoreData().get("selected")).toBe("");
+      dispose();
+    });
+
+    it("applies changes made before loading on top of the stored value", async () => {
+      await saveToDB("history", [1, 2]);
+      const { hook, dispose } = mount<number[]>("history", []);
+      hook[1]((prev) => [...prev, 3]);
+      await settle();
+      expect(hook[0]()).toEqual([1, 2, 3]);
+      expect(mockControl.getStoreData().get("history")).toEqual([1, 2, 3]);
+      dispose();
+    });
+
+    it("does not store the default before anything changed", async () => {
+      const { dispose } = mount("untouched", "default");
+      await settle();
+      expect(mockControl.getStoreData().has("untouched")).toBe(false);
+      dispose();
     });
   });
 });

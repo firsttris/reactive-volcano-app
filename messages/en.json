@@ -39,8 +39,7 @@
   "temperature_effective": "Effective",
   "workflow_editStep": "Edit Step",
   "workflow_editSteps": "Edit Workflow Steps",
-  "workflow_noSteps": "No steps yet. Click \"Add\" to add one.",
-  "common_add": "Add",
+  "workflow_noSteps": "No steps yet. Use “Add step” to add one.",
   "workflow_title": "Workflows",
   "workflow_add": "Add Workflow",
   "common_save": "Save",
@@ -212,5 +211,9 @@
   "connect_unreachable": "{device} not reachable",
   "connect_unreachableHint": "Make sure it is switched on and nearby. “Search for device” starts a new scan, which usually finds it.",
   "connect_searchDevice": "Search for device",
-  "connect_retry": "Try again"
+  "connect_retry": "Try again",
+  "common_done": "Done",
+  "workflow_addStep": "Add step",
+  "workflow_deleteStep": "Delete step",
+  "workflow_stepDeleted": "Step {number} deleted"
 }

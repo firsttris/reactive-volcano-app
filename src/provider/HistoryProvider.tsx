@@ -5,7 +5,7 @@ import {
   type JSX,
   useContext,
 } from "solid-js";
-import { saveToDB, useIndexedDB } from "../hooks/utils/useIndexedDB";
+import { useIndexedDB } from "../hooks/utils/useIndexedDB";
 import {
   addSession,
   type Session,
@@ -31,13 +31,7 @@ export const HistoryProvider = (props: { children: JSX.Element }) => {
       value={{
         sessions,
         add: (session) => setSessions((prev) => addSession(prev, session)),
-        clear: () => {
-          setSessions([]);
-          // useIndexedDB skips saving the default value, so store it here
-          saveToDB(STORAGE_KEY, []).catch((error) =>
-            console.error("Clearing the session history failed:", error)
-          );
-        },
+        clear: () => setSessions([]),
       }}
     >
       {props.children}
