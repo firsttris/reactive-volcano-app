@@ -21,21 +21,63 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
+      // The globPatterns below already cover the icons
+      includeManifestIcons: false,
+      // Icons are rendered from scripts/icons/icon.svg: npm run icons
       manifest: {
         name: "Reactive Volcano App",
         short_name: "Volcano App",
+        description:
+          "Control Storz & Bickel vaporizers (Volcano Hybrid, Venty, Veazy, Crafty) via Web Bluetooth",
+        lang: "en",
+        display: "standalone",
+        // Matches the dark theme, so the splash screen does not flash white
+        theme_color: "#09090b",
+        background_color: "#09090b",
+        categories: ["utilities", "lifestyle"],
         icons: [
           {
-            src: "android-chrome-192x192.png",
+            src: "pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
+            purpose: "any",
           },
           {
-            src: "android-chrome-512x512.png",
+            src: "pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
+            purpose: "any",
+          },
+          {
+            src: "maskable-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
           },
         ],
+        // Shown in the richer install dialog on Android
+        screenshots: [
+          {
+            src: "screenshots/control.png",
+            sizes: "1082x2202",
+            type: "image/png",
+            form_factor: "narrow",
+            label: "Temperature control",
+          },
+          {
+            src: "screenshots/workflows.png",
+            sizes: "1082x2202",
+            type: "image/png",
+            form_factor: "narrow",
+            label: "Workflows",
+          },
+        ],
+      },
+      workbox: {
+        // Fonts belong to the offline copy; the legacy bundles only serve
+        // browsers without service workers, and screenshots are install-only
+        globPatterns: ["**/*.{js,css,html,svg,png,ico}", "**/*latin*.woff2"],
+        globIgnores: ["**/*-legacy-*.js", "screenshots/**"],
       },
     }),
   ],

@@ -135,6 +135,8 @@
   html {
     @apply bg-background;
     color-scheme: light;
+    /* Reserve the scrollbar's space so pages don't shift when it appears */
+    scrollbar-gutter: stable;
   }
 
   html.dark {

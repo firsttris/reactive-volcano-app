@@ -28,6 +28,11 @@ says what is happening:
 | *Cooling down* | heater on, current temperature more than 2° above the target |
 | *Temperature reached* | within ±2° of the target |
 
+The Venty and Veazy do not report their current temperature. For them the gauge shows the *target*
+(including boost), and the chip relies on the heater mode and the device's own "temperature reached"
+signal: *Heater off*, *Heating up* or *Temperature reached*, without a remaining time. The live
+temperature curve is only shown for the Volcano and the Crafty.
+
 **Screen stays on.** While the heater is on or a workflow runs, the app holds a
 [screen wake lock](https://developer.mozilla.org/docs/Web/API/Screen_Wake_Lock_API) so your phone does
 not lock in the middle of a session. It is released as soon as the heater is off.

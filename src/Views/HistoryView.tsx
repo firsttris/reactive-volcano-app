@@ -141,9 +141,11 @@ const SessionRow = (props: { session: Session }) => (
             })}
           </span>
         </Show>
-        <span>
-          {m.history_peak({ temperature: `${props.session.peakTemp} °C` })}
-        </span>
+        <Show when={props.session.peakTemp !== null}>
+          <span>
+            {m.history_peak({ temperature: `${props.session.peakTemp} °C` })}
+          </span>
+        </Show>
         <Show when={props.session.pumpCycles > 0}>
           <span>
             {m.history_pumpCycles({ count: props.session.pumpCycles })}

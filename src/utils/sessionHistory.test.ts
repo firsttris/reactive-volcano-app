@@ -6,6 +6,7 @@ import {
   MAX_STORED_SESSIONS,
   type Session,
   type SessionReading,
+  sanitizeSession,
   sessionsToCsv,
   startSession,
   summarize,
@@ -129,5 +130,40 @@ describe("sessionHistory", () => {
     expect(csv.split("\n")[1]).toBe(
       '1970-01-01T00:00:00.000Z,"Crafty ""plus""",600,185,186,,0'
     );
+  });
+
+  it("records sessions without a measured temperature", () => {
+    let active = startSession(reading({ time: 0, temp: null }));
+    active = updateSession(
+      active,
+      reading({ time: 60_000, temp: null, reached: true })
+    );
+    const finished = finishSession(active, "Venty", 120_000, "id");
+    expect(finished).toMatchObject({
+      peakTemp: null,
+      heatUpSeconds: 60,
+      samples: [],
+    });
+  });
+
+  it("ignores the device's unknown marker", () => {
+    let active = startSession(reading({ time: 0, temp: 3277 }));
+    active = updateSession(active, reading({ time: 5_000, temp: 3277 }));
+    expect(active.peakTemp).toBeNull();
+    expect(active.samples).toEqual([]);
+  });
+
+  it("cleans sessions stored with the unknown marker", () => {
+    const cleaned = sanitizeSession(
+      session({
+        peakTemp: 3277,
+        samples: [
+          [0, 3277],
+          [5, 3277],
+        ],
+      })
+    );
+    expect(cleaned.peakTemp).toBeNull();
+    expect(cleaned.samples).toEqual([]);
   });
 });

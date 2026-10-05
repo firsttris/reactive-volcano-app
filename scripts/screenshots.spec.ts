@@ -9,17 +9,20 @@ import { test } from "../e2e/helpers/fixtures";
 
 const shot = (name: string) => `docs/screenshot-${name}.png`;
 
+// Shown by Android in the install dialog (manifest "screenshots")
+const storeShot = (name: string) => `public/screenshots/${name}.png`;
+
 /**
- * The mock never sends Venty/Veazy notifications, so answer every write on
- * the control characteristic with a realistic STATUS frame: 182 °C now,
- * 185 °C target, boost +10, superboost +15, battery 76 %, heater normal.
+ * Answer every write on the control characteristic with a realistic STATUS
+ * frame: no current temperature (0x8000, like the real device), 185 °C
+ * target, boost +10, superboost +15, battery 76 %, heater normal.
  */
 const feedVentyStatus = (page: Page) =>
   page.addInitScript(() => {
     const frame = new Uint8Array(20);
     const view = new DataView(frame.buffer);
     view.setUint8(0, 0x01);
-    view.setUint16(2, 1820, true);
+    view.setUint16(2, 0x8000, true);
     view.setUint16(4, 1850, true);
     view.setUint8(6, 10);
     view.setUint8(7, 15);
@@ -89,10 +92,12 @@ test("volcano", async ({ page, bluetoothDevice }) => {
   await page.getByText("Heater", { exact: true }).click();
   await page.waitForTimeout(800);
   await page.screenshot({ path: shot("volcano") });
+  await page.screenshot({ path: storeShot("control") });
 
   await page.getByText("Workflows").last().click();
   await page.waitForTimeout(800);
   await page.screenshot({ path: shot("volcano-workflows") });
+  await page.screenshot({ path: storeShot("workflows") });
 
   await page.getByText("Settings").last().click();
   await page.waitForTimeout(800);

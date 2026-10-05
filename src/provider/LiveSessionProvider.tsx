@@ -13,6 +13,7 @@ import type { TemperatureSample } from "../utils/heatProgress";
 import {
   type ActiveSession,
   finishSession,
+  isPlausibleTemp,
   type SessionReading,
   startSession,
   updateSession,
@@ -22,7 +23,8 @@ import { useHistory } from "./HistoryProvider";
 
 /** What a device view reports, temperatures in °C */
 export interface LiveReading {
-  current: number;
+  /** Undefined when the device does not measure it (Venty/Veazy) */
+  current?: number;
   target: number;
   heating: boolean;
   reached: boolean;
@@ -62,19 +64,22 @@ export const LiveSessionProvider = (props: {
     if (!reading.ready) return;
     const time = Date.now();
 
-    setSamples((prev) => {
-      const recent = prev.filter((s) => time - s.time <= LIVE_WINDOW_MS);
-      const last = recent[recent.length - 1];
-      // Notifications arrive in bursts; one point per tick is enough
-      if (last && time - last.time < TICK_MS && last.temp === reading.current) {
-        return recent;
-      }
-      return [...recent, { time, temp: reading.current }];
-    });
+    const current = reading.current;
+    if (isPlausibleTemp(current ?? null)) {
+      setSamples((prev) => {
+        const recent = prev.filter((s) => time - s.time <= LIVE_WINDOW_MS);
+        const last = recent[recent.length - 1];
+        // Notifications arrive in bursts; one point per tick is enough
+        if (last && time - last.time < TICK_MS && last.temp === current) {
+          return recent;
+        }
+        return [...recent, { time, temp: current as number }];
+      });
+    }
 
     const sessionReading: SessionReading = {
       time,
-      temp: reading.current,
+      temp: reading.current ?? null,
       target: reading.target,
       heating: reading.heating,
       reached: reading.reached,

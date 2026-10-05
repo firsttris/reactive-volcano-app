@@ -4,6 +4,7 @@ import { Show } from "solid-js";
 import { Limits } from "../../devices/crafty/protocol";
 import { m } from "../../paraglide/messages";
 import { useCrafty } from "../../provider/CraftyProvider";
+import { isPlausibleTemp } from "../../utils/sessionHistory";
 import { TemperatureChart } from "../TemperatureChart";
 import {
   OffsetStepper,
@@ -16,11 +17,14 @@ import { Alert, AlertDescription } from "../ui/alert";
 
 export const Temperature = () => {
   const { state, actions, derived, isOldFirmware } = useCrafty();
+  // An "unknown" marker from the device must not show up as a temperature
+  const currentTemp = () =>
+    isPlausibleTemp(state.currentTemp) ? state.currentTemp : undefined;
 
   return (
     <>
       <TemperatureGauge
-        current={state.currentTemp}
+        current={currentTemp()}
         target={state.targetTemp}
         min={Limits.MIN_TEMP}
         max={Limits.MAX_TEMP}
@@ -30,7 +34,11 @@ export const Temperature = () => {
         maxLabel={`${Limits.MAX_TEMP}°`}
         targetLabel={`${state.targetTemp} °C`}
       >
-        <TemperatureDisplay value={state.currentTemp} unit="C" raisedUnit />
+        <TemperatureDisplay
+          value={currentTemp() ?? state.targetTemp}
+          unit="C"
+          raisedUnit
+        />
       </TemperatureGauge>
 
       <TargetStepper

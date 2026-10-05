@@ -7,7 +7,6 @@ import {
 import { useWakeLock } from "../../hooks/utils/useWakeLock";
 import { m } from "../../paraglide/messages";
 import { useVentyVeazy } from "../../provider/VentyVeazyProvider";
-import { TemperatureChart } from "../TemperatureChart";
 import { OffsetStepper, TargetStepper } from "../TemperatureControls";
 import { TemperatureDisplay } from "../TemperatureDisplay";
 import { TemperatureGauge } from "../TemperatureGauge";
@@ -73,8 +72,9 @@ export const Temperature = () => {
 
   return (
     <>
+      {/* The Venty/Veazy reports no current temperature (0x8000), like the
+          official app the gauge shows the effective target and its status */}
       <TemperatureGauge
-        current={state.status?.currentTemp ?? 0}
         target={effectiveCelsius()}
         min={Limits.MIN_TEMP}
         max={Limits.MAX_TEMP}
@@ -85,10 +85,7 @@ export const Temperature = () => {
         targetLabel={`${display.effectiveTemp()} °${unit()}`}
       >
         <TemperatureDisplay
-          value={toDisplayTemperature(
-            state.status?.currentTemp ?? 0,
-            isCelsius()
-          )}
+          value={display.effectiveTemp()}
           unit={unit()}
           raisedUnit
         />
@@ -156,12 +153,6 @@ export const Temperature = () => {
           onIncrease={() => adjustSuperBoostTemp(1)}
         />
       </div>
-
-      <TemperatureChart
-        target={effectiveCelsius()}
-        unit={unit()}
-        toDisplay={(celsius) => toDisplayTemperature(celsius, isCelsius())}
-      />
     </>
   );
 };

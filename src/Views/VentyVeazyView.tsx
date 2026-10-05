@@ -75,7 +75,7 @@ const VentyVeazyLiveSession = (props: { children: JSX.Element }) => {
           target += status.superBoostTemp;
         }
         return {
-          current: status?.currentTemp ?? 0,
+          // No current temperature: the device reports none (0x8000)
           target,
           heating,
           reached: heating && (status?.setpointReached ?? false),
