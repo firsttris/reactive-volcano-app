@@ -1,16 +1,26 @@
 name: Release
 
-# Pushing a tag vX.Y.Z (npm run release:minor) publishes that version through the shared Docker
-# release from firsttris/workflows: the tag must match package.json, the image is pushed as :x.y.z,
-# :x.y and :latest, the Docker Hub description is updated, then the GitHub release is created.
-# Run by hand on main: the image as :edge, nothing is released.
+# Pushing a tag vX.Y.Z (npm run release:minor, or the button in bump.yml) publishes that version:
+# the checks from build.yml first, then the shared Docker release from firsttris/workflows. The tag
+# must match package.json, the image is pushed as :x.y.z, :x.y and :latest, the Docker Hub
+# description is updated, then the GitHub release is created.
+# Run by hand on main: the same checks, then the image as :edge, nothing is released.
 on:
   push:
     tags: ["v*"]
   workflow_dispatch:
 
 jobs:
+  checks:
+    uses: ./.github/workflows/build.yml
+    # build.yml also holds the Pages deployment (only on main), which needs these
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
   docker:
+    needs: checks
     uses: firsttris/workflows/.github/workflows/docker-release.yml@v1
     with:
       image: tristanteu/reactive-volcano-app

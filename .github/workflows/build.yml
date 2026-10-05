@@ -10,6 +10,8 @@ on:
   pull_request:
     paths-ignore: ["**.md", "docs/**", "LICENSE"]
   workflow_dispatch:
+  # The release workflow runs the same checks before it publishes anything
+  workflow_call:
 
 permissions:
   contents: read
