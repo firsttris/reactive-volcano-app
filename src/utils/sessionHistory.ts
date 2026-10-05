@@ -1,7 +1,8 @@
 /** One reading of a connected device, temperatures in °C */
 export interface SessionReading {
   time: number;
-  temp: number;
+  /** null when the device does not measure it (Venty/Veazy) */
+  temp: number | null;
   target: number;
   heating: boolean;
   reached: boolean;
@@ -12,7 +13,7 @@ export interface SessionReading {
 export interface ActiveSession {
   startedAt: number;
   maxTarget: number;
-  peakTemp: number;
+  peakTemp: number | null;
   reachedAt: number | null;
   pumpCycles: number;
   wasPumping: boolean;
@@ -28,7 +29,8 @@ export interface Session {
   startedAt: number;
   durationSeconds: number;
   maxTarget: number;
-  peakTemp: number;
+  /** null when the device does not report its current temperature */
+  peakTemp: number | null;
   /** Seconds from heater on until the target was first reached */
   heatUpSeconds: number | null;
   pumpCycles: number;
@@ -41,38 +43,55 @@ export const SAMPLE_INTERVAL_MS = 5_000;
 export const MIN_SESSION_SECONDS = 30;
 export const MAX_STORED_SESSIONS = 300;
 export const MAX_SESSION_POINTS = 120;
+// Anything above is an "unknown" marker from the device, not a temperature
+export const MAX_PLAUSIBLE_TEMP = 300;
+
+export const isPlausibleTemp = (temp: number | null): temp is number =>
+  temp !== null &&
+  Number.isFinite(temp) &&
+  temp >= 0 &&
+  temp <= MAX_PLAUSIBLE_TEMP;
+
+const maxTemp = (a: number | null, b: number | null) => {
+  if (!isPlausibleTemp(b)) return a;
+  return a === null ? b : Math.max(a, b);
+};
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export const startSession = (reading: SessionReading): ActiveSession => ({
   startedAt: reading.time,
   maxTarget: reading.target,
-  peakTemp: reading.temp,
+  peakTemp: isPlausibleTemp(reading.temp) ? reading.temp : null,
   reachedAt: reading.reached ? reading.time : null,
   pumpCycles: reading.pumping ? 1 : 0,
   wasPumping: reading.pumping,
   lastSampleAt: reading.time,
-  samples: [[reading.time, reading.temp]],
+  samples: isPlausibleTemp(reading.temp) ? [[reading.time, reading.temp]] : [],
 });
 
 export const updateSession = (
   session: ActiveSession,
   reading: SessionReading
 ): ActiveSession => {
-  const takeSample = reading.time - session.lastSampleAt >= SAMPLE_INTERVAL_MS;
+  const temp = reading.temp;
+  const takeSample =
+    isPlausibleTemp(temp) &&
+    reading.time - session.lastSampleAt >= SAMPLE_INTERVAL_MS;
   return {
     ...session,
     maxTarget: Math.max(session.maxTarget, reading.target),
-    peakTemp: Math.max(session.peakTemp, reading.temp),
+    peakTemp: maxTemp(session.peakTemp, temp),
     reachedAt:
       session.reachedAt ?? (reading.reached ? reading.time : session.reachedAt),
     pumpCycles:
       session.pumpCycles + (reading.pumping && !session.wasPumping ? 1 : 0),
     wasPumping: reading.pumping,
     lastSampleAt: takeSample ? reading.time : session.lastSampleAt,
-    samples: takeSample
-      ? [...session.samples, [reading.time, reading.temp]]
-      : session.samples,
+    samples:
+      takeSample && isPlausibleTemp(temp)
+        ? [...session.samples, [reading.time, temp]]
+        : session.samples,
   };
 };
 
@@ -133,6 +152,20 @@ export const summarize = (sessions: Session[], now: number): HistorySummary => {
         : Math.round(heatUps.reduce((sum, s) => sum + s, 0) / heatUps.length),
   };
 };
+
+/**
+ * Drops "unknown" markers that earlier versions stored as temperatures
+ * (a Venty reports 0x8000, which read as 3277 °C)
+ */
+export const sanitizeSession = (session: Session): Session =>
+  isPlausibleTemp(session.peakTemp) &&
+  session.samples.every(([, temp]) => isPlausibleTemp(temp))
+    ? session
+    : {
+        ...session,
+        peakTemp: isPlausibleTemp(session.peakTemp) ? session.peakTemp : null,
+        samples: session.samples.filter(([, temp]) => isPlausibleTemp(temp)),
+      };
 
 /** Newest first, capped so storage stays small */
 export const addSession = (sessions: Session[], session: Session) =>

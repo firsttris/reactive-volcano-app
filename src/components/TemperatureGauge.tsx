@@ -20,19 +20,24 @@ import {
   type TemperatureSample,
 } from "../utils/heatProgress";
 import { alertTargetReached } from "../utils/notify";
+import { isPlausibleTemp } from "../utils/sessionHistory";
 import { deviceLabel } from "./AppHeader";
 import { Badge } from "./ui/badge";
 
 interface TemperatureGaugeProps {
-  /** Temperatures in °C, they drive the arc and the heating estimate */
-  current: number;
+  /**
+   * Temperatures in °C, they drive the arc and the heating estimate.
+   * Without a (plausible) current temperature, as on the Venty/Veazy, the
+   * gauge shows the target and relies on `heating` and `reached` alone.
+   */
+  current?: number;
   target: number;
   min: number;
   max: number;
   heating: boolean;
   /** Device-reported "setpoint reached", overrides the tolerance check */
   reached?: boolean;
-  /** The current temperature as shown, in the device's unit */
+  /** The temperature as shown (current, else target), in the device's unit */
   children: JSX.Element;
   /** The target as shown, e.g. "185 °C", for the notification */
   targetLabel: string;
@@ -65,8 +70,18 @@ export const TemperatureGauge = (props: TemperatureGaugeProps) => {
   const [samples, setSamples] = createSignal<TemperatureSample[]>([]);
   const [now, setNow] = createSignal(Date.now());
 
+  const measured = () => isPlausibleTemp(props.current ?? null);
+
   const status = (): HeatStatus => {
-    const computed = getHeatStatus(props.current, props.target, props.heating);
+    if (!measured()) {
+      if (!props.heating) return "off";
+      return props.reached ? "reached" : "heating";
+    }
+    const computed = getHeatStatus(
+      props.current as number,
+      props.target,
+      props.heating
+    );
     return props.reached && computed !== "off" ? "reached" : computed;
   };
 
@@ -82,6 +97,7 @@ export const TemperatureGauge = (props: TemperatureGaugeProps) => {
     on(
       () => props.current,
       (temp) => {
+        if (temp === undefined || !isPlausibleTemp(temp)) return;
         const time = Date.now();
         setNow(time);
         setSamples((prev) => [
@@ -163,7 +179,11 @@ export const TemperatureGauge = (props: TemperatureGaugeProps) => {
         aria-valuenow={Math.round(
           (status() === "off"
             ? 0
-            : getHeatProgress(props.current, props.target)) * 100
+            : measured()
+              ? getHeatProgress(props.current as number, props.target)
+              : status() === "reached"
+                ? 1
+                : 0) * 100
         )}
       >
         <svg
@@ -197,7 +217,7 @@ export const TemperatureGauge = (props: TemperatureGaugeProps) => {
             stroke-opacity={status() === "off" ? 0.35 : 1}
             stroke-width="12"
             stroke-linecap="round"
-            stroke-dasharray={`${ARC_LENGTH * fraction(props.current)} ${CIRCUMFERENCE}`}
+            stroke-dasharray={`${ARC_LENGTH * fraction(measured() ? (props.current as number) : props.target)} ${CIRCUMFERENCE}`}
             transform={`rotate(${START_ANGLE} ${CENTER} ${CENTER})`}
             class={cn(
               "transition-[stroke-dasharray] duration-700 ease-out",
@@ -208,19 +228,22 @@ export const TemperatureGauge = (props: TemperatureGaugeProps) => {
                 "fx:drop-shadow-[0_0_10px_var(--success-soft)] fx-strong:drop-shadow-[0_0_18px_var(--success)]"
             )}
           />
-          <circle
-            cx={marker().x}
-            cy={marker().y}
-            r="9"
-            fill="var(--background)"
-            stroke="var(--foreground)"
-            stroke-width="3"
-            class="transition-[cx,cy] duration-300"
-          />
+          {/* The target marker only makes sense next to a measured value */}
+          <Show when={measured()}>
+            <circle
+              cx={marker().x}
+              cy={marker().y}
+              r="9"
+              fill="var(--background)"
+              stroke="var(--foreground)"
+              stroke-width="3"
+              class="transition-[cx,cy] duration-300"
+            />
+          </Show>
         </svg>
         <div class="absolute inset-x-0 top-[24%] flex flex-col items-center gap-1">
           <span class="font-medium text-[11px] text-muted-foreground uppercase tracking-[0.14em]">
-            {m.temperature_now()}
+            {measured() ? m.temperature_now() : m.temperature_target()}
           </span>
           <span
             class={cn(

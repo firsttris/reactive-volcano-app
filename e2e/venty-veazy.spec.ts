@@ -76,3 +76,22 @@ test.describe("Venty/Veazy - Boost Control", () => {
     await expect(boostControl).toBeVisible({ timeout: 5000 });
   });
 });
+
+test.describe("Venty - Temperaturanzeige", () => {
+  test("sollte ohne Messwert die Zieltemperatur zeigen", async ({
+    page,
+    bluetoothDevice,
+  }) => {
+    // The device reports 0x8000 instead of a current temperature
+    await bluetoothDevice("VENTY");
+    await page.goto("/");
+    await page.locator('button:has-text("Connect")').first().click();
+    await page.waitForURL(/.*venty|veazy.*/i, { timeout: 5000 });
+
+    const gauge = page.getByRole("progressbar");
+    await expect(gauge).toContainText("Target Temperature");
+    await expect(gauge).toContainText("185");
+    await expect(page.getByText("3277")).toHaveCount(0);
+    await expect(page.getByText("Cooling down")).toHaveCount(0);
+  });
+});

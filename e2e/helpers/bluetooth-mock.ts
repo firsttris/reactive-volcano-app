@@ -509,7 +509,13 @@ export async function mockBluetooth(
                     write: true,
                     writeWithoutResponse: false,
                   },
-                  value: new Uint8Array([0x00, 0x00, 0xc8, 0x00, 0xb4, 0x00]), // Current 200°C, Target 180°C
+                  // Status response like a real Venty: no current
+                  // temperature (0x8000), target 185 °C, boost +15,
+                  // superboost +15, battery 52 %, heater on (normal mode)
+                  value: new Uint8Array([
+                    0x01, 0x00, 0x00, 0x80, 0x3a, 0x07, 0x0f, 0x0f, 0x34, 0x00,
+                    0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                  ]),
                 },
               },
             },

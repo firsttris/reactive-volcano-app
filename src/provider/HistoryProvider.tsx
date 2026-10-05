@@ -1,6 +1,16 @@
-import { type Accessor, createContext, type JSX, useContext } from "solid-js";
+import {
+  type Accessor,
+  createContext,
+  createMemo,
+  type JSX,
+  useContext,
+} from "solid-js";
 import { saveToDB, useIndexedDB } from "../hooks/utils/useIndexedDB";
-import { addSession, type Session } from "../utils/sessionHistory";
+import {
+  addSession,
+  type Session,
+  sanitizeSession,
+} from "../utils/sessionHistory";
 
 interface HistoryContextType {
   sessions: Accessor<Session[]>;
@@ -14,7 +24,8 @@ const HistoryContext = createContext<HistoryContextType>();
 
 /** Recorded heater sessions of all devices, kept in IndexedDB */
 export const HistoryProvider = (props: { children: JSX.Element }) => {
-  const [sessions, setSessions] = useIndexedDB<Session[]>(STORAGE_KEY, []);
+  const [stored, setSessions] = useIndexedDB<Session[]>(STORAGE_KEY, []);
+  const sessions = createMemo(() => stored().map(sanitizeSession));
   return (
     <HistoryContext.Provider
       value={{
