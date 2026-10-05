@@ -54,6 +54,7 @@ secure context, so Web Bluetooth works there. For another device on your network
 | `npm run test:e2e` | end-to-end tests (Playwright, starts the dev server) |
 | `npm run test:e2e:ui` / `test:e2e:debug` / `test:e2e:report` | Playwright UI mode, debugger, last report |
 | `npm run screenshots` | renders the images in `docs/` ([below](#updating-screenshots)) |
+| `npm run icons` | renders the app icons in `public/` from `scripts/icons/icon.svg` ([below](#app-icons)) |
 | `npm run i18n` | compiles `messages/*.json` into `src/paraglide` |
 | `npm run release:patch` / `minor` / `major` | bumps the version, tags and pushes ([Releases](releases.md)) |
 
@@ -218,6 +219,21 @@ it at a local Chromium: `CHROMIUM_PATH=/usr/bin/chromium npm run screenshots`.
 
 Edit `docs/banner.svg` by hand for the banner; the PNG is only there because GitHub and Docker Hub
 render PNG more reliably.
+
+## App icons
+
+Every icon (favicon, PWA icons, maskable icon, Apple touch icon) is rendered from one source,
+`scripts/icons/icon.svg`:
+
+```bash
+npm run icons
+```
+
+`scripts/icons/generate.mjs` writes `public/pwa-192x192.png`, `pwa-512x512.png`, the full-bleed
+`maskable-512x512.png` and `apple-touch-icon.png`, `favicon.ico` (16, 32 and 48 px) and `favicon.svg`.
+Keep the artwork inside the central circle (80 % of the width): Android crops maskable icons to a
+circle or squircle. `npm run screenshots` also refreshes `public/screenshots/`, which Android shows in
+the install dialog. Use `CHROMIUM_PATH` here as well if the bundled browser is missing.
 
 ---
 

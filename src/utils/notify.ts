@@ -88,7 +88,7 @@ const playChime = () => {
 const showNotification = async (title: string, body: string) => {
   const options: NotificationOptions = {
     body,
-    icon: `${import.meta.env.BASE_URL}android-chrome-192x192.png`,
+    icon: `${import.meta.env.BASE_URL}pwa-192x192.png`,
     tag: "target-reached",
   };
   // Mobile Chrome only allows notifications through the service worker

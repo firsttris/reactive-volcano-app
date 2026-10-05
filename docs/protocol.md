@@ -187,7 +187,7 @@ ADVERTISING_INFO, STATUS, EXTENDED_DATA, DEVICE_DATA and BRIGHTNESS_VIBRATION, t
 |---|---|
 | 0 | `0x01` |
 | 1 | write mask (writes only): `1<<1` target, `1<<2` boost, `1<<3` superboost, `1<<5` heater mode, `1<<7` settings |
-| 2–3 | current temperature, uint16, 1/10 °C |
+| 2–3 | current temperature, uint16, 1/10 °C; in practice always `0x8000` (not measured), so the app ignores it, like the official app |
 | 4–5 | target temperature, uint16, 1/10 °C, 40–210 °C |
 | 6 | boost offset, °C (1–99) |
 | 7 | superboost offset, °C (1–99) |

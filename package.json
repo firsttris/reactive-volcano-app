@@ -12,6 +12,7 @@
     "build": "npm run i18n && tsc && vite build --base=/reactive-volcano-app/",
     "build:root": "npm run i18n && tsc && vite build",
     "preview": "vite preview",
+    "icons": "node scripts/icons/generate.mjs",
     "test": "npm run i18n && vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
