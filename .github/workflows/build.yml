@@ -8,6 +8,7 @@ on:
     branches: ["main"]
     paths-ignore: ["**.md", "docs/**", "LICENSE"]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore: ["**.md", "docs/**", "LICENSE"]
   workflow_dispatch:
   # The release workflow runs the same checks before it publishes anything
@@ -27,6 +28,8 @@ env:
 jobs:
   check:
     name: Lint, unit tests & build
+    # Draft pull requests do not build; "Ready for review" starts the run
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -68,6 +71,7 @@ jobs:
   # read the version from the lockfile instead of hard-coding it here
   playwright-version:
     name: Playwright version
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -117,7 +121,7 @@ jobs:
   # Catches a broken Dockerfile before it breaks a release
   docker:
     name: Docker build
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && !github.event.pull_request.draft
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
