@@ -67,9 +67,11 @@ support. Check with the manufacturer if that matters to you.
 ### License
 
 The source code and documentation are licensed under the
-[Creative Commons Attribution-NonCommercial 4.0 International License](../LICENSE) (CC BY-NC 4.0).
+[GNU Affero General Public License 3.0](../LICENSE) (AGPL-3.0); versions up to v1.0.4 were released under
+CC BY-NC 4.0. Whoever passes on a changed version or runs it for others has to offer its source code under
+the AGPL and keep the author attribution (see [NOTICE](../NOTICE)). A commercial license without these
+obligations is available via [teufel-it.de](https://teufel-it.de).
 Third-party libraries keep their own licenses (see `package.json` and `node_modules/*/LICENSE`).
-Commercial use, including selling the app or offering it as part of a paid service, is not permitted.
 
 ### Privacy
 
@@ -149,9 +151,10 @@ auswirken. Kläre das bei Bedarf mit dem Hersteller.
 ### Lizenz
 
 Quellcode und Dokumentation stehen unter der
-[Creative Commons Namensnennung – Nicht kommerziell 4.0 International](../LICENSE) (CC BY-NC 4.0).
-Bibliotheken Dritter behalten ihre eigenen Lizenzen. Eine kommerzielle Nutzung, auch der Verkauf der App
-oder ihr Einsatz in einem kostenpflichtigen Dienst, ist nicht gestattet.
+[GNU Affero General Public License 3.0](../LICENSE) (AGPL-3.0); bis v1.0.4 galt CC BY-NC 4.0. Wer eine
+veränderte Version weitergibt oder für andere betreibt, muss ihren Quellcode unter der AGPL anbieten und die
+Nennung des Autors erhalten (siehe [NOTICE](../NOTICE)). Eine kommerzielle Lizenz ohne diese Pflichten gibt es
+über [teufel-it.de](https://teufel-it.de). Bibliotheken Dritter behalten ihre eigenen Lizenzen.
 
 ### Datenschutz
 

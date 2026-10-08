@@ -41,4 +41,4 @@ this repository. See the [legal notice](docs/legal.md).
 ## License
 
 By contributing you agree that your contribution is licensed under the project's
-[CC BY-NC 4.0](LICENSE) license.
+[AGPL-3.0](LICENSE) license (see [NOTICE](NOTICE)).

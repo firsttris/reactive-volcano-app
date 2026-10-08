@@ -1,0 +1,28 @@
+Reactive Volcano App
+Copyright (C) 2023 Tristan Teufel and contributors
+
+Reactive Volcano App is free software: you can redistribute it and/or modify it under the
+terms of the GNU Affero General Public License, version 3, as published by the Free Software
+Foundation (see LICENSE). It comes without any warranty.
+
+Additional terms under section 7(b) of the license
+--------------------------------------------------
+
+Modified versions of Reactive Volcano App, and works based on it, must preserve the author
+attribution "Reactive Volcano App by Tristan Teufel" together with a link to
+https://github.com/firsttris/reactive-volcano-app in the Appropriate Legal Notices they
+display, at least wherever the original shows its author and source code link.
+
+Commercial license
+------------------
+
+To use Reactive Volcano App without the obligations of the AGPL, for example in a
+closed-source product or service, ask for a commercial license:
+https://teufel-it.de
+
+Earlier versions
+----------------
+
+Versions up to and including v1.0.4 were released under the Creative Commons
+Attribution-NonCommercial 4.0 International License and remain available
+under it.

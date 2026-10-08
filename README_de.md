@@ -12,7 +12,7 @@ Kein App-Store, kein Konto, kein Server: Seite öffnen, verbinden, fertig.
 [![Docker Image Version](https://img.shields.io/docker/v/tristanteu/reactive-volcano-app?sort=semver&logo=docker&logoColor=white&label=Docker%20Hub)](https://hub.docker.com/r/tristanteu/reactive-volcano-app)
 [![Docker Pulls](https://img.shields.io/docker/pulls/tristanteu/reactive-volcano-app?logo=docker&logoColor=white)](https://hub.docker.com/r/tristanteu/reactive-volcano-app)
 [![Plattformen](https://img.shields.io/badge/Plattform-amd64%20%7C%20arm64-lightgrey)](https://hub.docker.com/r/tristanteu/reactive-volcano-app/tags)
-[![Lizenz: CC BY-NC 4.0](https://img.shields.io/badge/Lizenz-CC%20BY--NC%204.0-lightgrey)](LICENSE)
+[![Lizenz: AGPL-3.0](https://img.shields.io/badge/Lizenz-AGPL--3.0-blue)](LICENSE)
 <br>
 [![SolidJS](https://img.shields.io/badge/SolidJS-1.9-2c4f7c?logo=solid&logoColor=white)](https://www.solidjs.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -223,7 +223,8 @@ Am meisten helfen Rückmeldungen von echten Geräten: bitte Gerät, Firmware-Ver
 🐛 [Fehler melden](https://github.com/firsttris/reactive-volcano-app/issues/new) · 💡 [Idee vorschlagen](https://github.com/firsttris/reactive-volcano-app/issues/new)
 
 <sub>
-<a href="LICENSE">CC BY-NC 4.0</a> · © Tristan Teufel und Mitwirkende · <a href="README.md">English version</a><br>
+<a href="LICENSE">AGPL-3.0</a> (bis v1.0.4 CC BY-NC 4.0) · © Tristan Teufel und Mitwirkende · <a href="README.md">English version</a><br>
+Wer eine veränderte Version weitergibt oder für andere betreibt, muss ihren Quellcode unter der AGPL anbieten; eine kommerzielle Lizenz ohne diese Pflichten gibt es über <a href="https://teufel-it.de">teufel-it.de</a>.<br>
 Unabhängiges, inoffizielles Open-Source-Projekt. Es steht in keiner Verbindung zur Storz &amp; Bickel GmbH und wird von ihr weder unterstützt, gesponsert noch autorisiert.<br>
 STORZ &amp; BICKEL, VOLCANO, VOLCANO HYBRID, VENTY, VEAZY und CRAFTY sind Marken der Storz &amp; Bickel GmbH und werden nur zur Beschreibung der Kompatibilität genannt.<br>
 Bereitgestellt „wie besehen“, ohne Gewährleistung. Nutzung auf eigene Gefahr. <a href="docs/legal.md">Rechtliche Hinweise</a>
