@@ -80,6 +80,10 @@ export default defineConfig({
         // the Apple touch icon are only read when installing, which needs a
         // connection anyway (pwa-192x192.png stays: notifications use it)
         globPatterns: ["**/*.{js,css,html,svg,png,ico}", "**/*latin*.woff2"],
+        // The documentation website is published next to the app under /docs/
+        // (build.yml); it is not an app route, so the service worker must not
+        // answer it with the app's index.html
+        navigateFallbackDenylist: [/\/docs\//],
         globIgnores: [
           "**/*-legacy-*.js",
           "screenshots/**",

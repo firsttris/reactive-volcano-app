@@ -1,0 +1,22 @@
+/* Colors of the app (src/css/main.css --primary): orange 600, orange 500 in the dark theme */
+:root {
+  --md-primary-fg-color: #ea580c;
+  --md-primary-fg-color--light: #f97316;
+  --md-primary-fg-color--dark: #c2410c;
+  --md-accent-fg-color: #c2410c;
+}
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #f97316;
+  --md-accent-fg-color: #fb923c;
+}
+/* Screenshots: rounded with a shadow, never wider than the text */
+.md-typeset img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+/* Wide tables (features, protocol frames, browsers per platform) */
+.md-typeset table:not([class]) {
+  font-size: 0.75rem;
+}

@@ -1,7 +1,8 @@
 # Releases & deployment
 
 The app is delivered two ways: the hosted web app on GitHub Pages, updated on every push to `main`, and
-versioned Docker images on Docker Hub, published from tags.
+versioned Docker images on Docker Hub, published from tags. The documentation website is published
+next to the app on GitHub Pages.
 
 ## Contents
 
@@ -19,13 +20,20 @@ versioned Docker images on Docker Hub, published from tags.
 |---|---|
 | URL | https://firsttris.github.io/reactive-volcano-app/ |
 | Workflow | [`.github/workflows/build.yml`](../.github/workflows/build.yml) |
-| Trigger | push to `main` (except changes to Markdown, `docs/` or `LICENSE` only), or by hand; pull requests run the checks without deploying |
+| Trigger | push to `main` (except changes to the README files, `CONTRIBUTING.md` or `LICENSE` only), or by hand; pull requests run the checks without deploying |
 | Build | `npm run build` with base `/reactive-volcano-app/` |
 | SPA fallback | `dist/index.html` is copied to `dist/404.html`, so deep links survive a reload |
+| Documentation | https://firsttris.github.io/reactive-volcano-app/docs/, built from `docs/` with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) (`mkdocs.yml`) and copied to `dist/docs/` before the deployment |
 
-Unit and end-to-end tests must pass before the build and deployment run
+Unit and end-to-end tests and the documentation build must pass before the deployment runs
 ([Continuous integration](testing.md#continuous-integration)). Users receive the new version through the
-service worker the next time they open the app.
+service worker the next time they open the app. The service worker leaves `/docs/` alone
+(`navigateFallbackDenylist` in `vite.config.ts`), so the documentation is served as it is, not as the app.
+
+The documentation website needs no setup beyond the Pages source *GitHub Actions*, which the app
+already uses. Links from `docs/` to files outside it, such as `../README.md`, are turned into links to
+GitHub while the site is built (`docs/hooks/repo_links.py`), so the Markdown works on GitHub and on the
+website alike.
 
 ## Versioning
 

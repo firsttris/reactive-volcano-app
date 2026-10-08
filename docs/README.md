@@ -1,7 +1,8 @@
 # Documentation
 
 Everything about the Reactive Vaporizer App in detail: how to use it, how to host it, and how it works
-inside. The quick overview is in the [README](../README.md).
+inside. The quick overview is in the [README](../README.md). Also as a website with search:
+**https://firsttris.github.io/reactive-volcano-app/docs/**
 
 > This is an independent, unofficial project with no connection to Storz & Bickel GmbH.
 > See the [legal notice](legal.md).
