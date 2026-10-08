@@ -13,6 +13,7 @@
     "build:root": "npm run typecheck && vite build",
     "preview": "vite preview",
     "icons": "node scripts/icons/generate.mjs",
+    "social-preview": "node scripts/social-preview/render.mjs",
     "test": "npm run i18n && vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
