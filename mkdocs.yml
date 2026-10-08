@@ -2,7 +2,7 @@
 # Source is docs/, built with MkDocs Material by the docs job in .github/workflows/build.yml
 # and published next to the app on GitHub Pages.
 # Locally: pip install -r requirements-docs.txt && mkdocs serve
-site_name: Reactive Vaporizer App
+site_name: Reactive Volcano App
 site_description: >-
   Control compatible vaporizers (Volcano Hybrid, Venty, Veazy, Crafty) from the browser
   over Web Bluetooth: live temperature, heater and pump, workflows, settings and self-diagnosis.
