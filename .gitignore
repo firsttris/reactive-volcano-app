@@ -37,3 +37,6 @@ src/paraglide
 
 # MkDocs build (mkdocs build)
 site/
+
+# Python bytecode of the MkDocs hook (docs/hooks/)
+__pycache__/
