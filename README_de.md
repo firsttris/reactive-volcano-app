@@ -18,14 +18,14 @@ Kein App-Store, kein Konto, kein Server: Seite öffnen, verbinden, fertig.
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)](https://vite.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![PWA](https://img.shields.io/badge/PWA-installierbar-5a0fc8?logo=pwa&logoColor=white)](docs/getting-started.md#install-as-an-app)
+[![PWA](https://img.shields.io/badge/PWA-installierbar-5a0fc8?logo=pwa&logoColor=white)](https://firsttris.github.io/reactive-volcano-app/docs/getting-started.html#install-as-an-app)
 
 [**▶ App öffnen**](https://firsttris.github.io/reactive-volcano-app/) •
 [Warum?](#-warum) •
 [Funktionen](#-funktionen) •
 [Loslegen](#-loslegen) •
 [Selbst hosten](#-selbst-hosten) •
-[Dokumentation](docs/README.md) •
+[Dokumentation](https://firsttris.github.io/reactive-volcano-app/docs/) •
 [Entwicklung](#️-entwicklung)
 
 <img src="docs/hero.png" alt="Die Steuerung für einen Tisch-Vaporizer, ein Handgerät mit Boost-Modi und ein Handgerät mit Akkuanzeige" width="900">
@@ -39,7 +39,7 @@ Kein App-Store, kein Konto, kein Server: Seite öffnen, verbinden, fertig.
 > wird von ihr weder unterstützt noch autorisiert. *VOLCANO*, *VENTY*, *VEAZY*, *CRAFTY* und
 > *STORZ & BICKEL* sind Marken ihres jeweiligen Inhabers und werden hier nur genannt, um zu beschreiben,
 > mit welchen Geräten die App kompatibel ist. Offizielle App, Firmware und Support gibt es beim
-> Hersteller. Siehe [Rechtliche Hinweise](docs/legal.md).
+> Hersteller. Siehe [Rechtliche Hinweise](https://firsttris.github.io/reactive-volcano-app/docs/legal.html).
 
 ## 💡 Warum?
 
@@ -86,7 +86,7 @@ Boost, Helligkeit und Akku funktionieren, der Rest wird ausgeblendet.
 **In der ganzen App**: hell und dunkel (folgt dem System), Deutsch und Englisch (folgt dem Browser),
 installierbare PWA mit Offline-Start, der Bildschirm bleibt an, solange geheizt wird oder ein Workflow
 läuft, klare Meldungen, wenn die Verbindung abreißt. Jede Seite ist in der
-[Bedienung](docs/usage.md) beschrieben (englisch).
+[Bedienung](https://firsttris.github.io/reactive-volcano-app/docs/usage.html) beschrieben (englisch).
 
 ## 📸 Screenshots
 
@@ -116,11 +116,11 @@ läuft, klare Meldungen, wenn die Verbindung abreißt. Jede Seite ist in der
 | Plattform | Funktioniert mit | Hinweis |
 |---|---|---|
 | Android, Windows, macOS, ChromeOS | Chrome, Edge, Opera | Web Bluetooth ist standardmäßig an |
-| Linux | Chrome, Chromium | einmal `chrome://flags/#enable-web-bluetooth` aktivieren, siehe [Getting started](docs/getting-started.md#linux) |
+| Linux | Chrome, Chromium | einmal `chrome://flags/#enable-web-bluetooth` aktivieren, siehe [Getting started](https://firsttris.github.io/reactive-volcano-app/docs/getting-started.html#linux) |
 | iOS, iPadOS | [Bluefy](https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055) | Safari kann kein Web Bluetooth |
 | Firefox, Safari | ❌ | kein Web Bluetooth |
 
-Gerät wird nicht gefunden? Die [Fehlersuche](docs/troubleshooting.md) beginnt mit Chromes eingebauter
+Gerät wird nicht gefunden? Die [Fehlersuche](https://firsttris.github.io/reactive-volcano-app/docs/troubleshooting.html) beginnt mit Chromes eingebauter
 Seite `chrome://bluetooth-internals` und zeigt in drei Schritten, ob Adapter, Browser oder Gerät das
 Problem ist.
 
@@ -134,7 +134,7 @@ docker run -d --name vaporizer-app -p 8080:8080 --restart unless-stopped tristan
 ```
 
 Der Container betreibt nginx ohne Root-Rechte und lauscht auf Port **8080** (ältere Images: 80, siehe
-[Aktualisieren](docs/self-hosting.md#updates)).
+[Aktualisieren](https://firsttris.github.io/reactive-volcano-app/docs/self-hosting.html#updates)).
 
 <details>
 <summary><b>Docker Compose</b></summary>
@@ -165,27 +165,27 @@ systemctl --user daemon-reload && systemctl --user start volcano-app
 > Browser erlauben Bluetooth nur in einem **sicheren Kontext**: `https://…` oder `http://localhost`.
 > Wer seine Instanz von einem anderen Gerät aus nutzen will, braucht einen Reverse Proxy mit HTTPS.
 > Beispiele für Caddy, nginx und Traefik und den Betrieb unter einem Unterpfad stehen in
-> [Self-hosting](docs/self-hosting.md).
+> [Self-hosting](https://firsttris.github.io/reactive-volcano-app/docs/self-hosting.html).
 
 ## 📚 Dokumentation
 
-Die ausführliche Dokumentation ist auf Englisch: [docs/README.md](docs/README.md), auch als Website
+Die ausführliche Dokumentation ist auf Englisch: [docs/README.md](https://firsttris.github.io/reactive-volcano-app/docs/), auch als Website
 mit Suche: **https://firsttris.github.io/reactive-volcano-app/docs/**
 
 | | |
 |---|---|
-| [Getting started](docs/getting-started.md) | Browser, Linux-Flag, iOS, Verbinden, als App installieren, Updates |
-| [Usage](docs/usage.md) | jede Seite je Gerät: Steuerung, Boost, Einstellungen, Diagnose, Gerät finden |
-| [Workflows](docs/workflows.md) | Ablauf eines Workflows, Bearbeiten, JSON-Format für Import und Export |
-| [Self-hosting](docs/self-hosting.md) | Docker, Compose, Podman, HTTPS mit Caddy / nginx / Traefik, Unterpfade |
-| [Troubleshooting & FAQ](docs/troubleshooting.md) | Gerät nicht gefunden, Verbindungsabbrüche, Linux, iOS, häufige Fragen |
-| [Privacy & security](docs/privacy-security.md) | was die App speichert, was sie sendet (nichts), Berechtigungen |
-| [Architecture](docs/architecture.md) | Schichten, Datenfluss, Bluetooth-Queue, Stores, Routing, PWA, Entscheidungen |
-| [Bluetooth protocol](docs/protocol.md) | Services, Characteristics und Kodierung je Gerätefamilie |
-| [Development](docs/development.md) | Einrichtung, Skripte, Projektstruktur, Konventionen, Übersetzungen, neues Gerät |
-| [Testing](docs/testing.md) | Unit-Tests, Bluetooth-Mock, End-to-End-Tests, Screenshots, CI |
-| [Releases & deployment](docs/releases.md) | GitHub Pages, Versionen, Docker-Images, Release-Workflow |
-| [Legal notice](docs/legal.md) | Marken, keine Verbindung zum Hersteller, keine Gewährleistung, Sicherheit, Lizenz |
+| [Getting started](https://firsttris.github.io/reactive-volcano-app/docs/getting-started.html) | Browser, Linux-Flag, iOS, Verbinden, als App installieren, Updates |
+| [Usage](https://firsttris.github.io/reactive-volcano-app/docs/usage.html) | jede Seite je Gerät: Steuerung, Boost, Einstellungen, Diagnose, Gerät finden |
+| [Workflows](https://firsttris.github.io/reactive-volcano-app/docs/workflows.html) | Ablauf eines Workflows, Bearbeiten, JSON-Format für Import und Export |
+| [Self-hosting](https://firsttris.github.io/reactive-volcano-app/docs/self-hosting.html) | Docker, Compose, Podman, HTTPS mit Caddy / nginx / Traefik, Unterpfade |
+| [Troubleshooting & FAQ](https://firsttris.github.io/reactive-volcano-app/docs/troubleshooting.html) | Gerät nicht gefunden, Verbindungsabbrüche, Linux, iOS, häufige Fragen |
+| [Privacy & security](https://firsttris.github.io/reactive-volcano-app/docs/privacy-security.html) | was die App speichert, was sie sendet (nichts), Berechtigungen |
+| [Architecture](https://firsttris.github.io/reactive-volcano-app/docs/architecture.html) | Schichten, Datenfluss, Bluetooth-Queue, Stores, Routing, PWA, Entscheidungen |
+| [Bluetooth protocol](https://firsttris.github.io/reactive-volcano-app/docs/protocol.html) | Services, Characteristics und Kodierung je Gerätefamilie |
+| [Development](https://firsttris.github.io/reactive-volcano-app/docs/development.html) | Einrichtung, Skripte, Projektstruktur, Konventionen, Übersetzungen, neues Gerät |
+| [Testing](https://firsttris.github.io/reactive-volcano-app/docs/testing.html) | Unit-Tests, Bluetooth-Mock, End-to-End-Tests, Screenshots, CI |
+| [Releases & deployment](https://firsttris.github.io/reactive-volcano-app/docs/releases.html) | GitHub Pages, Versionen, Docker-Images, Release-Workflow |
+| [Legal notice](https://firsttris.github.io/reactive-volcano-app/docs/legal.html) | Marken, keine Verbindung zum Hersteller, keine Gewährleistung, Sicherheit, Lizenz |
 
 ## 🛠️ Entwicklung
 
@@ -202,8 +202,8 @@ Web-Bluetooth-Stack laufen; mit `npm run test:e2e:ui` kann man sich durchklicken
 
 **Stack**: SolidJS mit `@solidjs/router` · Tailwind CSS 4 und [solid-ui](https://www.solid-ui.com)
 (Kobalte) · Paraglide JS für Deutsch und Englisch · `p-queue`, das jeden GATT-Zugriff serialisiert ·
-`vite-plugin-pwa` · Vitest, Playwright und Biome. Mehr in [Development](docs/development.md) und
-[Architecture](docs/architecture.md).
+`vite-plugin-pwa` · Vitest, Playwright und Biome. Mehr in [Development](https://firsttris.github.io/reactive-volcano-app/docs/development.html) und
+[Architecture](https://firsttris.github.io/reactive-volcano-app/docs/architecture.html).
 
 ```bash
 npm run typecheck && npm run lint && npm test && npm run test:e2e

@@ -1,0 +1,76 @@
+<!doctype html>
+<!-- Template for the repository's social preview (Settings → Social preview), 1280 × 640.
+     Render: npm run social-preview → docs/social-preview.png -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face {
+    font-family: "Geist";
+    src: url("../../node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2") format("woff2");
+    font-weight: 100 900;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1280px; height: 640px; overflow: hidden; }
+  body {
+    position: relative;
+    font-family: Geist, ui-sans-serif, system-ui, sans-serif;
+    color: #fafafa;
+    background:
+      radial-gradient(55% 70% at 78% 18%, rgba(249,115,22,.30), transparent 70%),
+      radial-gradient(40% 50% at 0% 100%, rgba(194,65,12,.22), transparent 70%),
+      linear-gradient(160deg, #141416, #09090b);
+  }
+  .text { position: absolute; left: 64px; top: 0; bottom: 0; width: 560px;
+          display: flex; flex-direction: column; justify-content: center; }
+  .head { display: flex; align-items: center; gap: 20px; }
+  .head img { width: 80px; height: 80px; border-radius: 18px;
+              box-shadow: 0 10px 34px rgba(249,115,22,.45); }
+  h1 { font-size: 54px; font-weight: 700; letter-spacing: -1.6px; line-height: 1.02; }
+  .sub { margin-top: 30px; font-size: 26px; line-height: 1.35; color: #d4d4d8; letter-spacing: -.2px; }
+  .sub b { color: #fafafa; font-weight: 600; }
+  .chips { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    font-size: 16px; font-weight: 500; color: #e4e4e7; padding: 8px 15px; border-radius: 999px;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .chip i { width: 8px; height: 8px; border-radius: 50%; background: #f97316; }
+  .note { margin-top: 28px; font-size: 14px; color: #71717a; }
+  .phones { position: absolute; right: -10px; top: 46px; width: 640px; height: 640px; }
+  .phone {
+    position: absolute; width: 250px; border-radius: 34px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,.14);
+    box-shadow: 0 30px 70px rgba(0,0,0,.6);
+  }
+  .phone img { width: 100%; display: block; }
+  .p1 { left: 20px;  top: 70px; transform: rotate(-6deg); opacity: .92; }
+  .p3 { left: 360px; top: 70px; transform: rotate(6deg);  opacity: .92; }
+  .p2 { left: 190px; top: 0; width: 270px; z-index: 2; }
+  .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 170px; z-index: 3;
+          background: linear-gradient(180deg, transparent, #0a0a0c 85%); }
+</style>
+</head>
+<body>
+  <div class="text">
+    <div class="head">
+      <img src="../icons/icon.svg" alt="">
+      <h1>Reactive<br>Volcano App</h1>
+    </div>
+    <p class="sub">Control your <b>Volcano Hybrid</b>, <b>Venty</b>, <b>Veazy</b> and <b>Crafty</b> from the browser over Web Bluetooth.</p>
+    <div class="chips">
+      <span class="chip"><i></i>Live temperature</span>
+      <span class="chip"><i></i>Heat-up workflows</span>
+      <span class="chip"><i></i>Installable PWA</span>
+      <span class="chip"><i></i>No account, no server</span>
+    </div>
+    <p class="note">Unofficial, open-source project · not affiliated with Storz &amp; Bickel</p>
+  </div>
+  <div class="phones">
+    <div class="phone p1"><img src="../../docs/screenshot-volcano.png" alt=""></div>
+    <div class="phone p3"><img src="../../docs/screenshot-crafty.png" alt=""></div>
+    <div class="phone p2"><img src="../../docs/screenshot-venty.png" alt=""></div>
+    <div class="fade"></div>
+  </div>
+</body>
+</html>

@@ -17,6 +17,8 @@ adding a device and debugging on a phone.
 - [Working without a device](#working-without-a-device)
 - [Debugging on Android](#debugging-on-android)
 - [Updating screenshots](#updating-screenshots)
+- [App icons](#app-icons)
+- [Social preview](#social-preview)
 
 ## Requirements
 
@@ -55,6 +57,7 @@ secure context, so Web Bluetooth works there. For another device on your network
 | `npm run test:e2e:ui` / `test:e2e:debug` / `test:e2e:report` | Playwright UI mode, debugger, last report |
 | `npm run screenshots` | renders the images in `docs/` ([below](#updating-screenshots)) |
 | `npm run icons` | renders the app icons in `public/` from `scripts/icons/icon.svg` ([below](#app-icons)) |
+| `npm run social-preview` | renders `docs/social-preview.png` ([below](#social-preview)) |
 | `npm run i18n` | compiles `messages/*.json` into `src/paraglide` |
 | `npm run release:patch` / `minor` / `major` | bumps the version, tags and pushes ([Releases](releases.md)) |
 
@@ -241,6 +244,19 @@ npm run icons
 Keep the artwork inside the central circle (80 % of the width): Android crops maskable icons to a
 circle or squircle. `npm run screenshots` also refreshes `public/screenshots/`, which Android shows in
 the install dialog. Use `CHROMIUM_PATH` here as well if the bundled browser is missing.
+
+## Social preview
+
+The image GitHub shows when the repository is shared (1280 × 640) is rendered from
+`scripts/social-preview/social-preview.html`, with the icon and the screenshots from `docs/`:
+
+```bash
+npm run social-preview
+```
+
+It writes `docs/social-preview.png`. Upload it under *Settings → General → Social preview*; GitHub does
+not read it from the repository. Render it again after `npm run screenshots` or a change to the icon.
+`CHROMIUM_PATH` works here too.
 
 ---
 
