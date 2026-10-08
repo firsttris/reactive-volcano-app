@@ -10,7 +10,7 @@
 
 ### No affiliation
 
-Reactive Vaporizer App ("the app", repository `reactive-volcano-app`) is an **independent, unofficial,
+Reactive Volcano App ("the app", repository `reactive-volcano-app`) is an **independent, unofficial,
 non-commercial open-source project** maintained by private individuals. It is **not affiliated with,
 endorsed, sponsored, authorized, reviewed or supported by Storz & Bickel GmbH** or any of its parent,
 subsidiary or affiliated companies.
@@ -90,7 +90,7 @@ good faith, and content will be changed or removed where justified.
 
 ### Keine Verbindung zum Hersteller
 
-Die Reactive Vaporizer App („die App“, Repository `reactive-volcano-app`) ist ein **unabhängiges,
+Die Reactive Volcano App („die App“, Repository `reactive-volcano-app`) ist ein **unabhängiges,
 inoffizielles, nicht kommerzielles Open-Source-Projekt** von Privatpersonen. Sie steht **in keiner
 Verbindung zur Storz & Bickel GmbH** oder mit ihr verbundenen Unternehmen und wird von diesen **weder
 unterstützt, gesponsert, autorisiert, geprüft noch betreut**.

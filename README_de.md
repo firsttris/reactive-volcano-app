@@ -1,7 +1,10 @@
 <div align="center">
 
+# Reactive Volcano App
+
 **Steuere deinen Vaporizer direkt aus dem Browser.**<br>
-Live-Temperatur, Heizung und Pumpe, Aufheiz-Workflows, Geräteeinstellungen und Selbstdiagnose per Web Bluetooth.<br>
+Inoffizielle Web-Bluetooth-App für Volcano Hybrid, Venty, Veazy und Crafty von Storz & Bickel:
+Live-Temperatur, Heizung und Pumpe, Aufheiz-Workflows, Geräteeinstellungen und Selbstdiagnose.<br>
 Kein App-Store, kein Konto, kein Server: Seite öffnen, verbinden, fertig.
 
 [![Build](https://github.com/firsttris/reactive-volcano-app/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/firsttris/reactive-volcano-app/actions/workflows/build.yml)
@@ -40,10 +43,10 @@ Kein App-Store, kein Konto, kein Server: Seite öffnen, verbinden, fertig.
 
 ## 💡 Warum?
 
-Kompatible Vaporizer sprechen Bluetooth Low Energy, und moderne Browser können über die
-[Web Bluetooth API](https://developer.mozilla.org/docs/Web/API/Web_Bluetooth_API) direkt mit ihnen
+Volcano Hybrid, Venty, Veazy und Crafty sprechen Bluetooth Low Energy, und moderne Browser können über
+die [Web Bluetooth API](https://developer.mozilla.org/docs/Web/API/Web_Bluetooth_API) direkt mit ihnen
 reden. Dieses Projekt macht daraus eine schnelle, aufgeräumte App, die überall läuft, wo Chrome oder
-Edge läuft:
+Edge läuft, als Alternative zur App des Herstellers:
 
 - **Nichts zu installieren**: eine Webseite, die auf Wunsch als App auf dem Startbildschirm landet.
   Läuft auf Android, Windows, macOS, ChromeOS und Linux, auf iOS mit einem Web-Bluetooth-Browser.
