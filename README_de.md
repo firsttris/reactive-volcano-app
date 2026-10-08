@@ -223,7 +223,7 @@ Am meisten helfen Rückmeldungen von echten Geräten: bitte Gerät, Firmware-Ver
 🐛 [Fehler melden](https://github.com/firsttris/reactive-volcano-app/issues/new) · 💡 [Idee vorschlagen](https://github.com/firsttris/reactive-volcano-app/issues/new)
 
 <sub>
-<a href="LICENSE">AGPL-3.0</a> (bis v1.0.4 CC BY-NC 4.0) · © Tristan Teufel und Mitwirkende · <a href="README.md">English version</a><br>
+<a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel und Mitwirkende · <a href="README.md">English version</a><br>
 Wer eine veränderte Version weitergibt oder für andere betreibt, muss ihren Quellcode unter der AGPL anbieten; eine kommerzielle Lizenz ohne diese Pflichten gibt es über <a href="https://teufel-it.de">teufel-it.de</a>.<br>
 Unabhängiges, inoffizielles Open-Source-Projekt. Es steht in keiner Verbindung zur Storz &amp; Bickel GmbH und wird von ihr weder unterstützt, gesponsert noch autorisiert.<br>
 STORZ &amp; BICKEL, VOLCANO, VOLCANO HYBRID, VENTY, VEAZY und CRAFTY sind Marken der Storz &amp; Bickel GmbH und werden nur zur Beschreibung der Kompatibilität genannt.<br>

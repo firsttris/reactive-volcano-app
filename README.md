@@ -217,7 +217,7 @@ your browser and operating system.
 🐛 [Report a bug](https://github.com/firsttris/reactive-volcano-app/issues/new) · 💡 [Request a feature](https://github.com/firsttris/reactive-volcano-app/issues/new)
 
 <sub>
-<a href="LICENSE">AGPL-3.0</a> (CC BY-NC 4.0 up to v1.0.4) · © Tristan Teufel and contributors · <a href="README_de.md">Deutsche Version</a><br>
+<a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel and contributors · <a href="README_de.md">Deutsche Version</a><br>
 Changed versions you pass on or run for others must offer their source code under the AGPL; a commercial license without these obligations is available via <a href="https://teufel-it.de">teufel-it.de</a>.<br>
 This is an independent, unofficial open-source project. It is not affiliated with, endorsed, sponsored or authorized by Storz &amp; Bickel GmbH.<br>
 STORZ &amp; BICKEL, VOLCANO, VOLCANO HYBRID, VENTY, VEAZY and CRAFTY are trademarks of Storz &amp; Bickel GmbH, used only to describe compatibility.<br>

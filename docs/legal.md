@@ -67,9 +67,8 @@ support. Check with the manufacturer if that matters to you.
 ### License
 
 The source code and documentation are licensed under the
-[GNU Affero General Public License 3.0](../LICENSE) (AGPL-3.0); versions up to v1.0.4 were released under
-CC BY-NC 4.0. Whoever passes on a changed version or runs it for others has to offer its source code under
-the AGPL and keep the author attribution (see [NOTICE](../NOTICE)). A commercial license without these
+[GNU Affero General Public License 3.0](../LICENSE) (AGPL-3.0). Whoever passes on a changed version or runs
+it for others has to offer its source code under the AGPL and keep the author attribution (see [NOTICE](../NOTICE)). A commercial license without these
 obligations is available via [teufel-it.de](https://teufel-it.de).
 Third-party libraries keep their own licenses (see `package.json` and `node_modules/*/LICENSE`).
 
@@ -151,8 +150,8 @@ auswirken. Kläre das bei Bedarf mit dem Hersteller.
 ### Lizenz
 
 Quellcode und Dokumentation stehen unter der
-[GNU Affero General Public License 3.0](../LICENSE) (AGPL-3.0); bis v1.0.4 galt CC BY-NC 4.0. Wer eine
-veränderte Version weitergibt oder für andere betreibt, muss ihren Quellcode unter der AGPL anbieten und die
+[GNU Affero General Public License 3.0](../LICENSE) (AGPL-3.0). Wer eine veränderte
+Version weitergibt oder für andere betreibt, muss ihren Quellcode unter der AGPL anbieten und die
 Nennung des Autors erhalten (siehe [NOTICE](../NOTICE)). Eine kommerzielle Lizenz ohne diese Pflichten gibt es
 über [teufel-it.de](https://teufel-it.de). Bibliotheken Dritter behalten ihre eigenen Lizenzen.
 
