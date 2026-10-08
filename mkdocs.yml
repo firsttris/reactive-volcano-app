@@ -11,7 +11,7 @@ repo_url: https://github.com/firsttris/reactive-volcano-app
 repo_name: firsttris/reactive-volcano-app
 edit_uri: edit/main/docs/
 copyright: >-
-  License CC BY-NC 4.0 · VOLCANO, VENTY, VEAZY, CRAFTY and STORZ & BICKEL are trademarks of
+  License AGPL-3.0 · VOLCANO, VENTY, VEAZY, CRAFTY and STORZ & BICKEL are trademarks of
   their respective owner. Independent, unofficial project, not affiliated with Storz & Bickel GmbH.
 
 docs_dir: docs

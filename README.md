@@ -12,7 +12,7 @@ No app store, no account, no server: open the page, connect, done.
 [![Docker Image Version](https://img.shields.io/docker/v/tristanteu/reactive-volcano-app?sort=semver&logo=docker&logoColor=white&label=Docker%20Hub)](https://hub.docker.com/r/tristanteu/reactive-volcano-app)
 [![Docker Pulls](https://img.shields.io/docker/pulls/tristanteu/reactive-volcano-app?logo=docker&logoColor=white)](https://hub.docker.com/r/tristanteu/reactive-volcano-app)
 [![Platforms](https://img.shields.io/badge/platform-amd64%20%7C%20arm64-lightgrey)](https://hub.docker.com/r/tristanteu/reactive-volcano-app/tags)
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/license-CC%20BY--NC%204.0-lightgrey)](LICENSE)
+[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
 <br>
 [![SolidJS](https://img.shields.io/badge/SolidJS-1.9-2c4f7c?logo=solid&logoColor=white)](https://www.solidjs.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -212,8 +212,13 @@ your browser and operating system.
 ---
 
 <div align="center">
+
+⭐ Like the Reactive Volcano App? A [star on GitHub](https://github.com/firsttris/reactive-volcano-app) helps others find it.<br>
+🐛 [Report a bug](https://github.com/firsttris/reactive-volcano-app/issues/new) · 💡 [Request a feature](https://github.com/firsttris/reactive-volcano-app/issues/new)
+
 <sub>
-<a href="LICENSE">CC BY-NC 4.0</a> · © Tristan Teufel and contributors · <a href="README_de.md">Deutsche Version</a><br>
+<a href="LICENSE">AGPL-3.0</a> · © Tristan Teufel and contributors · <a href="README_de.md">Deutsche Version</a><br>
+Changed versions you pass on or run for others must offer their source code under the AGPL; a commercial license without these obligations is available via <a href="https://teufel-it.de">teufel-it.de</a>.<br>
 This is an independent, unofficial open-source project. It is not affiliated with, endorsed, sponsored or authorized by Storz &amp; Bickel GmbH.<br>
 STORZ &amp; BICKEL, VOLCANO, VOLCANO HYBRID, VENTY, VEAZY and CRAFTY are trademarks of Storz &amp; Bickel GmbH, used only to describe compatibility.<br>
 Provided “as is”, without warranty. Use at your own risk. <a href="docs/legal.md">Legal notice</a>
