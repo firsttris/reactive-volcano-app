@@ -1,0 +1,3 @@
+# Documentation (mkdocs.yml, the docs job in .github/workflows/build.yml)
+mkdocs-material==9.7.7
+mkdocs-git-revision-date-localized-plugin==1.6.0

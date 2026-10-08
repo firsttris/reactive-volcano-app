@@ -117,6 +117,7 @@ flowchart LR
   C["Lint, unit tests, build<br/>biome ci · npm test · npm run build"] --> D["Deploy<br/>GitHub Pages"]
   V["Playwright version<br/>from package-lock.json"] --> E["E2E tests<br/>Playwright container"]
   E --> D
+  M["Docs<br/>mkdocs build --strict"] --> D
   K["Docker build<br/>pull requests only"]
 ```
 
@@ -125,12 +126,16 @@ flowchart LR
 - **E2E tests** run in the official Playwright container. Its tag is read from `package-lock.json`, so
   updating `@playwright/test` never leaves the container behind. Failures show up as annotations; the
   HTML report is attached to failed runs.
+- **Docs** builds the website from `docs/` with MkDocs Material (`mkdocs.yml`). `--strict` fails on a
+  broken link or anchor, including links between the pages, so a pull request catches them before they
+  are published.
 - **Docker build** (pull requests only) builds the image without pushing it, so a broken `Dockerfile`
   shows up before a release.
-- **Deploy** only runs for `main`, after the checks and E2E tests passed.
+- **Deploy** only runs for `main`, after the checks, E2E tests and docs passed: the app and, under
+  `/docs/`, the documentation website ([Releases & deployment](releases.md#github-pages)).
 
-A new push to a pull request cancels its outdated run. Changes to Markdown files, `docs/` or `LICENSE`
-alone trigger nothing. Releases are described in [Releases & deployment](releases.md).
+A new push to a pull request cancels its outdated run. Changes to the README files, `CONTRIBUTING.md` or
+`LICENSE` alone trigger nothing. Releases are described in [Releases & deployment](releases.md).
 
 ## Testing on a real device
 

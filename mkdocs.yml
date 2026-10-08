@@ -1,0 +1,134 @@
+# The documentation as a website: https://firsttris.github.io/reactive-volcano-app/docs/
+# Source is docs/, built with MkDocs Material by the docs job in .github/workflows/build.yml
+# and published next to the app on GitHub Pages.
+# Locally: pip install -r requirements-docs.txt && mkdocs serve
+site_name: Reactive Vaporizer App
+site_description: >-
+  Control compatible vaporizers (Volcano Hybrid, Venty, Veazy, Crafty) from the browser
+  over Web Bluetooth: live temperature, heater and pump, workflows, settings and self-diagnosis.
+site_url: https://firsttris.github.io/reactive-volcano-app/docs/
+repo_url: https://github.com/firsttris/reactive-volcano-app
+repo_name: firsttris/reactive-volcano-app
+edit_uri: edit/main/docs/
+copyright: >-
+  License CC BY-NC 4.0 · VOLCANO, VENTY, VEAZY, CRAFTY and STORZ & BICKEL are trademarks of
+  their respective owner. Independent, unofficial project, not affiliated with Storz & Bickel GmbH.
+
+docs_dir: docs
+# Pages as usage.html instead of usage/: the relative image paths of the <img>
+# tags, which must also work on GitHub, then stay correct
+use_directory_urls: false
+exclude_docs: |
+  hooks/
+# A broken link or anchor fails the build (mkdocs build --strict)
+validation:
+  links:
+    anchors: warn
+
+nav:
+  - Overview: README.md
+  - For users:
+      - Getting started: getting-started.md
+      - Usage: usage.md
+      - Workflows: workflows.md
+      - Troubleshooting & FAQ: troubleshooting.md
+      - Privacy & security: privacy-security.md
+      - Legal notice: legal.md
+  - For self-hosters:
+      - Self-hosting: self-hosting.md
+  - For developers:
+      - Architecture: architecture.md
+      - Bluetooth protocol: protocol.md
+      - Development: development.md
+      - Testing: testing.md
+      - Releases & deployment: releases.md
+
+theme:
+  name: material
+  language: en
+  logo: assets/icon.svg
+  favicon: assets/favicon.png
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    # Follows the system setting, switchable like in the app
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Dark theme
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Light theme
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - toc.follow
+    - content.code.copy
+    - content.action.edit
+    - content.tabs.link
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+# Links to files outside docs/ (../README.md, ../Dockerfile) point to GitHub
+hooks:
+  - docs/hooks/repo_links.py
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      type: date
+      fallback_to_build_date: true
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      permalink_title: Link to this section
+      # Anchors like on GitHub, so #crafty--crafty from the Markdown files keeps working
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra:
+  social:
+    - icon: material/open-in-app
+      link: https://firsttris.github.io/reactive-volcano-app/
+      name: Open the app
+    - icon: fontawesome/brands/github
+      link: https://github.com/firsttris/reactive-volcano-app
+      name: Source code on GitHub
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/tristanteu/reactive-volcano-app
+      name: Docker image

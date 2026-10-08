@@ -166,7 +166,8 @@ systemctl --user daemon-reload && systemctl --user start volcano-app
 
 ## 📚 Dokumentation
 
-Die ausführliche Dokumentation ist auf Englisch: [docs/README.md](docs/README.md).
+Die ausführliche Dokumentation ist auf Englisch: [docs/README.md](docs/README.md), auch als Website
+mit Suche: **https://firsttris.github.io/reactive-volcano-app/docs/**
 
 | | |
 |---|---|

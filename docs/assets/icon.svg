@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>Reactive Volcano App</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f1f23"/>
+      <stop offset="1" stop-color="#09090b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f97316" stop-opacity="0.38"/>
+      <stop offset="0.6" stop-color="#f97316" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#f97316" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="arc" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#f97316"/>
+    </linearGradient>
+    <linearGradient id="mountain" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fb923c"/>
+      <stop offset="1" stop-color="#c2410c"/>
+    </linearGradient>
+  </defs>
+  <rect id="background" width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="256" cy="268" r="190" fill="url(#glow)"/>
+  <!-- Gauge: a 270° track, three quarters filled, open at the bottom -->
+  <circle cx="256" cy="268" r="148" fill="none" stroke="#2a2a2f" stroke-width="30"
+    stroke-linecap="round" stroke-dasharray="697.4 929.9" transform="rotate(135 256 268)"/>
+  <circle cx="256" cy="268" r="148" fill="none" stroke="url(#arc)" stroke-width="30"
+    stroke-linecap="round" stroke-dasharray="523 929.9" transform="rotate(135 256 268)"/>
+  <!-- Volcano with rising vapor -->
+  <path d="M158 362 L222 250 Q229 238 243 238 L269 238 Q283 238 290 250 L354 362 Q359 372 348 372 L164 372 Q153 372 158 362 Z" fill="url(#mountain)"/>
+  <path d="M222 250 Q229 238 243 238 L269 238 Q283 238 290 250 L283 262 Q256 276 229 262 Z" fill="#7c2d12" opacity="0.6"/>
+  <g fill="none" stroke="#fde68a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M256 218 c-13 -11 -13 -22 0 -33 c13 -11 13 -22 0 -33"/>
+    <path d="M222 216 c-10 -9 -10 -18 0 -27 c10 -9 10 -18 0 -27" opacity="0.7"/>
+    <path d="M290 216 c-10 -9 -10 -18 0 -27 c10 -9 10 -18 0 -27" opacity="0.7"/>
+  </g>
+</svg>

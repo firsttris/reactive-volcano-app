@@ -60,6 +60,15 @@ secure context, so Web Bluetooth works there. For another device on your network
 
 Before a pull request: `npm run typecheck && npm run lint && npm test && npm run test:e2e`.
 
+The documentation website ([MkDocs Material](https://squidfunk.github.io/mkdocs-material/), `mkdocs.yml`)
+is built with Python:
+
+```bash
+pip install -r requirements-docs.txt
+mkdocs serve            # http://127.0.0.1:8000/ with live reload
+mkdocs build --strict   # what CI runs: fails on a broken link or anchor
+```
+
 ## Project structure
 
 ```
@@ -90,6 +99,7 @@ e2e/                        Playwright tests and the Web Bluetooth mock
 scripts/                    screenshot renderer
 public/                     icons and static files
 docs/                       this documentation and its images
+  assets/, hooks/           theme and link hook of the documentation website (mkdocs.yml)
 ```
 
 The layering behind `devices/` is explained in [Architecture](architecture.md#layers).

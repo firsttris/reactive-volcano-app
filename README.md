@@ -160,6 +160,8 @@ systemctl --user daemon-reload && systemctl --user start volcano-app
 
 ## 📚 Documentation
 
+Also as a website with search: **https://firsttris.github.io/reactive-volcano-app/docs/**
+
 | | |
 |---|---|
 | [Getting started](docs/getting-started.md) | browsers, Linux flag, iOS, connecting, installing as an app, updates |

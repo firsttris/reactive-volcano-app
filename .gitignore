@@ -34,3 +34,6 @@ src/paraglide
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# MkDocs build (mkdocs build)
+site/
