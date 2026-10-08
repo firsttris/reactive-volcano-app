@@ -212,6 +212,10 @@ your browser and operating system.
 ---
 
 <div align="center">
+
+⭐ Like the Reactive Volcano App? A [star on GitHub](https://github.com/firsttris/reactive-volcano-app) helps others find it.<br>
+🐛 [Report a bug](https://github.com/firsttris/reactive-volcano-app/issues/new) · 💡 [Request a feature](https://github.com/firsttris/reactive-volcano-app/issues/new)
+
 <sub>
 <a href="LICENSE">CC BY-NC 4.0</a> · © Tristan Teufel and contributors · <a href="README_de.md">Deutsche Version</a><br>
 This is an independent, unofficial open-source project. It is not affiliated with, endorsed, sponsored or authorized by Storz &amp; Bickel GmbH.<br>

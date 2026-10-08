@@ -218,6 +218,10 @@ Am meisten helfen Rückmeldungen von echten Geräten: bitte Gerät, Firmware-Ver
 ---
 
 <div align="center">
+
+⭐ Gefällt dir die Reactive Volcano App? Ein [Stern auf GitHub](https://github.com/firsttris/reactive-volcano-app) hilft anderen, es zu finden.<br>
+🐛 [Fehler melden](https://github.com/firsttris/reactive-volcano-app/issues/new) · 💡 [Idee vorschlagen](https://github.com/firsttris/reactive-volcano-app/issues/new)
+
 <sub>
 <a href="LICENSE">CC BY-NC 4.0</a> · © Tristan Teufel und Mitwirkende · <a href="README.md">English version</a><br>
 Unabhängiges, inoffizielles Open-Source-Projekt. Es steht in keiner Verbindung zur Storz &amp; Bickel GmbH und wird von ihr weder unterstützt, gesponsert noch autorisiert.<br>
