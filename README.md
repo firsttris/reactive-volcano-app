@@ -90,7 +90,7 @@ clear error messages when the connection drops. Every screen is described in [Us
 <table>
   <tr>
     <td width="33%"><img src="docs/screenshot-connect.png" alt="Connect screen with the supported devices and help for devices that are not found"><br><sub><b>Connect</b>: one tap, with help if nothing is found</sub></td>
-    <td width="33%"><img src="docs/screenshot-volcano-workflows.png" alt="Workflow list with four workflows and their temperature steps"><br><sub><b>Workflows</b>: run, edit, import, export · <a href="docs/workflows.md">docs →</a></sub></td>
+    <td width="33%"><img src="docs/screenshot-volcano-workflows.png" alt="Workflow list with four workflows and their temperature steps"><br><sub><b>Workflows</b>: run, edit, import, export · <a href="https://firsttris.github.io/reactive-volcano-app/docs/workflows.html">docs →</a></sub></td>
     <td width="33%"><img src="docs/screenshot-volcano-settings.png" alt="Settings for the desktop vaporizer: shutdown time, brightness, vibration, standby light, unit and device info"><br><sub><b>Settings</b>: device options, info and diagnosis</sub></td>
   </tr>
   <tr>
@@ -221,6 +221,6 @@ your browser and operating system.
 Changed versions you pass on or run for others must offer their source code under the AGPL; a commercial license without these obligations is available via <a href="https://teufel-it.de">teufel-it.de</a>.<br>
 This is an independent, unofficial open-source project. It is not affiliated with, endorsed, sponsored or authorized by Storz &amp; Bickel GmbH.<br>
 STORZ &amp; BICKEL, VOLCANO, VOLCANO HYBRID, VENTY, VEAZY and CRAFTY are trademarks of Storz &amp; Bickel GmbH, used only to describe compatibility.<br>
-Provided “as is”, without warranty. Use at your own risk. <a href="docs/legal.md">Legal notice</a>
+Provided “as is”, without warranty. Use at your own risk. <a href="https://firsttris.github.io/reactive-volcano-app/docs/legal.html">Legal notice</a>
 </sub>
 </div>
