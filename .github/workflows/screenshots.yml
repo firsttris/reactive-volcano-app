@@ -1,0 +1,20 @@
+name: Update screenshots
+
+# Takes the pictures in docs/ and public/screenshots (README, documentation, install dialog of the
+# app, social preview) against the Bluetooth mock and commits the ones that changed. Run it after a
+# change to the look.
+on:
+  workflow_dispatch:
+
+jobs:
+  screenshots:
+    uses: firsttris/workflows/.github/workflows/screenshots.yml@v1
+    with:
+      command: npm run screenshots && npm run social-preview
+      paths: |
+        docs/screenshot-*.png
+        docs/hero.png
+        docs/social-preview.png
+        public/screenshots
+    permissions:
+      contents: write

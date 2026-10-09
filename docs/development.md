@@ -230,6 +230,10 @@ server if none is running), writes `docs/screenshot-*.png` and composes `docs/he
 bundled browser is not installed, point it at a local Chromium:
 `CHROMIUM_PATH=/usr/bin/chromium npm run screenshots`.
 
+After a change to the look, run **Update screenshots** (Actions → Run workflow,
+`.github/workflows/screenshots.yml`) on the branch: it takes the pictures and the social preview in
+the official Playwright image and commits the ones that changed.
+
 ## App icons
 
 Every icon (favicon, PWA icons, maskable icon, Apple touch icon) is rendered from one source,
