@@ -78,6 +78,10 @@ flowchart LR
   H --> R["create GitHub release"]
 ```
 
+- The checks are skipped when `main`'s `build.yml` already passed for the code: a release commit from
+  *Bump version* (or `npm version`) only changes the version, so the green run of the commit before it
+  counts ([`tested-on-main`](https://github.com/firsttris/workflows#tested-on-main)). Anything else runs
+  them first.
 - The image is built from the [`Dockerfile`](../Dockerfile) (`npm ci`, `npm run build:root`, nginx).
 - The Docker Hub description is taken from `README.md` with relative links made absolute, so the README
   and its images render there too. The short description is set in `release.yml` (max. 100 characters).

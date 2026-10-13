@@ -130,7 +130,8 @@ flowchart LR
   broken link or anchor, including links between the pages, so a pull request catches them before they
   are published.
 - **Docker build** (pull requests only) builds the image without pushing it, so a broken `Dockerfile`
-  shows up before a release.
+  shows up before a release. It shares the registry build cache with the release's amd64 build, so
+  unchanged stages are not built again.
 - **Deploy** only runs for `main`, after the checks, E2E tests and docs passed: the app and, under
   `/docs/`, the documentation website ([Releases & deployment](releases.md#github-pages)).
 

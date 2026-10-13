@@ -5,13 +5,25 @@ name: Release
 # must match package.json, the image is pushed as :x.y.z, :x.y and :latest, the Docker Hub
 # description is updated, then the GitHub release is created.
 # Run by hand on main: the same checks, then the image as :edge, nothing is released.
+# When main's build.yml already passed for the code (a release commit from bump.yml only changes
+# the version), the checks are skipped and the image is built right away.
 on:
   push:
     tags: ["v*"]
   workflow_dispatch:
 
 jobs:
+  tested:
+    uses: firsttris/workflows/.github/workflows/tested-on-main.yml@ccr-161f105b-9ns022
+    with:
+      workflows: build.yml
+    permissions:
+      actions: read
+      contents: read
+
   checks:
+    needs: tested
+    if: needs.tested.outputs.tested != 'true'
     uses: ./.github/workflows/build.yml
     # build.yml also holds the Pages deployment (only on main), which needs these
     permissions:
@@ -20,7 +32,9 @@ jobs:
       id-token: write
 
   docker:
-    needs: checks
+    needs: [tested, checks]
+    # Also runs when the checks were skipped because main already passed them
+    if: ${{ !cancelled() && needs.tested.result == 'success' && needs.checks.result != 'failure' }}
     uses: firsttris/workflows/.github/workflows/docker-release.yml@v1
     with:
       image: tristanteu/reactive-volcano-app
