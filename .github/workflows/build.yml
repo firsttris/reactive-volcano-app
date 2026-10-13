@@ -161,26 +161,26 @@ jobs:
           path: playwright-report/
           retention-days: 14
 
-  # Catches a broken Dockerfile before it breaks a release
+  # Catches a broken Dockerfile before it breaks a release. Shares the registry build cache with
+  # the release's amd64 build (ghcr.io/firsttris/reactive-volcano-app-buildcache), so an unchanged
+  # npm ci and build stage come from the cache in both directions.
   docker:
     name: Docker build
     if: github.event_name == 'pull_request' && !github.event.pull_request.draft
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write # keeps the build cache
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Setup Buildx
-        uses: docker/setup-buildx-action@v4
-
       - name: Build image
-        uses: docker/build-push-action@v7
+        uses: firsttris/workflows/actions/docker-build@ccr-161f105b-9ns022
         with:
-          context: .
-          push: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          dockerfile: Dockerfile
+          tags: reactive-volcano-app:ci
 
   deploy:
     name: Deploy
