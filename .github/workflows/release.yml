@@ -25,9 +25,11 @@ jobs:
     needs: tested
     if: needs.tested.outputs.tested != 'true'
     uses: ./.github/workflows/build.yml
-    # build.yml also holds the Pages deployment (only on main), which needs these
+    # build.yml also holds the Pages deployment (only on main) and the Docker build check with its
+    # build cache (only on pull requests), which need these
     permissions:
       contents: read
+      packages: write
       pages: write
       id-token: write
 
