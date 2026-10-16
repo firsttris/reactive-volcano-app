@@ -25,6 +25,16 @@ export const convertFahrenheitToCelsius = (fahrenheit: number): number => {
   return Math.round((fahrenheit - 32) / 1.8);
 };
 
+/** The device unit's value of a temperature stored in °C */
+export const toDisplayTemperature = (
+  celsius: number,
+  isCelsius: boolean
+): number => (isCelsius ? celsius : convertCelsiusToFahrenheit(celsius));
+
+/** A temperature stored in °C, formatted in the device unit, e.g. "365 °F" */
+export const formatTemperature = (celsius: number, isCelsius: boolean) =>
+  `${toDisplayTemperature(celsius, isCelsius)} °${isCelsius ? "C" : "F"}`;
+
 export const convertToUInt8BLE = (value: number): ArrayBuffer => {
   const buffer = new ArrayBuffer(1);
   const dataView = new DataView(buffer);
