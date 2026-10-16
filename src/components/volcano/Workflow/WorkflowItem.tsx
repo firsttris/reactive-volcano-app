@@ -13,9 +13,11 @@ import { type Component, createSignal, For, Index, Show } from "solid-js";
 import { cn } from "../../../lib/utils";
 import { m } from "../../../paraglide/messages";
 import { useToast } from "../../../provider/ToastProvider";
+import { useVolcano } from "../../../provider/VolcanoProvider";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { useWorkflowRunner } from "../../../provider/WorkflowRunnerProvider";
 import { buildRoute } from "../../../routes";
+import { toDisplayTemperature } from "../../../utils/bluetoothUtils";
 import type { Workflow } from "../../../utils/workflowData";
 import { buildShareUrl } from "../../../utils/workflowShare";
 import { Button } from "../../ui/button";
@@ -48,6 +50,7 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
   const [isEditingName, setIsEditingName] = createSignal(false);
   const [editedName, setEditedName] = createSignal(props.workflow.name);
   const runner = useWorkflowRunner();
+  const { derived } = useVolcano();
   const showToast = useToast();
 
   const workflowSteps = () => props.workflow.workflowSteps;
@@ -250,7 +253,7 @@ export const WorkflowItem: Component<WorkflowItemProps> = (props) => {
             <For each={workflowSteps().slice(0, VISIBLE_STEPS)}>
               {(step) => (
                 <span class="inline-flex h-6 items-center rounded-full border bg-muted px-2 font-mono text-[11px] text-muted-foreground tabular-nums">
-                  {step.temperature}°
+                  {toDisplayTemperature(step.temperature, derived.isCelsius())}°
                 </span>
               )}
             </For>

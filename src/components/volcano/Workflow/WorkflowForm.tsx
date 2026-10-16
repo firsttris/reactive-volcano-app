@@ -7,14 +7,17 @@ import {
   createSignal,
 } from "solid-js";
 import { m } from "../../../paraglide/messages";
+import { useVolcano } from "../../../provider/VolcanoProvider";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { buildRoute } from "../../../routes";
+import { formatTemperature } from "../../../utils/bluetoothUtils";
 import { SettingSlider, SettingsSection } from "../../Settings";
 import { Button } from "../../ui/button";
 import { EditorHeader } from "./EditorHeader";
 
 export const WorkflowForm: Component = () => {
   const { stepsOf, editWorkflowStepInList } = useWorkflowContext();
+  const { derived } = useVolcano();
   // Not destructured, so the form follows a change of the route
   const params = useParams();
   const workflowId = () => params.workflowListId ?? "";
@@ -57,7 +60,8 @@ export const WorkflowForm: Component = () => {
       <SettingsSection title={m.workflow_editStep()}>
         <SettingSlider
           label={m.workflow_temperature()}
-          valueLabel={`${temperature()} °C`}
+          // Steps are stored in °C, shown in the unit set on the device
+          valueLabel={formatTemperature(temperature(), derived.isCelsius())}
           value={temperature()}
           min={150}
           max={230}

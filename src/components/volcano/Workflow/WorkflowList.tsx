@@ -6,8 +6,10 @@ import Trash2 from "lucide-solid/icons/trash";
 import { For, type JSX, Show } from "solid-js";
 import { m } from "../../../paraglide/messages";
 import { useToast } from "../../../provider/ToastProvider";
+import { useVolcano } from "../../../provider/VolcanoProvider";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { buildRoute } from "../../../routes";
+import { formatTemperature } from "../../../utils/bluetoothUtils";
 import { Button } from "../../ui/button";
 import { Card } from "../../ui/card";
 import { EditorHeader } from "./EditorHeader";
@@ -28,6 +30,7 @@ export const WorkflowList = () => {
     updateWorkflowStepsInList,
     addNewWorkflowStep,
   } = useWorkflowContext();
+  const { derived } = useVolcano();
   // Not destructured, so the page follows a change of the route
   const params = useParams();
   const workflowId = () => params.workflowListId ?? "";
@@ -89,7 +92,10 @@ export const WorkflowList = () => {
                   </span>
                   <div class="grid flex-1 grid-cols-3 gap-2">
                     <StepValue label={m.workflow_temperature()}>
-                      {workflowItem.temperature} °C
+                      {formatTemperature(
+                        workflowItem.temperature,
+                        derived.isCelsius()
+                      )}
                     </StepValue>
                     <StepValue label={m.workflow_holdTime()}>
                       {workflowItem.holdTimeInSeconds} s

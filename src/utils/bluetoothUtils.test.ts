@@ -6,6 +6,8 @@ import {
   convertToUInt8BLE,
   convertToUInt16BLE,
   convertToUInt32BLE,
+  formatTemperature,
+  toDisplayTemperature,
 } from "./bluetoothUtils";
 
 describe("bluetoothUtils", () => {
@@ -48,6 +50,23 @@ describe("bluetoothUtils", () => {
       const dataView = new DataView(arrayBuffer);
       dataView.setUint16(0, 65535, true);
       expect(convertBLEToUint16(dataView)).toBe(65535);
+    });
+  });
+
+  describe("toDisplayTemperature", () => {
+    it("should keep °C in Celsius mode", () => {
+      expect(toDisplayTemperature(185, true)).toBe(185);
+    });
+
+    it("should convert to °F in Fahrenheit mode", () => {
+      expect(toDisplayTemperature(185, false)).toBe(365);
+    });
+  });
+
+  describe("formatTemperature", () => {
+    it("should format in the device unit", () => {
+      expect(formatTemperature(180, true)).toBe("180 °C");
+      expect(formatTemperature(180, false)).toBe("356 °F");
     });
   });
 
