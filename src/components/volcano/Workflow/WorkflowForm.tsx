@@ -65,8 +65,13 @@ export const WorkflowForm: Component = () => {
           value={temperature()}
           min={150}
           max={230}
-          // 1 °C like the Control tab, so about 2 °F in Fahrenheit mode
-          step={1}
+          // Quick 5 °C jumps; −/+ for 1 °C (about 2 °F) like the Control tab
+          step={5}
+          fineTuning={{
+            step: 1,
+            decreaseLabel: m.temperature_decrease(),
+            increaseLabel: m.temperature_increase(),
+          }}
           onChange={setTemperature}
         />
         <SettingSlider
