@@ -22,7 +22,7 @@ Each step has three values:
 
 | Field | Unit | Meaning |
 |---|---|---|
-| Temperature | °C | target for this step (40–230) |
+| Temperature | °C | target for this step (40–230), up to one decimal |
 | Hold time | seconds | how long to wait once the temperature is reached, before pumping (0 = pump at once) |
 | Pump time | seconds | how long the air pump runs (at least 0.5 s) |
 
@@ -64,7 +64,10 @@ device, which then follows its own auto-shutdown.
 - **New**: creates an empty workflow; add steps with *Add*.
 - **⋯ menu** on a workflow: rename, edit steps, export, delete. Deleting can be undone from the
   notification that appears.
-- **Edit steps**: each step opens a form with temperature, hold time and pump time.
+- **Edit steps**: each step opens a form with temperature, hold time and pump time. The temperature
+  is edited in the unit set on the Volcano: the slider jumps in 5° steps (°C or °F), the −/+
+  buttons next to it change single degrees. In Fahrenheit mode the step is stored in °C with one
+  decimal, so every whole °F is kept exactly.
 - **Import & export** (the download button next to *New*):
   - *Export workflow*: one workflow as `<name>_workflow.json`.
   - *Import single workflow*: adds the workflow from such a file.

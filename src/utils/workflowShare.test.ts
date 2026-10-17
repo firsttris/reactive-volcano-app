@@ -59,6 +59,22 @@ describe("workflowShare", () => {
     expect(decodeWorkflow(code)?.workflowSteps[0].temperature).toBe(40);
   });
 
+  it("keeps tenths of a degree, e.g. from °F steps", () => {
+    const code = encodeWorkflow({
+      id: "x",
+      name: "Fahrenheit",
+      workflowSteps: [
+        {
+          id: "a",
+          temperature: 187.777,
+          holdTimeInSeconds: 0,
+          pumpTimeInSeconds: 5,
+        },
+      ],
+    });
+    expect(decodeWorkflow(code)?.workflowSteps[0].temperature).toBe(187.8);
+  });
+
   describe("parseWorkflowFile", () => {
     const step = {
       temperature: 180,

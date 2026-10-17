@@ -1,5 +1,8 @@
+import Minus from "lucide-solid/icons/minus";
+import Plus from "lucide-solid/icons/plus";
 import { type JSX, Show } from "solid-js";
 import { cn } from "../lib/utils";
+import { RepeatButton } from "./RepeatButton";
 import { Card } from "./ui/card";
 import { Slider, SliderLabel, SliderTrack } from "./ui/slider";
 import {
@@ -50,6 +53,13 @@ export const SettingSwitch = (props: {
   </Switch>
 );
 
+/** −/+ buttons for exact values in between the slider's steps */
+interface FineTuning {
+  step: number;
+  decreaseLabel: string;
+  increaseLabel: string;
+}
+
 export const SettingSlider = (props: {
   label: string;
   /** Formatted current value, e.g. "4 min" */
@@ -58,26 +68,62 @@ export const SettingSlider = (props: {
   min: number;
   max: number;
   step: number;
+  fineTuning?: FineTuning;
   onChange: (value: number) => void;
-}) => (
-  <Slider
-    class="gap-4 px-4 pt-4 pb-5"
-    value={[props.value]}
-    minValue={props.min}
-    maxValue={props.max}
-    step={props.step}
-    onChange={(values) => props.onChange(values[0])}
-    getValueLabel={() => props.valueLabel}
-  >
-    <div class="flex w-full items-center justify-between gap-3">
-      <SliderLabel class="font-medium text-sm">{props.label}</SliderLabel>
-      <span class="rounded-md bg-muted px-2 py-0.5 font-mono text-xs tabular-nums">
-        {props.valueLabel}
-      </span>
-    </div>
-    <SliderTrack />
-  </Slider>
-);
+}) => {
+  const nudge = (delta: number) =>
+    props.onChange(
+      Math.min(props.max, Math.max(props.min, props.value + delta))
+    );
+
+  const valuePill = (
+    <span class="rounded-md bg-muted px-2 py-0.5 font-mono text-xs tabular-nums">
+      {props.valueLabel}
+    </span>
+  );
+
+  return (
+    <Slider
+      class="gap-4 px-4 pt-4 pb-5"
+      value={[props.value]}
+      minValue={props.min}
+      maxValue={props.max}
+      step={props.step}
+      onChange={(values) => props.onChange(values[0])}
+      getValueLabel={() => props.valueLabel}
+    >
+      <div class="flex w-full items-center justify-between gap-3">
+        <SliderLabel class="font-medium text-sm">{props.label}</SliderLabel>
+        <Show when={props.fineTuning} fallback={valuePill}>
+          {(fine) => (
+            <div class="flex items-center gap-2">
+              <RepeatButton
+                size="icon"
+                class="size-8"
+                onStep={() => nudge(-fine().step)}
+                disabled={props.value <= props.min}
+                aria-label={fine().decreaseLabel}
+              >
+                <Minus />
+              </RepeatButton>
+              {valuePill}
+              <RepeatButton
+                size="icon"
+                class="size-8"
+                onStep={() => nudge(fine().step)}
+                disabled={props.value >= props.max}
+                aria-label={fine().increaseLabel}
+              >
+                <Plus />
+              </RepeatButton>
+            </div>
+          )}
+        </Show>
+      </div>
+      <SliderTrack />
+    </Slider>
+  );
+};
 
 export const SettingRow = (props: {
   label: string;

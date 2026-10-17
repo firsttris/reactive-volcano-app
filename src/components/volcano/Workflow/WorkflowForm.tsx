@@ -10,7 +10,11 @@ import { m } from "../../../paraglide/messages";
 import { useVolcano } from "../../../provider/VolcanoProvider";
 import { useWorkflowContext } from "../../../provider/WorkflowProvider";
 import { buildRoute } from "../../../routes";
-import { formatTemperature } from "../../../utils/bluetoothUtils";
+import {
+  formatTemperature,
+  fromDisplayTemperature,
+  toDisplayTemperature,
+} from "../../../utils/bluetoothUtils";
 import { SettingSlider, SettingsSection } from "../../Settings";
 import { Button } from "../../ui/button";
 import { EditorHeader } from "./EditorHeader";
@@ -18,6 +22,7 @@ import { EditorHeader } from "./EditorHeader";
 export const WorkflowForm: Component = () => {
   const { stepsOf, editWorkflowStepInList } = useWorkflowContext();
   const { derived } = useVolcano();
+  const isCelsius = derived.isCelsius;
   // Not destructured, so the form follows a change of the route
   const params = useParams();
   const workflowId = () => params.workflowListId ?? "";
@@ -60,13 +65,21 @@ export const WorkflowForm: Component = () => {
       <SettingsSection title={m.workflow_editStep()}>
         <SettingSlider
           label={m.workflow_temperature()}
-          // Steps are stored in °C, shown in the unit set on the device
-          valueLabel={formatTemperature(temperature(), derived.isCelsius())}
-          value={temperature()}
-          min={150}
-          max={230}
+          // Steps are stored in °C, edited in the unit set on the device:
+          // 5° jumps, −/+ for single degrees
+          valueLabel={formatTemperature(temperature(), isCelsius())}
+          value={toDisplayTemperature(temperature(), isCelsius())}
+          min={isCelsius() ? 150 : 300}
+          max={isCelsius() ? 230 : 446}
           step={5}
-          onChange={setTemperature}
+          fineTuning={{
+            step: 1,
+            decreaseLabel: m.temperature_decrease(),
+            increaseLabel: m.temperature_increase(),
+          }}
+          onChange={(value) =>
+            setTemperature(fromDisplayTemperature(value, isCelsius()))
+          }
         />
         <SettingSlider
           label={m.workflow_holdTime()}

@@ -91,7 +91,8 @@ export const createVolcanoStore = (
     /** Target temperature in °C, written immediately (for workflows) */
     async applyTargetTemp(celsius: number) {
       const value = clamp(celsius, Limits.MIN_TEMP, Limits.MAX_TEMP);
-      setState("targetTemp", value);
+      // Workflow steps can hold 0.1 °C; the device reports whole degrees
+      setState("targetTemp", Math.round(value));
       await driver.setTargetTemperature(value);
     },
     async setHeater(on: boolean) {
