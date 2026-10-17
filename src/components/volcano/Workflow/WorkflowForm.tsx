@@ -70,7 +70,7 @@ export const WorkflowForm: Component = () => {
           valueLabel={formatTemperature(temperature(), isCelsius())}
           value={toDisplayTemperature(temperature(), isCelsius())}
           min={isCelsius() ? 150 : 300}
-          max={isCelsius() ? 230 : 445}
+          max={isCelsius() ? 230 : 446}
           step={5}
           fineTuning={{
             step: 1,
