@@ -64,7 +64,8 @@ device, which then follows its own auto-shutdown.
 - **New**: creates an empty workflow; add steps with *Add*.
 - **⋯ menu** on a workflow: rename, edit steps, export, delete. Deleting can be undone from the
   notification that appears.
-- **Edit steps**: each step opens a form with temperature, hold time and pump time.
+- **Edit steps**: each step opens a form with temperature, hold time and pump time. The temperature
+  moves in 1 °C steps (about 2 °F) and is shown in the unit set on the Volcano.
 - **Import & export** (the download button next to *New*):
   - *Export workflow*: one workflow as `<name>_workflow.json`.
   - *Import single workflow*: adds the workflow from such a file.

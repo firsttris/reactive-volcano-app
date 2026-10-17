@@ -65,7 +65,8 @@ export const WorkflowForm: Component = () => {
           value={temperature()}
           min={150}
           max={230}
-          step={5}
+          // 1 °C like the Control tab, so about 2 °F in Fahrenheit mode
+          step={1}
           onChange={setTemperature}
         />
         <SettingSlider
