@@ -5,7 +5,7 @@ import { cn } from "../../../lib/utils";
 import { m } from "../../../paraglide/messages";
 import { useVolcano } from "../../../provider/VolcanoProvider";
 import { useWorkflowRunner } from "../../../provider/WorkflowRunnerProvider";
-import { convertCelsiusToFahrenheit } from "../../../utils/bluetoothUtils";
+import { toDisplayTemperature } from "../../../utils/bluetoothUtils";
 import { formatDuration } from "../../../utils/heatProgress";
 import { Button } from "../../ui/button";
 
@@ -19,10 +19,10 @@ export const RunningWorkflowBar = () => {
 
   const steps = () => runner.runningWorkflow()?.workflowSteps ?? [];
 
-  const formatTemp = (celsius: number) =>
-    derived.isCelsius()
-      ? `${celsius}°C`
-      : `${convertCelsiusToFahrenheit(celsius)}°F`;
+  const formatTemp = (celsius: number) => {
+    const isCelsius = derived.isCelsius();
+    return `${toDisplayTemperature(celsius, isCelsius)}°${isCelsius ? "C" : "F"}`;
+  };
 
   const phaseText = () => {
     const phase = runner.phase();

@@ -66,7 +66,8 @@ export const toValidStep = (
     return null;
   }
   return {
-    temperature: Math.max(MIN_TEMP, temperature),
+    // Steps keep at most 0.1 °C, enough for every whole °F
+    temperature: Math.max(MIN_TEMP, Math.round(temperature * 10) / 10),
     holdTimeInSeconds: hold,
     pumpTimeInSeconds: pump,
   };

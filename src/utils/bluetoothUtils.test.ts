@@ -7,6 +7,7 @@ import {
   convertToUInt16BLE,
   convertToUInt32BLE,
   formatTemperature,
+  fromDisplayTemperature,
   toDisplayTemperature,
 } from "./bluetoothUtils";
 
@@ -60,6 +61,28 @@ describe("bluetoothUtils", () => {
 
     it("should convert to °F in Fahrenheit mode", () => {
       expect(toDisplayTemperature(185, false)).toBe(365);
+    });
+
+    it("should show whole degrees for tenths", () => {
+      expect(toDisplayTemperature(187.8, true)).toBe(188);
+      expect(toDisplayTemperature(187.8, false)).toBe(370);
+    });
+  });
+
+  describe("fromDisplayTemperature", () => {
+    it("should keep °C in Celsius mode", () => {
+      expect(fromDisplayTemperature(185, true)).toBe(185);
+    });
+
+    it("should store °F as °C with one decimal", () => {
+      expect(fromDisplayTemperature(370, false)).toBe(187.8);
+    });
+
+    it("should bring back every whole °F", () => {
+      for (let fahrenheit = 300; fahrenheit <= 446; fahrenheit++) {
+        const celsius = fromDisplayTemperature(fahrenheit, false);
+        expect(toDisplayTemperature(celsius, false)).toBe(fahrenheit);
+      }
     });
   });
 

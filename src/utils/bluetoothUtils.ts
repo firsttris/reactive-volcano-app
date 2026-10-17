@@ -25,11 +25,21 @@ export const convertFahrenheitToCelsius = (fahrenheit: number): number => {
   return Math.round((fahrenheit - 32) / 1.8);
 };
 
-/** The device unit's value of a temperature stored in °C */
+/** The device unit's whole-degree value of a temperature stored in °C */
 export const toDisplayTemperature = (
   celsius: number,
   isCelsius: boolean
-): number => (isCelsius ? celsius : convertCelsiusToFahrenheit(celsius));
+): number =>
+  isCelsius ? Math.round(celsius) : convertCelsiusToFahrenheit(celsius);
+
+/**
+ * A temperature in the device unit as stored °C. Fahrenheit keeps 0.1 °C,
+ * so every whole °F survives the round trip
+ */
+export const fromDisplayTemperature = (
+  value: number,
+  isCelsius: boolean
+): number => (isCelsius ? value : Math.round(((value - 32) / 1.8) * 10) / 10);
 
 /** A temperature stored in °C, formatted in the device unit, e.g. "365 °F" */
 export const formatTemperature = (celsius: number, isCelsius: boolean) =>
