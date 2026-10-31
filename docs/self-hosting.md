@@ -184,7 +184,7 @@ while a device is connected.
 | Image | [`tristanteu/reactive-volcano-app`](https://hub.docker.com/r/tristanteu/reactive-volcano-app) |
 | Tags | `latest`, `x.y.z`, `x.y` for releases; `edge` for manual builds from `main` |
 | Platforms | `linux/amd64`, `linux/arm64` |
-| Base | `nginxinc/nginx-unprivileged:stable-alpine` (nginx without root), built in a `node:22-alpine` stage ([`Dockerfile`](../Dockerfile)) |
+| Base | `nginxinc/nginx-unprivileged:1.30.6-alpine` (nginx without root, the stable branch), built in a `node:22-alpine` stage ([`Dockerfile`](../Dockerfile)) |
 | Port | `8080` inside the container |
 | User | `nginx` (uid 101), not root |
 | Volumes, environment | none needed |

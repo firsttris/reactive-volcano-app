@@ -1,0 +1,80 @@
+// Renovate (GitHub App, https://github.com/apps/renovate): a pull request for each new release of
+// what the image of Volcano App is built from, plus the "Dependency Dashboard" issue listing what
+// is open. Only those: nginx (the runtime, nginx-unprivileged of the stable branch) and Node (the
+// build stage, CI and its types). The app talks to the devices through the browser's Web
+// Bluetooth API with its own protocol code (src/devices/*/protocol.ts), so there is no Bluetooth
+// library to follow; the npm packages and the actions are not tracked here. Check with
+// `npx --package renovate renovate-config-validator .github/renovate.json5`.
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:recommended"],
+  enabledManagers: ["dockerfile", "npm", "custom.regex"],
+  timezone: "Europe/Berlin",
+  labels: ["dependencies"],
+  automerge: false,
+  customManagers: [
+    {
+      // NODE_VERSION of build.yml: the check, build and E2E jobs
+      customType: "regex",
+      managerFilePatterns: ["/^\\.github/workflows/build\\.yml$/"],
+      matchStrings: ['NODE_VERSION: "(?<currentValue>\\d+)"'],
+      depNameTemplate: "node",
+      datasourceTemplate: "node-version",
+      versioningTemplate: "node",
+    },
+    {
+      // The images the docs name (architecture.md, self-hosting.md), so they move with the
+      // Dockerfile
+      customType: "regex",
+      managerFilePatterns: ["/^docs/(architecture|self-hosting)\\.md$/"],
+      matchStrings: [
+        "`(?<depName>node):(?<currentValue>\\d+-alpine)`",
+        "`(?<depName>nginxinc/nginx-unprivileged):(?<currentValue>\\d+\\.\\d+\\.\\d+-alpine)`",
+      ],
+      datasourceTemplate: "docker",
+    },
+  ],
+  packageRules: [
+    {
+      // From the package manager only @types/node (below)
+      matchManagers: ["npm"],
+      enabled: false,
+    },
+    {
+      // The app's own image moves with its releases
+      matchPackageNames: ["docker.io/tristanteu/**", "tristanteu/**"],
+      enabled: false,
+    },
+    {
+      // Stable branch only: nginx's even minors (1.30.x, 1.32.x); odd ones are mainline
+      matchPackageNames: ["nginxinc/nginx-unprivileged"],
+      allowedVersions: "/^\\d+\\.\\d*[02468]\\.\\d+-alpine$/",
+      groupName: "nginx",
+      sourceUrl: "https://github.com/nginx/nginx",
+      prBodyNotes: [
+        "The runtime of the image; the Dockerfile and the base named in docs/architecture.md and docs/self-hosting.md move together. The Docker build check of this PR builds it. Before merging: read nginx's CHANGES for directives used in `nginx.conf` and `nginx-security-headers.inc` (`gzip_static`, headers, caching); then publish a release (**Actions → Bump version**), since the users' containers (AutoUpdate) get the new nginx only with a new image.",
+      ],
+    },
+    {
+      // Node of the build stage, CI, the docs and its types, in one PR so they stay on one major
+      matchPackageNames: ["node", "@types/node"],
+      enabled: true,
+      groupName: "Node",
+      sourceUrl: "https://github.com/nodejs/node",
+      prBodyNotes: [
+        "The image's build stage (`node:<major>-alpine`), `NODE_VERSION` of build.yml, `@types/node` and the image named in docs/architecture.md and docs/self-hosting.md move together. The floor `engines.node` and \"Node.js 22 or newer\" in README.md and docs/development.md stay unless the new major drops support for the old one.",
+      ],
+    },
+    {
+      // engines.node is a floor, not the version the app is built with
+      matchDepTypes: ["engines"],
+      enabled: false,
+    },
+    {
+      // The types follow the image's major; their own patches are not worth a PR
+      matchPackageNames: ["@types/node"],
+      matchUpdateTypes: ["minor", "patch"],
+      enabled: false,
+    },
+  ],
+}

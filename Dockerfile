@@ -11,9 +11,10 @@ COPY . .
 # .gz copies next to the files for gzip_static in nginx.conf
 RUN npm run build:root && node scripts/precompress.mjs dist
 
-# Runs nginx as an unprivileged user instead of root; the stable branch,
-# not mainline, since the image updates itself (AutoUpdate)
-FROM nginxinc/nginx-unprivileged:stable-alpine
+# Runs nginx as an unprivileged user instead of root; the stable branch (even
+# minor), not mainline, since the users' containers update themselves
+# (AutoUpdate). Pinned, so Renovate opens a pull request for each new release.
+FROM nginxinc/nginx-unprivileged:1.30.6-alpine
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY nginx-security-headers.inc /etc/nginx/conf.d/security-headers.inc
