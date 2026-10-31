@@ -177,7 +177,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Build image
-        uses: firsttris/workflows/actions/docker-build@ccr-161f105b-9ns022
+        uses: firsttris/workflows/actions/docker-build@v1
         with:
           dockerfile: Dockerfile
           tags: reactive-volcano-app:ci
