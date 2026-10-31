@@ -1,17 +1,16 @@
 // Renovate (GitHub App, https://github.com/apps/renovate): a pull request for each new release of
 // what the image of Volcano App is built from, plus the "Dependency Dashboard" issue listing what
-// is open. Only those: nginx (the runtime, nginx-unprivileged of the stable branch) and Node (the
-// build stage, CI and its types). The app talks to the devices through the browser's Web
-// Bluetooth API with its own protocol code (src/devices/*/protocol.ts), so there is no Bluetooth
-// library to follow; the npm packages and the actions are not tracked here. Check with
-// `npx --package renovate renovate-config-validator .github/renovate.json5`.
+// is open. Their own pull requests: nginx (the runtime, nginx-unprivileged of the stable branch)
+// and Node (the build stage, CI and its types). The app talks to the devices through the browser's
+// Web Bluetooth API with its own protocol code (src/devices/*/protocol.ts), so there is no
+// Bluetooth library to follow.
+// Everything else (the other packages, the actions, the images) comes with the shared settings of
+// firsttris/workflows (renovate/default.json5): minor and patch updates once a month in one pull
+// request that merges itself when CI is green, majors on request in the dashboard.
+// Check with `npx --package renovate renovate-config-validator .github/renovate.json5`.
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:recommended"],
-  enabledManagers: ["dockerfile", "npm", "custom.regex"],
-  timezone: "Europe/Berlin",
-  labels: ["dependencies"],
-  automerge: false,
+  extends: ["github>firsttris/workflows//renovate/default.json5"],
   customManagers: [
     {
       // NODE_VERSION of build.yml: the check, build and E2E jobs
@@ -36,11 +35,6 @@
   ],
   packageRules: [
     {
-      // From the package manager only @types/node (below)
-      matchManagers: ["npm"],
-      enabled: false,
-    },
-    {
       // The app's own image moves with its releases
       matchPackageNames: ["docker.io/tristanteu/**", "tristanteu/**"],
       enabled: false,
@@ -54,6 +48,9 @@
       prBodyNotes: [
         "The runtime of the image; the Dockerfile and the base named in docs/architecture.md and docs/self-hosting.md move together. The Docker build check of this PR builds it. Before merging: read nginx's CHANGES for directives used in `nginx.conf` and `nginx-security-headers.inc` (`gzip_static`, headers, caching); then publish a release (**Actions → Bump version**), since the users' containers (AutoUpdate) get the new nginx only with a new image.",
       ],
+      schedule: ["at any time"],
+      automerge: false,
+      dependencyDashboardApproval: false,
     },
     {
       // Node of the build stage, CI, the docs and its types, in one PR so they stay on one major
@@ -64,6 +61,9 @@
       prBodyNotes: [
         "The image's build stage (`node:<major>-alpine`), `NODE_VERSION` of build.yml, `@types/node` and the image named in docs/architecture.md and docs/self-hosting.md move together. The floor `engines.node` and \"Node.js 22 or newer\" in README.md and docs/development.md stay unless the new major drops support for the old one.",
       ],
+      schedule: ["at any time"],
+      automerge: false,
+      dependencyDashboardApproval: false,
     },
     {
       // engines.node is a floor, not the version the app is built with
