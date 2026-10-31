@@ -48,7 +48,7 @@
     "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.0.0",
-    "@types/web-bluetooth": "^0.0.21",
+    "@types/web-bluetooth": "^0.0.22",
     "@vitejs/plugin-legacy": "^8.2.3",
     "@vitest/coverage-v8": "^5.0.3",
     "@vitest/ui": "^5.0.3",
