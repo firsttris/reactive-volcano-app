@@ -40,3 +40,4 @@ site/
 
 # Python bytecode of the MkDocs hook (docs/hooks/)
 __pycache__/
+**/project.inlang/cache/
