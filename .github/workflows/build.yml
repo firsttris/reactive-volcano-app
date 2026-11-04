@@ -25,9 +25,6 @@ concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-env:
-  NODE_VERSION: "26"
-
 jobs:
   check:
     name: Lint, unit tests & build
@@ -39,25 +36,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Setup Node
-        uses: actions/setup-node@v7
+      # The Bun of packageManager in package.json
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
+          bun-version-file: package.json
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       # Annotates problems inline in the pull request diff
       - name: Lint
-        run: npx biome ci --reporter=github .
+        run: bunx biome ci --reporter=github .
 
       - name: Unit tests
-        run: npm test
+        run: bun run test
 
       # Includes the type check (tsc) after compiling the messages
       - name: Build
-        run: npm run build
+        run: bun run build
 
       # GitHub Pages has no SPA fallback; serve the app for unknown paths so
       # deep links like /connect survive a reload.
@@ -118,17 +115,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      version: ${{ steps.version.outputs.version }}
+      image: ${{ steps.version.outputs.image }}
     steps:
-      - name: Checkout lockfile
-        uses: actions/checkout@v7
-        with:
-          sparse-checkout: package-lock.json
-          sparse-checkout-cone-mode: false
-
-      - name: Read version
+      - name: Image of the @playwright/test version in bun.lock
         id: version
-        run: echo "version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")" >> "$GITHUB_OUTPUT"
+        uses: firsttris/workflows/actions/playwright-image@v1
+        with:
+          lockfile: bun.lock
 
   e2e:
     name: E2E tests
@@ -136,22 +129,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     container:
-      image: mcr.microsoft.com/playwright:v${{ needs.playwright-version.outputs.version }}-noble
+      image: ${{ needs.playwright-version.outputs.image }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Setup Node
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
+      # The npm package brings the binary without curl or unzip, which the image lacks.
+      # The image has no jq; node reads the version from packageManager, in an assignment of its
+      # own so that a failure stops the step instead of installing npm's latest Bun.
+      - name: Setup Bun
+        run: |
+          version=$(node -p "require('./package.json').packageManager.split('@')[1]")
+          npm install --global "bun@$version"
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Run Playwright tests
-        run: npm run test:e2e
+        run: bun run test:e2e
 
       - name: Upload Playwright report
         if: failure()
@@ -163,7 +158,7 @@ jobs:
 
   # Catches a broken Dockerfile before it breaks a release. Shares the registry build cache with
   # the release's amd64 build (ghcr.io/firsttris/reactive-volcano-app-buildcache), so an unchanged
-  # npm ci and build stage come from the cache in both directions.
+  # bun install and build stage come from the cache in both directions.
   docker:
     name: Docker build
     if: github.event_name == 'pull_request' && !github.event.pull_request.draft

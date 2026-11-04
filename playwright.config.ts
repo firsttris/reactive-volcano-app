@@ -47,13 +47,13 @@ export default defineConfig({
 
   webServer: [
     {
-      command: "npm run dev",
+      command: "bun run dev",
       url: "http://localhost:5173",
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
     },
     {
-      command: `npm run build && npx vite preview --base=${PAGES_BASE} --port 4173 --strictPort`,
+      command: `bun run build && bun --bun vite preview --base=${PAGES_BASE} --port 4173 --strictPort`,
       url: `http://localhost:4173${PAGES_BASE}`,
       reuseExistingServer: !process.env.CI,
       timeout: 180000,

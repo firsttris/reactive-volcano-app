@@ -136,11 +136,11 @@ The Docker image is built for the **domain root** (`/`). To serve the app under 
 `https://example.com/vaporizer/`, build it with a matching base:
 
 ```bash
-npm ci
-npx vite build --base=/vaporizer/   # → dist/
+bun install --frozen-lockfile
+bun --bun vite build --base=/vaporizer/   # → dist/
 ```
 
-`npm run build` does the same for the GitHub Pages path `/reactive-volcano-app/`. The router and the
+`bun run build` does the same for the GitHub Pages path `/reactive-volcano-app/`. The router and the
 service worker pick the base up from the build, so deep links and offline start keep working.
 
 ## Any static web server
@@ -148,7 +148,7 @@ service worker pick the base up from the build, so deep links and offline start 
 Build once and copy `dist/` anywhere:
 
 ```bash
-npm ci && npm run build:root   # → dist/
+bun install --frozen-lockfile && bun run build:root   # → dist/
 ```
 
 Two things the server must do:
@@ -184,7 +184,7 @@ while a device is connected.
 | Image | [`tristanteu/reactive-volcano-app`](https://hub.docker.com/r/tristanteu/reactive-volcano-app) |
 | Tags | `latest`, `x.y.z`, `x.y` for releases; `edge` for manual builds from `main` |
 | Platforms | `linux/amd64`, `linux/arm64` |
-| Base | `nginxinc/nginx-unprivileged:1.30.6-alpine` (nginx without root, the stable branch), built in a `node:26-alpine` stage ([`Dockerfile`](../Dockerfile)) |
+| Base | `nginxinc/nginx-unprivileged:1.30.6-alpine` (nginx without root, the stable branch), built in an `oven/bun:1.4.4-alpine` stage ([`Dockerfile`](../Dockerfile)) |
 | Port | `8080` inside the container |
 | User | `nginx` (uid 101), not root |
 | Volumes, environment | none needed |

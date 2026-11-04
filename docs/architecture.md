@@ -239,8 +239,8 @@ picked up promptly. The Docker build writes `.gz` copies of all text files
 | Bundler | Vite 8 with `vite-plugin-solid`, `@tailwindcss/vite`, Paraglide plugin, PWA plugin |
 | Legacy | `@vitejs/plugin-legacy` adds a fallback bundle for iOS ≥ 10 / Safari ≥ 10 (for Web Bluetooth browsers built on old WebKit) |
 | TypeScript | strict, checked with `tsc` before every build |
-| Builds | `npm run build` (base `/reactive-volcano-app/`, GitHub Pages), `npm run build:root` (base `/`, Docker) |
-| Container | multi-stage `Dockerfile`: `node:26-alpine` build, `nginxinc/nginx-unprivileged:1.30.6-alpine` runtime |
+| Builds | `bun run build` (base `/reactive-volcano-app/`, GitHub Pages), `bun run build:root` (base `/`, Docker) |
+| Container | multi-stage `Dockerfile`: `oven/bun:1.4.4-alpine` build, `nginxinc/nginx-unprivileged:1.30.6-alpine` runtime |
 
 ## Design decisions
 

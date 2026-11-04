@@ -1,7 +1,7 @@
 /**
  * Renders the app icons in public/ from scripts/icons/icon.svg.
  *
- *   npm run icons
+ *   bun run icons
  *
  * Uses Playwright's Chromium; set CHROMIUM_PATH to use another Chromium.
  */

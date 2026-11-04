@@ -21,7 +21,7 @@ next to the app on GitHub Pages.
 | URL | https://firsttris.github.io/reactive-volcano-app/ |
 | Workflow | [`.github/workflows/build.yml`](../.github/workflows/build.yml) |
 | Trigger | push to `main` (except changes to the README files, `CONTRIBUTING.md` or `LICENSE` only), or by hand; pull requests run the checks without deploying |
-| Build | `npm run build` with base `/reactive-volcano-app/` |
+| Build | `bun run build` with base `/reactive-volcano-app/` |
 | SPA fallback | `dist/index.html` is copied to `dist/404.html`, so deep links survive a reload |
 | Documentation | https://firsttris.github.io/reactive-volcano-app/docs/, built from `docs/` with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) (`mkdocs.yml`) and copied to `dist/docs/` before the deployment |
 
@@ -56,10 +56,10 @@ Either way creates the tag `vX.Y.Z`:
 
 ```bash
 git checkout main && git pull
-npm run release:minor     # or release:patch / release:major
+bun run release:minor     # or release:patch / release:major
 ```
 
-`npm version` bumps `package.json` and `package-lock.json`, commits, creates the tag `vX.Y.Z`, and
+`bun pm version` bumps `package.json`, commits, creates the tag `vX.Y.Z`, and
 the `postversion` script pushes the commit and the tag.
 
 ## What the release workflow does
@@ -79,10 +79,10 @@ flowchart LR
 ```
 
 - The checks are skipped when `main`'s `build.yml` already passed for the code: a release commit from
-  *Bump version* (or `npm version`) only changes the version, so the green run of the commit before it
+  *Bump version* (or `bun pm version`) only changes the version, so the green run of the commit before it
   counts ([`tested-on-main`](https://github.com/firsttris/workflows#tested-on-main)). Anything else runs
   them first.
-- The image is built from the [`Dockerfile`](../Dockerfile) (`npm ci`, `npm run build:root`, nginx).
+- The image is built from the [`Dockerfile`](../Dockerfile) (`bun install`, `bun run build:root`, nginx).
 - The Docker Hub description is taken from `README.md` with relative links made absolute, so the README
   and its images render there too. The short description is set in `release.yml` (max. 100 characters).
 
@@ -106,9 +106,9 @@ The GitHub release uses the workflow's own `GITHUB_TOKEN` (`contents: write`). G
 
 Before tagging:
 
-- [ ] `npm run typecheck && npm run lint && npm test && npm run test:e2e` pass
+- [ ] `bun run typecheck && bun run lint && bun run test && bun run test:e2e` pass
 - [ ] tested on at least one real device per changed family ([checklist](testing.md#testing-on-a-real-device))
-- [ ] screenshots updated if the UI changed (`npm run screenshots`)
+- [ ] screenshots updated if the UI changed (`bun run screenshots`)
 - [ ] README feature table and docs updated
 - [ ] both translations complete (the i18n test enforces this)
 

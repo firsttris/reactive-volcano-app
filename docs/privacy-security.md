@@ -69,8 +69,8 @@ host the app yourself, serve it over HTTPS ([Self-hosting](self-hosting.md#https
 
 ## Supply chain
 
-- Dependencies are pinned through `package-lock.json` and installed with `npm ci` in CI and in the
-  Docker build.
+- Dependencies are pinned through `bun.lock` and installed with `bun install --frozen-lockfile` in
+  CI and in the Docker build.
 - CI runs type checks, unit tests and end-to-end tests before every deployment to GitHub Pages.
 - Docker images are built by GitHub Actions from tagged commits, see [Releases](releases.md).
 

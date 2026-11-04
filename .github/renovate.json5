@@ -1,33 +1,24 @@
 // Renovate (GitHub App, https://github.com/apps/renovate): a pull request for each new release of
 // what the image of Volcano App is built from, plus the "Dependency Dashboard" issue listing what
 // is open. Their own pull requests: nginx (the runtime, nginx-unprivileged of the stable branch)
-// and Node (the build stage, CI and its types). The app talks to the devices through the browser's
+// and Bun (the build stage and CI). The app talks to the devices through the browser's
 // Web Bluetooth API with its own protocol code (src/devices/*/protocol.ts), so there is no
 // Bluetooth library to follow.
 // Everything else (the other packages, the actions, the images) comes with the shared settings of
 // firsttris/workflows (renovate/default.json5): minor and patch updates once a month in one pull
 // request that merges itself when CI is green, majors on request in the dashboard.
-// Check with `npx --package renovate renovate-config-validator .github/renovate.json5`.
+// Check with `bunx --package renovate renovate-config-validator .github/renovate.json5`.
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: ["github>firsttris/workflows//renovate/default.json5"],
   customManagers: [
-    {
-      // NODE_VERSION of build.yml: the check, build and E2E jobs
-      customType: "regex",
-      managerFilePatterns: ["/^\\.github/workflows/build\\.yml$/"],
-      matchStrings: ['NODE_VERSION: "(?<currentValue>\\d+)"'],
-      depNameTemplate: "node",
-      datasourceTemplate: "node-version",
-      versioningTemplate: "node",
-    },
     {
       // The images the docs name (architecture.md, self-hosting.md), so they move with the
       // Dockerfile
       customType: "regex",
       managerFilePatterns: ["/^docs/(architecture|self-hosting)\\.md$/"],
       matchStrings: [
-        "`(?<depName>node):(?<currentValue>\\d+-alpine)`",
+        "`(?<depName>oven/bun):(?<currentValue>\\d+\\.\\d+\\.\\d+-alpine)`",
         "`(?<depName>nginxinc/nginx-unprivileged):(?<currentValue>\\d+\\.\\d+\\.\\d+-alpine)`",
       ],
       datasourceTemplate: "docker",
@@ -53,32 +44,17 @@
       dependencyDashboardApproval: false,
     },
     {
-      // Node of the build stage, CI, the docs and its types, in one PR so they stay on one major
-      matchPackageNames: ["node", "@types/node"],
-      enabled: true,
-      groupName: "Node",
-      sourceUrl: "https://github.com/nodejs/node",
+      // Bun: packageManager in package.json (Renovate's npm manager reads it as the dependency
+      // `bun`), the image's build stage and the image named in the docs, in one PR
+      matchPackageNames: ["bun", "oven/bun", "docker.io/oven/bun"],
+      groupName: "Bun",
+      sourceUrl: "https://github.com/oven-sh/bun",
       prBodyNotes: [
-        "The image's build stage (`node:<major>-alpine`), `NODE_VERSION` of build.yml, `@types/node` and the image named in docs/architecture.md and docs/self-hosting.md move together. The floor `engines.node` and \"Node.js 22 or newer\" in README.md and docs/development.md stay unless the new major drops support for the old one.",
+        "`packageManager` in package.json is the Bun of every CI job (`bun-version-file` of setup-bun, and `npm install --global bun@…` in the Playwright image), and the image's build stage (`oven/bun:<version>-alpine`) and the image named in docs/architecture.md and docs/self-hosting.md move with it. Bun installs the packages (`bun.lock`), runs the scripts, Vite and Vitest (`bun --bun`) and Playwright's test runner (`bun --bun playwright test`). Check the build, E2E and Docker build jobs, read the release notes for `bun install` and `bun run`, and run `bun install` locally if `bun.lock` changes.",
       ],
       schedule: ["at any time"],
       automerge: false,
       dependencyDashboardApproval: false,
-    },
-    {
-      // engines.node is a floor, not the version the app is built with
-      matchDepTypes: ["engines"],
-      enabled: false,
-    },
-    {
-      // The types' own minor and patch releases go with the monthly update of the other packages;
-      // a new major comes with Node above
-      matchPackageNames: ["@types/node"],
-      matchUpdateTypes: ["minor", "patch"],
-      groupName: "dependencies (minor and patch)",
-      groupSlug: "minor-patch",
-      schedule: ["* 0-5 1 * *"],
-      automerge: true,
     },
   ],
 }

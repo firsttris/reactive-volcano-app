@@ -189,16 +189,16 @@ mit Suche: **https://firsttris.github.io/reactive-volcano-app/docs/**
 
 ## 🛠️ Entwicklung
 
-Voraussetzung: Node.js 22 oder neuer.
+Voraussetzung: [Bun](https://bun.sh) (die Version aus `packageManager` in package.json).
 
 ```bash
 git clone https://github.com/firsttris/reactive-volcano-app.git && cd reactive-volcano-app
-npm install
-npm run dev        # http://localhost:5173
+bun install
+bun run dev        # http://localhost:5173
 ```
 
 Kein Gerät zur Hand? Die End-to-End-Tests lassen die ganze App gegen einen simulierten
-Web-Bluetooth-Stack laufen; mit `npm run test:e2e:ui` kann man sich durchklicken.
+Web-Bluetooth-Stack laufen; mit `bun run test:e2e:ui` kann man sich durchklicken.
 
 **Stack**: SolidJS mit `@solidjs/router` · Tailwind CSS 4 und [solid-ui](https://www.solid-ui.com)
 (Kobalte) · Paraglide JS für Deutsch und Englisch · `p-queue`, das jeden GATT-Zugriff serialisiert ·
@@ -206,7 +206,7 @@ Web-Bluetooth-Stack laufen; mit `npm run test:e2e:ui` kann man sich durchklicken
 [Architecture](https://firsttris.github.io/reactive-volcano-app/docs/architecture.html).
 
 ```bash
-npm run typecheck && npm run lint && npm test && npm run test:e2e
+bun run typecheck && bun run lint && bun run test && bun run test:e2e
 ```
 
 ## 🤝 Mitwirken
