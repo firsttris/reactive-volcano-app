@@ -4,7 +4,7 @@ import { test } from "../e2e/helpers/fixtures";
 
 /**
  * Renders the screenshots in docs/ against the Bluetooth mock from e2e/.
- * Run with `npm run screenshots` (dev server on :5173 is started if needed).
+ * Run with `bun run screenshots` (dev server on :5173 is started if needed).
  */
 
 const shot = (name: string) => `docs/screenshot-${name}.png`;

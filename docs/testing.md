@@ -17,10 +17,10 @@ the whole app against a simulated Web Bluetooth stack, and checks on types, lint
 
 | Level | Tool | Where | Run |
 |---|---|---|---|
-| Unit | Vitest | `src/**/*.test.ts`, `tests/` | `npm test` |
-| End-to-end | Playwright (Chromium) | `e2e/*.spec.ts` | `npm run test:e2e` |
-| Types | TypeScript | everything in `src/` | `npm run typecheck` |
-| Lint / format | Biome | whole repository | `npm run lint` |
+| Unit | Vitest | `src/**/*.test.ts`, `tests/` | `bun run test` |
+| End-to-end | Playwright (Chromium) | `e2e/*.spec.ts` | `bun run test:e2e` |
+| Types | TypeScript | everything in `src/` | `bun run typecheck` |
+| Lint / format | Biome | whole repository | `bun run lint` |
 
 ## Unit tests
 
@@ -54,14 +54,14 @@ expect(characteristic.commands()).toEqual([0x02, 0x1d, 0x01, 0x04, 0x05, 0x06]);
 ```
 
 ```bash
-npm test                 # once
-npm run test:watch       # on change
-npm run test:coverage    # with a v8 coverage report in coverage/
+bun run test             # once
+bun run test:watch       # on change
+bun run test:coverage    # with a v8 coverage report in coverage/
 ```
 
 ## End-to-end tests
 
-Playwright starts the dev server (`npm run dev`, port 5173) and runs the specs in Chromium:
+Playwright starts the dev server (`bun run dev`, port 5173) and runs the specs in Chromium:
 
 | Spec | Covers |
 |---|---|
@@ -71,10 +71,10 @@ Playwright starts the dev server (`npm run dev`, port 5173) and runs the specs i
 | `crafty.spec.ts` | connect, navigation, temperature display |
 
 ```bash
-npm run test:e2e          # headless
-npm run test:e2e:ui       # interactive UI mode
-npm run test:e2e:debug    # step through with the inspector
-npm run test:e2e:report   # open the last HTML report
+bun run test:e2e          # headless
+bun run test:e2e:ui       # interactive UI mode
+bun run test:e2e:debug    # step through with the inspector
+bun run test:e2e:report   # open the last HTML report
 ```
 
 In CI tests retry twice and record a trace on the first retry; the HTML report is uploaded as an
@@ -103,9 +103,9 @@ chooser. Writes update the stored value, so a later read returns it. More detail
 
 ## Static checks
 
-- `npm run typecheck`: TypeScript in strict mode, after compiling the messages so missing keys are type
+- `bun run typecheck`: TypeScript in strict mode, after compiling the messages so missing keys are type
   errors.
-- `npm run lint`: Biome's recommended rules plus the Solid domain (for example reactivity mistakes),
+- `bun run lint`: Biome's recommended rules plus the Solid domain (for example reactivity mistakes),
   formatting and import order.
 
 ## Continuous integration
@@ -114,8 +114,8 @@ chooser. Writes update the stored value, so a later read returns it. More detail
 
 ```mermaid
 flowchart LR
-  C["Lint, unit tests, build<br/>biome ci · npm test · npm run build"] --> D["Deploy<br/>GitHub Pages"]
-  V["Playwright version<br/>from package-lock.json"] --> E["E2E tests<br/>Playwright container"]
+  C["Lint, unit tests, build<br/>biome ci · bun run test · bun run build"] --> D["Deploy<br/>GitHub Pages"]
+  V["Playwright version<br/>from bun.lock"] --> E["E2E tests<br/>Playwright container"]
   E --> D
   M["Docs<br/>mkdocs build --strict"] --> D
   K["Docker build<br/>pull requests only"]
@@ -123,7 +123,7 @@ flowchart LR
 
 - **Lint, unit tests, build** run in one job. Biome reports problems as annotations in the pull request
   diff; the build includes the type check.
-- **E2E tests** run in the official Playwright container. Its tag is read from `package-lock.json`, so
+- **E2E tests** run in the official Playwright container. Its tag is read from `bun.lock`, so
   updating `@playwright/test` never leaves the container behind. Failures show up as annotations; the
   HTML report is attached to failed runs.
 - **Docs** builds the website from `docs/` with MkDocs Material (`mkdocs.yml`). `--strict` fails on a

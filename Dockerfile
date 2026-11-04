@@ -1,15 +1,16 @@
-FROM node:26-alpine AS build
+# The Bun of packageManager in package.json (Renovate's "Bun" group moves both)
+FROM oven/bun:1.4.4-alpine AS build
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json bun.lock ./
 
-RUN npm ci
+RUN bun install --frozen-lockfile
 
 COPY . .
 
 # .gz copies next to the files for gzip_static in nginx.conf
-RUN npm run build:root && node scripts/precompress.mjs dist
+RUN bun run build:root && bun scripts/precompress.mjs dist
 
 # Runs nginx as an unprivileged user instead of root; the stable branch (even
 # minor), not mainline, since the users' containers update themselves

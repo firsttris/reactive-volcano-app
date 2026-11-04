@@ -1,6 +1,6 @@
 name: Release
 
-# Pushing a tag vX.Y.Z (npm run release:minor, or the button in bump.yml) publishes that version:
+# Pushing a tag vX.Y.Z (bun run release:minor, or the button in bump.yml) publishes that version:
 # the checks from build.yml first, then the shared Docker release from firsttris/workflows. The tag
 # must match package.json, the image is pushed as :x.y.z, :x.y and :latest, the Docker Hub
 # description is updated, then the GitHub release is created.

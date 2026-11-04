@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 // Renders the screenshots in docs/ against the Bluetooth mock:
-// npm run screenshots
+// bun run screenshots
 export default defineConfig({
   testDir: "./scripts",
   testMatch: "screenshots.spec.ts",
@@ -16,7 +16,7 @@ export default defineConfig({
     launchOptions: { executablePath: process.env.CHROMIUM_PATH || undefined },
   },
   webServer: {
-    command: "npm run dev",
+    command: "bun run dev",
     url: "http://localhost:5173",
     reuseExistingServer: true,
     timeout: 120000,

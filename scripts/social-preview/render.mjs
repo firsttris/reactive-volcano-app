@@ -1,12 +1,12 @@
 // Renders social-preview.html to docs/social-preview.png (1280 × 640), the image
-// for Settings → Social preview on GitHub. Run: npm run social-preview
+// for Settings → Social preview on GitHub. Run: bun run social-preview
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const out = path.resolve(here, "../../docs/social-preview.png");
-// Like npm run icons: set CHROMIUM_PATH to use another Chromium
+// Like bun run icons: set CHROMIUM_PATH to use another Chromium
 const browser = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH || undefined,
 });

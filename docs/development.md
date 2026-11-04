@@ -22,7 +22,8 @@ adding a device and debugging on a phone.
 
 ## Requirements
 
-- **Node.js 22** or newer and npm.
+- **[Bun](https://bun.sh)** in the version of `packageManager` in `package.json`: it installs the
+  packages and runs the scripts, Vite, Vitest and Playwright.
 - **Chrome or Edge** for Web Bluetooth (see [Getting started](getting-started.md#browsers)), plus a
   compatible device for real-world testing. Most work can be done against the
   [Bluetooth mock](#working-without-a-device).
@@ -33,8 +34,8 @@ adding a device and debugging on a phone.
 ```bash
 git clone https://github.com/firsttris/reactive-volcano-app.git
 cd reactive-volcano-app
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 The dev server listens on all interfaces (`vite --host`) at port **5173**. `http://localhost:5173` is a
@@ -45,23 +46,23 @@ secure context, so Web Bluetooth works there. For another device on your network
 
 | Script | What it does |
 |---|---|
-| `npm run dev` | Vite dev server with hot reload |
-| `npm run build` | type check + production build for GitHub Pages (base `/reactive-volcano-app/`) into `dist/` |
-| `npm run build:root` | the same with base `/` (Docker, own domain) |
-| `npm run preview` | serves `dist/` locally |
-| `npm run typecheck` | compiles the messages, then `tsc --noEmit` |
-| `npm run lint` / `lint:fix` | Biome: lint, format and import order |
-| `npm test` | unit tests (Vitest) |
-| `npm run test:watch` / `test:ui` / `test:coverage` | Vitest in watch mode, with UI, with coverage |
-| `npm run test:e2e` | end-to-end tests (Playwright, starts the dev server) |
-| `npm run test:e2e:ui` / `test:e2e:debug` / `test:e2e:report` | Playwright UI mode, debugger, last report |
-| `npm run screenshots` | renders the images in `docs/` ([below](#updating-screenshots)) |
-| `npm run icons` | renders the app icons in `public/` from `scripts/icons/icon.svg` ([below](#app-icons)) |
-| `npm run social-preview` | renders `docs/social-preview.png` ([below](#social-preview)) |
-| `npm run i18n` | compiles `messages/*.json` into `src/paraglide` |
-| `npm run release:patch` / `minor` / `major` | bumps the version, tags and pushes ([Releases](releases.md)) |
+| `bun run dev` | Vite dev server with hot reload |
+| `bun run build` | type check + production build for GitHub Pages (base `/reactive-volcano-app/`) into `dist/` |
+| `bun run build:root` | the same with base `/` (Docker, own domain) |
+| `bun run preview` | serves `dist/` locally |
+| `bun run typecheck` | compiles the messages, then `tsc --noEmit` |
+| `bun run lint` / `lint:fix` | Biome: lint, format and import order |
+| `bun run test` | unit tests (Vitest) |
+| `bun run test:watch` / `test:ui` / `test:coverage` | Vitest in watch mode, with UI, with coverage |
+| `bun run test:e2e` | end-to-end tests (Playwright, starts the dev server) |
+| `bun run test:e2e:ui` / `test:e2e:debug` / `test:e2e:report` | Playwright UI mode, debugger, last report |
+| `bun run screenshots` | renders the images in `docs/` ([below](#updating-screenshots)) |
+| `bun run icons` | renders the app icons in `public/` from `scripts/icons/icon.svg` ([below](#app-icons)) |
+| `bun run social-preview` | renders `docs/social-preview.png` ([below](#social-preview)) |
+| `bun run i18n` | compiles `messages/*.json` into `src/paraglide` |
+| `bun run release:patch` / `minor` / `major` | bumps the version, tags and pushes ([Releases](releases.md)) |
 
-Before a pull request: `npm run typecheck && npm run lint && npm test && npm run test:e2e`.
+Before a pull request: `bun run typecheck && bun run lint && bun run test && bun run test:e2e`.
 
 The documentation website ([MkDocs Material](https://squidfunk.github.io/mkdocs-material/), `mkdocs.yml`)
 is built with Python:
@@ -112,7 +113,7 @@ The layering behind `devices/` is explained in [Architecture](architecture.md#la
 - **TypeScript strict**, no `any` in new code. Device values are typed end to end, from the protocol
   parser to the store.
 - **Biome** formats and lints (2 spaces, double quotes, semicolons, trailing commas `es5`, 80 columns,
-  sorted imports, Solid rules). Run `npm run lint:fix` before committing.
+  sorted imports, Solid rules). Run `bun run lint:fix` before committing.
 - **Protocol code stays pure**: no Web Bluetooth, no Solid, no timers in `protocol.ts`. Everything there
   gets a unit test with byte fixtures.
 - **All GATT calls go through the queue** that is passed in. Never call `readValue` / `writeValue`
@@ -132,7 +133,7 @@ Texts live in `messages/en.json` and `messages/de.json`
 - Placeholders use braces: `"workflow_stepOf": "Step {current}/{total}"`.
 - Plurals use the message format's `match` syntax, see `workflow_stepCount`.
 - Components import `m` and call `m.settings_title()`; the compiler creates one typed function per key.
-- `npm run i18n` compiles them to `src/paraglide`; `dev`, `build`, `typecheck` and `test` do that on
+- `bun run i18n` compiles them to `src/paraglide`; `dev`, `build`, `typecheck` and `test` do that on
   their own.
 - `tests/i18n.test.ts` fails when the two files have different keys or placeholders, or when a message
   is not used anywhere in `src/`.
@@ -193,7 +194,7 @@ used by the end-to-end tests, and the easiest way to explore the UI without hard
 mode:
 
 ```bash
-npm run test:e2e:ui
+bun run test:e2e:ui
 ```
 
 Pick a test, run it, then use the *Pick locator* and timeline views to inspect every step. See
@@ -208,7 +209,7 @@ treat it as one:
 2. On the **phone**, open `chrome://flags/#unsafely-treat-insecure-origin-as-secure`, add
    `http://<your-computer-ip>:5173`, enable it and restart Chrome.
    ![The insecure origins flag](chrome-insecure-origins.png)
-3. Start `npm run dev` and open `http://<your-computer-ip>:5173` on the phone.
+3. Start `bun run dev` and open `http://<your-computer-ip>:5173` on the phone.
 4. On the computer, open `chrome://inspect/#devices` and click **inspect** next to the tab. You get the
    full DevTools for the page on the phone, including the console with Bluetooth errors.
    ![chrome://inspect](inspect.png)
@@ -222,13 +223,13 @@ All images of the app in `docs/` are rendered from the running app against the B
 English, dark mode, at phone size:
 
 ```bash
-npm run screenshots
+bun run screenshots
 ```
 
 This runs `scripts/screenshots.spec.ts` with `playwright.screenshots.config.ts` (it starts the dev
 server if none is running), writes `docs/screenshot-*.png` and composes `docs/hero.png`. If Playwright's
 bundled browser is not installed, point it at a local Chromium:
-`CHROMIUM_PATH=/usr/bin/chromium npm run screenshots`.
+`CHROMIUM_PATH=/usr/bin/chromium bun run screenshots`.
 
 After a change to the look, run **Update screenshots** (Actions → Run workflow,
 `.github/workflows/screenshots.yml`) on the branch: it takes the pictures and the social preview in
@@ -240,13 +241,13 @@ Every icon (favicon, PWA icons, maskable icon, Apple touch icon) is rendered fro
 `scripts/icons/icon.svg`:
 
 ```bash
-npm run icons
+bun run icons
 ```
 
 `scripts/icons/generate.mjs` writes `public/pwa-192x192.png`, `pwa-512x512.png`, the full-bleed
 `maskable-512x512.png` and `apple-touch-icon.png`, `favicon.ico` (16, 32 and 48 px) and `favicon.svg`.
 Keep the artwork inside the central circle (80 % of the width): Android crops maskable icons to a
-circle or squircle. `npm run screenshots` also refreshes `public/screenshots/`, which Android shows in
+circle or squircle. `bun run screenshots` also refreshes `public/screenshots/`, which Android shows in
 the install dialog. Use `CHROMIUM_PATH` here as well if the bundled browser is missing.
 
 ## Social preview
@@ -255,11 +256,11 @@ The image GitHub shows when the repository is shared (1280 × 640) is rendered f
 `scripts/social-preview/social-preview.html`, with the icon and the screenshots from `docs/`:
 
 ```bash
-npm run social-preview
+bun run social-preview
 ```
 
 It writes `docs/social-preview.png`. Upload it under *Settings → General → Social preview*; GitHub does
-not read it from the repository. Render it again after `npm run screenshots` or a change to the icon.
+not read it from the repository. Render it again after `bun run screenshots` or a change to the icon.
 `CHROMIUM_PATH` works here too.
 
 ---

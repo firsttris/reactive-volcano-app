@@ -2,7 +2,7 @@
  * Writes a gzip copy next to every compressible file in dist/, so nginx can
  * serve it with `gzip_static on` instead of compressing on every request.
  *
- *   node scripts/precompress.mjs [dir]
+ *   bun scripts/precompress.mjs [dir]
  *
  * Used by the Dockerfile only; GitHub Pages compresses on its own. No Brotli:
  * the nginx image has no Brotli module.

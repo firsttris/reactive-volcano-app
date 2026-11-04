@@ -73,13 +73,13 @@ test('Mein Test', async ({ page, bluetoothDevice }) => {
 
 ### Browser DevTools öffnen
 ```bash
-PWDEBUG=1 npm run test:e2e
+PWDEBUG=1 bun run test:e2e
 ```
 
 ### Trace Viewer verwenden
 Nach einem fehlgeschlagenen Test:
 ```bash
-npx playwright show-trace trace.zip
+bunx playwright show-trace trace.zip
 ```
 
 ### Screenshots bei Fehlern
@@ -97,10 +97,10 @@ Die Tests sind für CI/CD vorbereitet:
 ### GitHub Actions Beispiel
 ```yaml
 - name: Install Playwright Browsers
-  run: npx playwright install --with-deps
+  run: bunx playwright install --with-deps
 
 - name: Run E2E tests
-  run: npm run test:e2e
+  run: bun run test:e2e
 
 - name: Upload test results
   if: always()

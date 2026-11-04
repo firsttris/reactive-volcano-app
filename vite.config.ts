@@ -24,7 +24,7 @@ export default defineConfig({
       registerType: "prompt",
       // The globPatterns below already cover the icons
       includeManifestIcons: false,
-      // Icons are rendered from scripts/icons/icon.svg: npm run icons
+      // Icons are rendered from scripts/icons/icon.svg: bun run icons
       manifest: {
         name: "Reactive Volcano App",
         short_name: "Volcano App",

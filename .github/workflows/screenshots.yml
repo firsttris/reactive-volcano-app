@@ -10,7 +10,14 @@ jobs:
   screenshots:
     uses: firsttris/workflows/.github/workflows/screenshots.yml@v1
     with:
-      command: npm run screenshots && npm run social-preview
+      # The Bun of packageManager in package.json, as setup-bun takes it in build.yml; the image has
+      # npm and node, but no unzip for Bun's installer and no jq (not the workflow's `bun-version`
+      # input, which would be a second place for the version)
+      install: >-
+        npm install --global "bun@$(node -p "require('./package.json').packageManager.split('@')[1]")"
+        && bun install --frozen-lockfile
+      lockfile: bun.lock
+      command: bun run screenshots && bun run social-preview
       paths: |
         docs/screenshot-*.png
         docs/hero.png

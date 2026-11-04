@@ -24,12 +24,12 @@ Security issues: please report privately, see [Privacy & security](docs/privacy-
 3. Run the checks:
 
    ```bash
-   npm run typecheck && npm run lint && npm test && npm run test:e2e
+   bun run typecheck && bun run lint && bun run test && bun run test:e2e
    ```
 
 4. Update the docs if behaviour changed: [Usage](docs/usage.md), the feature tables in `README.md` and
    `README_de.md`, [Bluetooth protocol](docs/protocol.md) for byte-level changes, screenshots with
-   `npm run screenshots` for visible UI changes.
+   `bun run screenshots` for visible UI changes.
 5. Describe what changed and why, and on which real device you tested it, if any.
 
 ## Protocol work
