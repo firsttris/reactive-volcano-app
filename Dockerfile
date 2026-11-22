@@ -1,5 +1,5 @@
 # The Bun of packageManager in package.json (Renovate's "Bun" group moves both)
-FROM oven/bun:1.4.4-alpine AS build
+FROM oven/bun:1.4.5-alpine AS build
 
 WORKDIR /app
 
